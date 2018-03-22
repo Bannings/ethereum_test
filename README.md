@@ -6,5 +6,6 @@ The first version of [the blockchain middleware](https://gitlab.chainedfinance.c
 
 [R2-D2](https://en.wikipedia.org/wiki/R2-D2) or Artoo-Detoo (called "R2" for short) is a fictional character in the Star Wars universe.
 
-And Ar2 is FX :(
+Ar2 is FX :(
+And one day we may use r3 Corda
 
