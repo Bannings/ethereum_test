@@ -90,7 +90,7 @@ func DeleteNodeHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, resp)
 }
 
-func QueryNode(w http.ResponseWriter, r *http.Request) {
+func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 	node := r.URL.Query().Get("nodeName")
 	if node == "" {
 		render.Render(w, r, ex.ErrBadRequest(errors.New("No nodeName")))

@@ -3,3 +3,4 @@
 *.swp
 *.log
 r2
+*.pid

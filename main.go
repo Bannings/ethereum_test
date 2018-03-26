@@ -120,6 +120,7 @@ func main() {
 	r.Route("/api/cf/node", func(r chi.Router) {
 		r.Post("/deleteNode/", handler.DeleteNodeHandler)
 		r.Post("/addNode/", handler.AddNodeHandler)
+		r.Get("/getNodeKey/", handler.QueryNodeHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
