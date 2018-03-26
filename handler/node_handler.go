@@ -99,7 +99,8 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, v, err := blockchain.DefaultClient.NodesCallerSession(ctx).GetNodeKey(node)
+	pub, v, err := blockchain.DefaultClient.NodesCallerSession(ctx).GetNodeKey(node)
+	log.Infof("publicKey: %v", pub)
 	if err != nil {
 		log.Errorf("Query node from block chain failed: %s", err.Error())
 		render.Render(w, r, ex.ErrRender(err))
@@ -112,8 +113,9 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ex.ErrRender(err))
 		return
 	}
+	m["nodeName"] = node
+	m["publicKey"] = pub
 	log.Infof("ar: %+v", m)
-
-	resp := data.NewSuccResponse(m)
-	render.JSON(w, r, resp)
+	
+	render.JSON(w, r, data.NewSuccResponse(m))
 }
