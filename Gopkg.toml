@@ -1,0 +1,31 @@
+[[constraint]]
+  name = "github.com/eddyzhou/log"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/ethereum/go-ethereum"
+  version = "1.8.2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/getsentry/raven-go"
+
+[[constraint]]
+  name = "github.com/go-chi/chi"
+  version = "3.3.2"
+
+[[constraint]]
+  name = "github.com/go-chi/render"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "0.8.0"
+
+[[constraint]]
+  branch = "develop"
+  name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
+
+[prune]
+  go-tests = true
+  unused-packages = true
