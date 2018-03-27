@@ -128,6 +128,7 @@ func main() {
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT)
 
+	log.Infof("listening on: %v", *port)
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *port), Handler: r}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {

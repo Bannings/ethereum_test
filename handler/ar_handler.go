@@ -42,7 +42,7 @@ func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 
 	b, _ := json.Marshal(m)
 	s := string(b)
-	log.Infof("ar into: %s", s)
+	log.Infof("ar info: %s", s)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).CreateAR(arId, s)
@@ -64,6 +64,7 @@ func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ex.ErrBadRequest(errors.New("No arId")))
 		return
 	}
+	log.Infof("arId: %v", arId)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()

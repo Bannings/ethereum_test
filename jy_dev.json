@@ -1,0 +1,7 @@
+{
+  "key": "{\"address\":\"5505052224de05522251f2eb50c713eaea583f85\",\"crypto\":{\"cipher\":\"aes-128-ctr\",\"ciphertext\":\"47243748f8171a413eb6e21f1572e8799fb210f644fe78f176b26bca3c469007\",\"cipherparams\":{\"iv\":\"56fc60459e8dbc2fbd4918fb4acf115f\"},\"kdf\":\"scrypt\",\"kdfparams\":{\"dklen\":32,\"n\":262144,\"p\":1,\"r\":8,\"salt\":\"880f3793e7f5fad30f0e71f081e29ec0443862b0da907a69ed937cfec352ffdd\"},\"mac\":\"60b07994de0ed25b2eab0b260a237ad76c1fd3b4dcc39bebafe6681ad96eb7af\"},\"id\":\"f81a458c-58dd-4f6f-b2c0-b2dcc4bfbda7\",\"version\":3}",
+  "password": "cuu",
+  "rawUrl": "http://10.26.1.13:62361",
+  "nodeContractAddr" : "0x4d07fd58970b6254bb500ace0a1d15b9394513af",
+  "storeContractAddr": "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
+}

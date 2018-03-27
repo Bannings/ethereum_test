@@ -116,6 +116,6 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 	m["nodeName"] = node
 	m["publicKey"] = pub
 	log.Infof("ar: %+v", m)
-	
+
 	render.JSON(w, r, data.NewSuccResponse(m))
 }
