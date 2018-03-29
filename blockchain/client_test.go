@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	key      = `{"address":"0be438acbade790d5efd46efe199b59eef8e0cb8","crypto":{"cipher":"aes-128-ctr","ciphertext":"4c9e41ad9f9cebe547487f7d6b93dbd4b3195074e7854d95903ae1b3161ec67a","cipherparams":{"iv":"1ca5419b2236f534f8f22c46782b5a08"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"4541c0f43a0fddf944575befa2b93fa87468510665cf205082f9e9a5f20d1564"},"mac":"81ea3adb1c5dcd31c1e232dd54176515c165ed5e3c2db7a1564768166098b2bb"},"id":"962c374a-5bb8-46f4-b1d6-cd36ed044a9f","version":3}`
-	password = "dianrong"
+	key      = `86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc`
 	rawUrl   = "http://10.26.1.17:62361"
 
 	nodeContractAddr  = "0x4d07fd58970b6254bb500ace0a1d15b9394513af"
@@ -20,7 +19,6 @@ const (
 var (
 	conf = &Config{
 		key,
-		password,
 		rawUrl,
 		nodeContractAddr,
 		storeContractAddr,

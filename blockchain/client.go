@@ -3,7 +3,6 @@ package blockchain
 import (
 	"context"
 	"math/big"
-	"strings"
 	"sync/atomic"
 
 	"gitlab.chainedfinance.com/chaincore/dr-contracts"
@@ -12,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -91,17 +91,19 @@ func (c *EthClient) NodesTransactorSession(ctx context.Context) *contracts.CfNod
 }
 
 func NewEthClient(conf *Config) (*EthClient, error) {
+	privKey, err := crypto.HexToECDSA(conf.Key)
+	if err != nil {
+		log.Errorf("Failed to convert private key: %v", err)
+		return nil ,err
+	}
+
 	conn, err := ethclient.Dial(conf.RawUrl)
 	if err != nil {
 		log.Errorf("Failed to connect to the Ethereum client: %v", err)
 		return nil, err
 	}
 
-	auth, err := bind.NewTransactor(strings.NewReader(conf.Key), conf.Password)
-	if err != nil {
-		log.Errorf("Failed to create authorized transactor: %v", err)
-		return nil, err
-	}
+	auth := bind.NewKeyedTransactor(privKey)
 
 	store, err := contracts.NewArStore(common.HexToAddress(conf.StoreContractAddr), conn)
 	if err != nil {

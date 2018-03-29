@@ -7,7 +7,6 @@ import (
 
 type Config struct {
 	Key               string `json:"key"`
-	Password          string `json:"password"`
 	RawUrl            string `json:"rawUrl"`
 	NodeContractAddr  string `json:"nodeContractAddr"`
 	StoreContractAddr string `json:"storeContractAddr"`
