@@ -14,6 +14,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
+	"gitlab.chainedfinance.com/chaincore/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/chi"
@@ -29,7 +30,11 @@ var (
 	logLevel = flag.String("L", "info", "log level: info, debug, warn, error, fatal")
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
+	keydir   = flag.String("keydir", "", "accounts store path")
 )
+
+var keystore *keychain.Store
+
 
 func init() {
 	flag.Usage = usage
@@ -57,6 +62,11 @@ func init() {
 	}
 
 	blockchain.DefaultClient, err = blockchain.NewEthClient(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	keystore, err = keychain.NewStore(conf.RawUrl, *keydir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,9 +128,20 @@ func main() {
 	})
 
 	r.Route("/api/cf/node", func(r chi.Router) {
+		r.Use(mw.Auth())
+		r.Use(mw.OnlyCF)
+
 		r.Post("/deleteNode/", handler.DeleteNodeHandler)
 		r.Post("/addNode/", handler.AddNodeHandler)
 		r.Get("/getNodeKey/", handler.QueryNodeHandler)
+	})
+
+	r.Route("/api/fx", func(r chi.Router) {
+		r.Use(middleware.WithValue(handler.StoreKey, keystore))
+		r.Use(mw.Auth())
+		r.Use(mw.OnlyCF)
+
+		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())

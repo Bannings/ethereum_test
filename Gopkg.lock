@@ -14,6 +14,12 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  name = "github.com/boltdb/bolt"
+  packages = ["."]
+  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
+  version = "v1.3.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
@@ -58,8 +64,8 @@
     "rpc",
     "trie"
   ]
-  revision = "b8b9f7f4476a30a0aaf6077daade6ae77f969960"
-  version = "v1.8.2"
+  revision = "329ac18ef617d0238f71637bffe78f028b0f13f7"
+  version = "v1.8.3"
 
 [[projects]]
   branch = "master"
@@ -193,6 +199,12 @@
 
 [[projects]]
   branch = "master"
+  name = "gitlab.chainedfinance.com/chaincore/keychain"
+  packages = ["."]
+  revision = "581fc7c92444f2dc63d9ed510226cfe3902f85c2"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "pbkdf2",
@@ -242,6 +254,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "faec304fc4b6178a27037146906a4f9b71418ab7b2d56c43697208c205e85ed0"
+  inputs-digest = "9cda579c053677ad5e4a636452fa5cacfdbdb1f090189afe9d3768ff5719f788"
   solver-name = "gps-cdcl"
   solver-version = 1
