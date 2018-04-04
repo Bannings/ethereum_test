@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
-	"strconv"
 
+	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
-	"gitlab.chainedfinance.com/chaincore/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/chi"
@@ -34,7 +34,6 @@ var (
 )
 
 var keystore *keychain.Store
-
 
 func init() {
 	flag.Usage = usage
@@ -103,7 +102,7 @@ func main() {
 	})
 
 	r.Route("/api/cf/ar", func(r chi.Router) {
-		r.Use(apiVersionCtx("v1"))
+		r.Use(mw.ApiVersionCtx("v1"))
 		r.Use(mw.Auth())
 
 		r.Get("/queryCompanyByCId", handler.QueryCompanyHandler)
@@ -165,13 +164,4 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 	log.Println("Server gracefully stopped")
-}
-
-func apiVersionCtx(version string) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r = r.WithContext(context.WithValue(r.Context(), "api.version", version))
-			next.ServeHTTP(w, r)
-		})
-	}
 }
