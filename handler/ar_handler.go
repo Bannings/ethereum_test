@@ -10,10 +10,13 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/data"
 	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
+
+var AccountStore keychain.Store
 
 func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 	var m data.M
@@ -55,7 +58,6 @@ func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
-
 }
 
 func QueryArHandler(w http.ResponseWriter, r *http.Request) {

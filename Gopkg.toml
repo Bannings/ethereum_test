@@ -4,7 +4,7 @@
 
 [[constraint]]
   name = "github.com/ethereum/go-ethereum"
-  version = "1.8.2"
+  version = "1.8.3"
 
 [[constraint]]
   branch = "master"
@@ -25,6 +25,10 @@
 [[constraint]]
   branch = "develop"
   name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
+
+[[constraint]]
+  branch = "master"
+  name = "gitlab.chainedfinance.com/chaincore/keychain"
 
 [prune]
   go-tests = true
