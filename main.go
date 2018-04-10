@@ -65,9 +65,10 @@ func init() {
 		log.Fatal(err)
 	}
 
-	keystore, err = keychain.NewStore(conf.RawUrl, *keydir)
-	if err != nil {
-		log.Fatal(err)
+	if adminAccount, err := conf.ObtainAdminAccount(); err == nil {
+		if keystore, err = keychain.NewStore(adminAccount, conf.RawUrl, *keydir); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	pid2file()

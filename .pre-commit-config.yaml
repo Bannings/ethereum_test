@@ -2,5 +2,5 @@
   sha: HEAD
   hooks:
     - id: go-fmt
-    - id: go-vet
+    #- id: go-vet
     #- id: go-lint

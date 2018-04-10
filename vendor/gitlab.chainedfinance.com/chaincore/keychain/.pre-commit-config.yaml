@@ -1,4 +1,0 @@
-- repo: git://github.com/eddyzhou/pre-commit-golang
-  sha: HEAD
-  hooks:
-    - id: go-fmt
