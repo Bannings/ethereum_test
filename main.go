@@ -71,6 +71,10 @@ func init() {
 		}
 	}
 
+	blockchain.FxTokenAddr = conf.ContractAddrs.FxTokenAddr
+	blockchain.FxPayBoxAddr = conf.ContractAddrs.FxTokenAddr
+	blockchain.FxBoxFactoryAddr = conf.ContractAddrs.FxBoxFactoryAddr
+
 	pid2file()
 }
 

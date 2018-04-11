@@ -23,6 +23,9 @@ var (
 		nodeContractAddr,
 		storeContractAddr,
 		"",
+		"",
+		"",
+		"",
 	}
 )
 

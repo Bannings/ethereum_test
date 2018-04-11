@@ -11,13 +11,22 @@ import (
 )
 
 type Config struct {
-	Key               string `json:"key"`
-	RawUrl            string `json:"rawUrl"`
-	NodeContractAddr  string `json:"nodeContractAddr"`
-	StoreContractAddr string `json:"storeContractAddr"`
+	Key    string `json:"key"`
+	RawUrl string `json:"rawUrl"`
 
 	AdminKey        string `json:"adminKey"`
 	AdminPassphrase string `json:"adminPassphrase"`
+
+	ContractAddrs ContractAddrs `json:"contractAddrs"`
+}
+
+type ContractAddrs struct {
+	FxTokenAddr      string `json:"fxTokenAddr"`
+	FxPayBoxAddr     string `json:"fxPayBoxAddr"`
+	FxBoxFactoryAddr string `json:"fxBoxFactoryAddr"`
+
+	NodeAddr  string `json:"nodeAddr"`
+	StoreAddr string `json:"storeAddr"`
 }
 
 func LoadConfig(jsonFile string) (*Config, error) {

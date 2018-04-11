@@ -2,6 +2,7 @@ package fx
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 )
 
@@ -12,6 +13,7 @@ const (
 	Discount
 	SplitFX
 	MintFX
+	Confirm
 )
 
 var types = []string{
@@ -19,6 +21,7 @@ var types = []string{
 	"Discount",
 	"SplitFX",
 	"MintFX",
+	"Confirm",
 }
 
 func ParseType(typ string) (CmdType, error) {
@@ -31,6 +34,8 @@ func ParseType(typ string) (CmdType, error) {
 		return SplitFX, nil
 	case "mintfx":
 		return MintFX, nil
+	case "confirm":
+		return Confirm, nil
 	}
 
 	var t CmdType
@@ -70,10 +75,11 @@ func ParseState(state string) (State, error) {
 // ----------------
 
 type Token struct {
-	ID     uint64
-	Amount uint64
-	Owner  string
-	State  State
+	ID         big.Int
+	Amount     uint64
+	Owner      string // companyID
+	State      State
+	ExpireTime uint64
 }
 
 type Transaction struct {
