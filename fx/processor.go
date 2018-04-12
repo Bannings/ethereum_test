@@ -22,7 +22,7 @@ type Executor interface {
 
 type EthExecutor struct {
 	ethUrl   string
-	keystore keychain.Store
+	keystore *keychain.Store
 }
 
 func (e *EthExecutor) Execute(cmd Command) error {
@@ -97,7 +97,7 @@ func (e *EthExecutor) splitFX(c *blockchain.FxClient, cmd Command) error {
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
 		states[i] = new(big.Int).SetInt64(int64(t.State))
 	}
-	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId, newTokenIds, amounts)
+	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
 	var innerErr error
@@ -151,11 +151,7 @@ func (e *EthExecutor) pay(c *blockchain.FxClient, cmd Command) error {
 		}
 
 		log.Infof("transfer box(%v) to %v", boxID, t.Owner)
-		acc, err := e.keystore.GetAccount(t.Owner)
-		if err != nil {
-			log.Errorf("get account of %v failed: %v", t.Owner, err)
-			return err
-		}
+		acc := e.keystore.GetAdminAccount()
 
 		ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
@@ -237,7 +233,7 @@ func (e *EthExecutor) mintFX(c *blockchain.FxClient, cmd Command) error {
 	var tx *ethTypes.Transaction
 	var innerErr error
 	for _, t := range output {
-		log.Infof("mint fx: id: %v, owner: %v, amount: %v, state: %v", t.ID, t.Owner, t.Amount, t.State)
+		log.Infof("mint fx: id: %v, owner: %v, amount: %v, state: %v", t.ID.String(), t.Owner, t.Amount, t.State)
 		acc, err := e.keystore.GetAccount(t.Owner)
 		if err != nil {
 			log.Errorf("get account of %v failed: %v", t.Owner, err)
@@ -251,7 +247,7 @@ func (e *EthExecutor) mintFX(c *blockchain.FxClient, cmd Command) error {
 				tx, innerErr = session.CreateFux(
 					acc.Address,
 					&t.ID, new(big.Int).SetUint64(t.Amount),
-					new(big.Int).SetUint64(t.ExpireTime),
+					new(big.Int).SetInt64(t.ExpireTime),
 					new(big.Int).SetUint64(uint64(t.State)),
 					"")
 				return innerErr

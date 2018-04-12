@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	gasLimit uint64 = 30000000
+	gasLimit uint64 = 4712357
 )
 
 var DefaultClient Client

@@ -20,12 +20,9 @@ var (
 	conf = &Config{
 		key,
 		rawUrl,
-		nodeContractAddr,
-		storeContractAddr,
 		"",
 		"",
-		"",
-		"",
+		ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
 	}
 )
 

@@ -79,7 +79,7 @@ type Token struct {
 	Amount     uint64
 	Owner      string // companyID
 	State      State
-	ExpireTime uint64
+	ExpireTime int64
 }
 
 type Transaction struct {
