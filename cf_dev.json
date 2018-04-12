@@ -1,6 +1,15 @@
 {
-  "key": "86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc",
-  "rawUrl": "http://10.26.1.17:62361",
-  "nodeContractAddr" : "0x4d07fd58970b6254bb500ace0a1d15b9394513af",
-  "storeContractAddr": "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
+  "key": "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b",
+  "rawUrl": "http://127.0.0.1:8545",
+
+  "adminKey": "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b",
+  "adminPassphrase": "",
+
+  "contractAddrs": {
+    "fxTokenAddr": "0x77227767836175e4799262607Cbe2F9957fE5B0E",
+    "fxPayBoxAddr": "0x5DE012D26771173038138c30764b4E62F5D643df",
+    "fxBoxFactoryAddr": "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B",
+    "nodeAddr" : "0x4d07fd58970b6254bb500ace0a1d15b9394513af",
+    "storeAddr": "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
+  }
 }
