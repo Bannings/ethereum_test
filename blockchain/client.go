@@ -10,12 +10,12 @@ import (
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
-	gasLimit uint64 = 30000000
+	gasLimit uint64 = 4712357
 )
 
 var DefaultClient Client
@@ -94,7 +94,7 @@ func NewEthClient(conf *Config) (*EthClient, error) {
 	privKey, err := crypto.HexToECDSA(conf.Key)
 	if err != nil {
 		log.Errorf("Failed to convert private key: %v", err)
-		return nil ,err
+		return nil, err
 	}
 
 	conn, err := ethclient.Dial(conf.RawUrl)
@@ -105,13 +105,13 @@ func NewEthClient(conf *Config) (*EthClient, error) {
 
 	auth := bind.NewKeyedTransactor(privKey)
 
-	store, err := contracts.NewArStore(common.HexToAddress(conf.StoreContractAddr), conn)
+	store, err := contracts.NewArStore(common.HexToAddress(conf.ContractAddrs.StoreAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a ArStore contract: %v", err)
 		return nil, err
 	}
 
-	nodes, err := contracts.NewCfNodes(common.HexToAddress(conf.NodeContractAddr), conn)
+	nodes, err := contracts.NewCfNodes(common.HexToAddress(conf.ContractAddrs.NodeAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a CfNodes contract: %v", err)
 		return nil, err
