@@ -192,16 +192,22 @@
   revision = "169b1b37be738edb2813dab48c97a549bcf99bb5"
 
 [[projects]]
+  branch = "master"
+  name = "gitlab.chainedfinance.com/chaincore/contract-gen"
+  packages = ["."]
+  revision = "d32b5d1bbb584af435a3578ebe9db81eca73206a"
+
+[[projects]]
   branch = "develop"
   name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
   packages = ["."]
   revision = "0d8be6d0ad9cf439457ba663133807cf28bb37bb"
 
 [[projects]]
-  branch = "master"
   name = "gitlab.chainedfinance.com/chaincore/keychain"
   packages = ["."]
-  revision = "581fc7c92444f2dc63d9ed510226cfe3902f85c2"
+  revision = "32c3a49896db04eae4125c8377708cbfba2b60bf"
+  version = "v0.0.1"
 
 [[projects]]
   branch = "master"
@@ -254,6 +260,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9cda579c053677ad5e4a636452fa5cacfdbdb1f090189afe9d3768ff5719f788"
+  inputs-digest = "078c98f4b897ddd0e27dc115d591d7aa34c8233c839cca029a962dbfe87d113a"
   solver-name = "gps-cdcl"
   solver-version = 1

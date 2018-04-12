@@ -27,8 +27,8 @@
   name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
 
 [[constraint]]
-  branch = "master"
   name = "gitlab.chainedfinance.com/chaincore/keychain"
+  version = "0.0.1"
 
 [prune]
   go-tests = true

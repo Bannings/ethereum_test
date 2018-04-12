@@ -30,7 +30,7 @@ var (
 	logLevel = flag.String("L", "info", "log level: info, debug, warn, error, fatal")
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
-	keydir   = flag.String("keydir", "", "accounts store path")
+	keydir   = flag.String("keydir", "/tmp", "accounts store path")
 )
 
 var keystore *keychain.Store
