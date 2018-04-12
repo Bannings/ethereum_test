@@ -1,0 +1,55 @@
+package handler
+
+import (
+	"errors"
+	"net/http"
+
+	"gitlab.chainedfinance.com/chaincore/r2/data"
+	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+
+	"github.com/go-chi/render"
+	"github.com/eddyzhou/log"
+	"gitlab.chainedfinance.com/chaincore/keychain"
+)
+
+type ctxKeyStore int
+
+const (
+	salt = "@cf#&"
+	StoreKey ctxKeyStore = 0
+)
+
+func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
+	var m data.M
+	if err := render.Bind(r, &m); err != nil {
+		log.Errorf("Unmarshal request failed: %s", err.Error())
+		render.Render(w, r, ex.ErrBadRequest(err))
+		return
+	}
+
+	companyId := m["companyId"].(string)
+	if companyId == "" {
+		render.Render(w, r, ex.ErrBadRequest(errors.New("No companyId")))
+		return
+	}
+	log.Infof("companyId: %s", companyId)
+
+	ctx := r.Context()
+	store := ctx.Value(StoreKey).(keychain.Store)
+
+	passphrase := companyId + salt
+	acc, err := store.CreateAccount(passphrase)
+	if err != nil {
+		log.Errorf("Create account failed: %s", err.Error())
+		render.Render(w, r, ex.ErrRender(err))
+		return
+	}
+
+	if err := store.StoreAccount(companyId, acc); err != nil {
+		log.Errorf("Store account failed: %s", err.Error())
+		render.Render(w, r, ex.ErrRender(err))
+		return
+	}
+
+	render.JSON(w, r, data.NewSuccResponse(acc))
+}

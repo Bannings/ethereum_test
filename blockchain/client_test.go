@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	key      = `86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc`
-	rawUrl   = "http://10.26.1.17:62361"
+	key    = `86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc`
+	rawUrl = "http://10.26.1.17:62361"
 
 	nodeContractAddr  = "0x4d07fd58970b6254bb500ace0a1d15b9394513af"
 	storeContractAddr = "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
@@ -20,8 +20,9 @@ var (
 	conf = &Config{
 		key,
 		rawUrl,
-		nodeContractAddr,
-		storeContractAddr,
+		"",
+		"",
+		ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
 	}
 )
 

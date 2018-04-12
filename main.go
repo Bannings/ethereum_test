@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
-	"strconv"
 
+	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
@@ -29,7 +30,10 @@ var (
 	logLevel = flag.String("L", "info", "log level: info, debug, warn, error, fatal")
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
+	keydir   = flag.String("keydir", "/tmp", "accounts store path")
 )
+
+var keystore *keychain.Store
 
 func init() {
 	flag.Usage = usage
@@ -60,6 +64,16 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	if adminAccount, err := conf.ObtainAdminAccount(); err == nil {
+		if keystore, err = keychain.NewStore(adminAccount, conf.RawUrl, *keydir); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	blockchain.FxTokenAddr = conf.ContractAddrs.FxTokenAddr
+	blockchain.FxPayBoxAddr = conf.ContractAddrs.FxTokenAddr
+	blockchain.FxBoxFactoryAddr = conf.ContractAddrs.FxBoxFactoryAddr
 
 	pid2file()
 }
@@ -93,7 +107,7 @@ func main() {
 	})
 
 	r.Route("/api/cf/ar", func(r chi.Router) {
-		r.Use(apiVersionCtx("v1"))
+		r.Use(mw.ApiVersionCtx("v1"))
 		r.Use(mw.Auth())
 
 		r.Get("/queryCompanyByCId", handler.QueryCompanyHandler)
@@ -118,9 +132,20 @@ func main() {
 	})
 
 	r.Route("/api/cf/node", func(r chi.Router) {
+		r.Use(mw.Auth())
+		r.Use(mw.OnlyCF)
+
 		r.Post("/deleteNode/", handler.DeleteNodeHandler)
 		r.Post("/addNode/", handler.AddNodeHandler)
 		r.Get("/getNodeKey/", handler.QueryNodeHandler)
+	})
+
+	r.Route("/api/fx", func(r chi.Router) {
+		r.Use(middleware.WithValue(handler.StoreKey, keystore))
+		r.Use(mw.Auth())
+		r.Use(mw.OnlyCF)
+
+		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
@@ -144,13 +169,4 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 	log.Println("Server gracefully stopped")
-}
-
-func apiVersionCtx(version string) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r = r.WithContext(context.WithValue(r.Context(), "api.version", version))
-			next.ServeHTTP(w, r)
-		})
-	}
 }
