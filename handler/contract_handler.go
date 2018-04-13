@@ -8,18 +8,17 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
 
 func AddContractHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("contract: %+v", m)
@@ -30,11 +29,11 @@ func AddContractHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckContractNo(contractNo)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if existed {
-		render.Render(w, r, ex.ErrContractNoAlreadyExist)
+		render.Render(w, r, g.ErrContractNoAlreadyExist)
 		return
 	}
 
@@ -45,12 +44,12 @@ func AddContractHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).AddContract(contractNo, s)
 	if err != nil {
 		log.Errorf("Add contract data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 
 }
@@ -58,7 +57,7 @@ func AddContractHandler(w http.ResponseWriter, r *http.Request) {
 func QueryContractHandler(w http.ResponseWriter, r *http.Request) {
 	no := r.URL.Query().Get("contractNo")
 	if no == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No contractNo")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no contractNo")))
 		return
 	}
 
@@ -67,11 +66,11 @@ func QueryContractHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckContractNo(no)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrContractNoNotExist)
+		render.Render(w, r, g.ErrContractNoNotExist)
 		return
 	}
 
@@ -80,35 +79,35 @@ func QueryContractHandler(w http.ResponseWriter, r *http.Request) {
 	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryContractInfo(no)
 	if err != nil {
 		log.Errorf("Query contract from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var c data.M
+	var c g.M
 	if err := json.Unmarshal([]byte(v), &c); err != nil {
 		log.Errorf("Unmarshal contract data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	c["contractNo"] = no
 	log.Infof("contract: %+v", c)
 
-	resp := data.NewSuccResponse(map[string]data.M{"ContractInfo": c})
+	resp := g.NewSuccResponse(map[string]g.M{"ContractInfo": c})
 	render.JSON(w, r, resp)
 }
 
 func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("params: %v", m)
 
 	v, ok := m["contractNo"]
 	if !ok {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No contractNo")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no contractNo")))
 		return
 	}
 	no := v.(string)
@@ -118,11 +117,11 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckContractNo(no)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrContractNoNotExist)
+		render.Render(w, r, g.ErrContractNoNotExist)
 		return
 	}
 
@@ -131,14 +130,14 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 	_, c, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryContractInfo(no)
 	if err != nil {
 		log.Errorf("Query contract from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var contract data.M
+	var contract g.M
 	if err := json.Unmarshal([]byte(c), &contract); err != nil {
 		log.Errorf("Unmarshal contract data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	log.Infof("contract from blockchain: %s", contract)
@@ -155,11 +154,11 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateContractInfo(no, s)
 	if err != nil {
 		log.Errorf("update contract data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }

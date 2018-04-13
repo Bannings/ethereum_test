@@ -11,8 +11,7 @@ import (
 	"strings"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/sig"
 
 	"github.com/eddyzhou/log"
@@ -40,12 +39,12 @@ func (a *author) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	node := r.Header.Get("nodeName")
 	if signature == "" {
 		log.Error("Auth: no sig Header")
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No sig Header")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no sig Header")))
 		return
 	}
 	if node == "" {
 		log.Error("Auth: no nodeName Header")
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No nodeName Header")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no nodeName Header")))
 		return
 	}
 
@@ -53,14 +52,14 @@ func (a *author) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("baseString: %s", baseStr)
 	if err != nil {
 		log.Errorf("Auth: bad request. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 
 	pubPEM, err := sig.GetKey(a.client, node)
 	if err != nil {
 		log.Errorf("Auth: node err: %s", node)
-		render.Render(w, r, ex.ErrInvalidNode)
+		render.Render(w, r, g.ErrInvalidNode)
 		return
 	}
 
@@ -72,7 +71,7 @@ func (a *author) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if errSig != nil {
 		log.Errorf("Auth: verify sig failed. %s", errSig.Error())
-		render.Render(w, r, ex.ErrVerifySignature)
+		render.Render(w, r, g.ErrVerifySignature)
 		return
 	}
 
@@ -101,7 +100,7 @@ func baseString(r *http.Request) (string, error) {
 		}
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
-		var m data.M
+		var m g.M
 		if err := json.Unmarshal(body, &m); err != nil {
 			return "", err
 		}
@@ -121,16 +120,15 @@ func baseString(r *http.Request) (string, error) {
 		return strings.Join(sortedKv, ""), nil
 
 	default:
-		return "", errors.New("Not supported method")
+		return "", errors.New("not supported method")
 	}
 }
-
 
 func OnlyCF(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		node := r.Header.Get("nodeName")
-		if node != "cf" && node != "CF"{
-			render.Render(w, r, ex.ErrBadRequest(errors.New("node err: Only CF")))
+		if node != "cf" && node != "CF" {
+			render.Render(w, r, g.ErrBadRequest(errors.New("node err: Only CF")))
 			return
 		}
 

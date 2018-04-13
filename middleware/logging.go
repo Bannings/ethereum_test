@@ -76,7 +76,7 @@ func Logging(logger *log.Logger, opts ...LoggingOption) func(next http.Handler) 
 			start := time.Now()
 
 			defer func() {
-				log := LogEntry{
+				entry := LogEntry{
 					StartTime: start.Format(httpLogger.opt.dateFormat),
 					Status:    rw.status,
 					Duration:  time.Since(start),
@@ -87,7 +87,7 @@ func Logging(logger *log.Logger, opts ...LoggingOption) func(next http.Handler) 
 				}
 
 				buff := &bytes.Buffer{}
-				httpLogger.template.Execute(buff, log)
+				httpLogger.template.Execute(buff, entry)
 				httpLogger.Println(buff.String())
 			}()
 

@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"time"
 	"fmt"
+	"net/http"
 	"strings"
+	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
@@ -23,17 +22,17 @@ const (
 )
 
 func AddNodeHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	nodeName, ok1 := m["nodeName"]
 	publicKey, ok2 := m["publicKey"]
 	if !ok1 || !ok2 {
 		log.Errorf("Bad params: %s", m)
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No nodeName or publicKey")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no nodeName or publicKey")))
 		return
 	}
 	log.Infof("node: %s", m)
@@ -52,26 +51,26 @@ func AddNodeHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.NodesTransactorSession(ctx).AddNode(nodeName.(string), pubPem, s)
 	if err != nil {
 		log.Errorf("Add Node to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }
 
 func DeleteNodeHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	nodeName, ok := m["nodeName"]
 	if !ok {
 		log.Errorf("Bad params: %s", m)
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No nodeName")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no nodeName")))
 		return
 	}
 	log.Infof("node: %s", m)
@@ -81,19 +80,19 @@ func DeleteNodeHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.NodesTransactorSession(ctx).DeleteNode(nodeName.(string))
 	if err != nil {
 		log.Errorf("Delete Node from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }
 
 func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 	node := r.URL.Query().Get("nodeName")
 	if node == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No nodeName")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no nodeName")))
 		return
 	}
 
@@ -103,19 +102,19 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Infof("publicKey: %v", pub)
 	if err != nil {
 		log.Errorf("Query node from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var m data.M
+	var m g.M
 	if err := json.Unmarshal([]byte(v), &m); err != nil {
 		log.Errorf("Unmarshal node data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	m["nodeName"] = node
 	m["publicKey"] = pub
 	log.Infof("ar: %+v", m)
 
-	render.JSON(w, r, data.NewSuccResponse(m))
+	render.JSON(w, r, g.NewSuccResponse(m))
 }

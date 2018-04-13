@@ -1,4 +1,4 @@
-package data
+package g
 
 import (
 	"net/http"

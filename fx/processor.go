@@ -9,6 +9,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
 	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -16,13 +17,20 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
+var clientCache *ClientCache
+
+func Init(rawUrl string, keystore *keychain.Store) {
+	clientCache = NewCache(rawUrl, keystore, 3)
+}
+
 type Executor interface {
 	Execute(cmd Command) error
 }
 
 type EthExecutor struct {
-	ethUrl   string
-	keystore *keychain.Store
+	ethUrl        string
+	contractAddrs g.ContractAddrs
+	keystore      *keychain.Store
 }
 
 func (e *EthExecutor) Execute(cmd Command) error {
@@ -34,19 +42,13 @@ func (e *EthExecutor) Execute(cmd Command) error {
 	case MintFX, Confirm:
 		return e.executeByPlatform(cmd)
 	default:
-		return fmt.Errorf("Unknow command: %v", cmd)
+		return fmt.Errorf("unknow command: %v", cmd)
 	}
 }
 
 func (e *EthExecutor) executeBySupplier(cmd Command) error {
 	companyID := cmd.T.Sponsor()
-	acc, err := e.keystore.GetAccount(companyID)
-	if err != nil {
-		log.Errorf("get account failed: %v", err)
-		return err
-	}
-
-	c, err := blockchain.NewPersonalClient(e.ethUrl, acc)
+	c, err := clientCache.GetOrCreate(companyID)
 	if err != nil {
 		log.Errorf("create personal client failed: %v", err)
 		return err
@@ -66,7 +68,7 @@ func (e *EthExecutor) executeBySupplier(cmd Command) error {
 
 func (e *EthExecutor) executeByPlatform(cmd Command) error {
 	acc := e.keystore.GetAdminAccount()
-	c, err := blockchain.NewPersonalClient(e.ethUrl, acc)
+	c, err := blockchain.NewPersonalClient(e.ethUrl, acc, e.contractAddrs)
 	if err != nil {
 		log.Errorf("create admin client failed: %v", err)
 		return err

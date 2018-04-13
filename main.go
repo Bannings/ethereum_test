@@ -13,6 +13,7 @@ import (
 
 	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gitlab.chainedfinance.com/chaincore/r2/fx"
 )
 
 const (
@@ -55,25 +57,25 @@ func init() {
 	}
 
 	configFile := args[0]
-	conf, err := blockchain.LoadConfig(configFile)
+	conf, err := g.LoadConfig(configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	blockchain.DefaultClient, err = blockchain.NewEthClient(conf)
+	blockchainConf := conf.BlockchainConfig
+	blockchain.DefaultClient, err = blockchain.NewEthClient(blockchainConf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if adminAccount, err := conf.ObtainAdminAccount(); err == nil {
-		if keystore, err = keychain.NewStore(adminAccount, conf.RawUrl, *keydir); err != nil {
+	if adminAccount, err := conf.BlockchainConfig.ObtainAdminAccount(); err == nil {
+		keystore, err = keychain.NewStore(adminAccount, blockchainConf.RawUrl, *keydir)
+		if err != nil {
 			log.Fatal(err)
 		}
-	}
 
-	blockchain.FxTokenAddr = conf.ContractAddrs.FxTokenAddr
-	blockchain.FxPayBoxAddr = conf.ContractAddrs.FxTokenAddr
-	blockchain.FxBoxFactoryAddr = conf.ContractAddrs.FxBoxFactoryAddr
+		fx.Init(blockchainConf.RawUrl, keystore)
+	}
 
 	pid2file()
 }
