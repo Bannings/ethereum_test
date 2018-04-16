@@ -8,10 +8,13 @@ import (
 )
 
 const (
-	rawUrl = "http://10.26.1.17:62361"
+	//rawUrl     = "http://10.26.1.17:62361"
+	//key        = "86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc"
+	//passphrase = "dianrong"
 
-	key        = "86007224917ef7efd9e0d2c9cf3c85fb48f95ba55cc84fa8e4cdc6a5477e58bc"
-	passphrase = "dianrong"
+	key        = "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b"
+	rawUrl     = "http://127.0.0.1:8545"
+	passphrase = "123456"
 )
 
 var dbConfig = g.DbConfig{

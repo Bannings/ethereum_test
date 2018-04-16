@@ -29,8 +29,9 @@ type Store struct {
 }
 
 func NewStore(adminAccount Account, rawUrl string, dbConfig g.DbConfig) (*Store, error) {
-	c, err := newClient(adminAccount, rawUrl, 2*time.Second)
+	c, err := newClient(adminAccount, rawUrl, 5*time.Second)
 	if err != nil {
+		log.Errorf("new client failed: %v", err)
 		return nil, err
 	}
 
