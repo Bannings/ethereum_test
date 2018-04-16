@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"gitlab.chainedfinance.com/chaincore/r2/g"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
@@ -17,12 +19,12 @@ const (
 )
 
 var (
-	conf = &Config{
+	conf = g.BlockChainConfig{
 		key,
 		rawUrl,
 		"",
 		"",
-		ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
+		g.ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
 	}
 )
 

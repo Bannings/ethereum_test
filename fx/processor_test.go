@@ -5,17 +5,16 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/keychain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/crypto"
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 )
 
 const (
 	cfKey      = "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b"
 	ethUrl     = "http://127.0.0.1:8545"
-	dir        = "/tmp"
 	passphrase = "123456"
 )
 
@@ -23,28 +22,39 @@ var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
 	frozenRate = 0.2
 	feeRate    = 0.001
+
+	dbConfig = g.DbConfig{
+		Schema:   "keystore",
+		Host:     "127.0.0.1",
+		Port:     "3306",
+		Username: "root",
+		Password: "chou1103",
+	}
 )
 
 var cfAccount keychain.Account
+var contractAddrs g.ContractAddrs
 
 func init() {
 	privKey, _ := crypto.HexToECDSA(cfKey)
 	address := crypto.PubkeyToAddress(privKey.PublicKey)
-	cfAccount = keychain.Account{address, cfKey, ""}
+	cfAccount = keychain.Account{Address: address, Key: cfKey}
 
-	blockchain.FxTokenAddr = "0x77227767836175e4799262607Cbe2F9957fE5B0E"
-	blockchain.FxPayBoxAddr = "0x5DE012D26771173038138c30764b4E62F5D643df"
-	blockchain.FxBoxFactoryAddr = "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B"
+	contractAddrs = g.ContractAddrs{
+		FxTokenAddr:      "0x77227767836175e4799262607Cbe2F9957fE5B0E",
+		FxPayBoxAddr:     "0x5DE012D26771173038138c30764b4E62F5D643df",
+		FxBoxFactoryAddr: "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B",
+	}
 }
 
 func TestFX(t *testing.T) {
-	store, err := keychain.NewStore(cfAccount, ethUrl, dir)
+	store, err := keychain.NewStore(cfAccount, ethUrl, dbConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer store.Close()
 
-	acc1, err := settleIn(store, "supplier001")
+	_, err = settleIn(store, "supplier001")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,10 +63,10 @@ func TestFX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	executor := &EthExecutor{ethUrl, store}
+	executor := &EthExecutor{ethUrl, contractAddrs, store}
 
 	tokenId1 := generateTokenId()
-	err = mintFX(executor, acc1, tokenId1, 100000)
+	err = mintFX(executor, tokenId1, 100000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,6 +87,10 @@ func TestFX(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	err = confirm(executor, *tokenId2, uint64(txId))
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
@@ -142,7 +156,7 @@ func splitFX4Fee(executor *EthExecutor, inTokenID *big.Int) (*big.Int, *big.Int,
 	return tokenId1, tokenId2, err
 }
 
-func mintFX(executor *EthExecutor, acc keychain.Account, tokenId int64, amount uint64) error {
+func mintFX(executor *EthExecutor, tokenId int64, amount uint64) error {
 	frozenAmount := uint64(float64(amount) * frozenRate)
 	activeAmount := amount - frozenAmount
 

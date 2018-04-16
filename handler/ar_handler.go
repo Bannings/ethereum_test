@@ -8,21 +8,17 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
-	"gitlab.chainedfinance.com/chaincore/keychain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
 
-var AccountStore keychain.Store
-
 func CreateArHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("ar: %+v", m)
@@ -34,12 +30,12 @@ func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("existed: %v", existed)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if existed {
 		log.Errorf("arId already exist: %s", arId)
-		render.Render(w, r, ex.ErrArIdAlreadyExist)
+		render.Render(w, r, g.ErrArIdAlreadyExist)
 		return
 	}
 
@@ -51,19 +47,19 @@ func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).CreateAR(arId, s)
 	if err != nil {
 		log.Errorf("Add AR data to block chain failed: %v", err)
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }
 
 func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 	arId := r.URL.Query().Get("arId")
 	if arId == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No arId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no arId")))
 		return
 	}
 	log.Infof("arId: %v", arId)
@@ -73,11 +69,11 @@ func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckARId(arId)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrArIdNotExist)
+		render.Render(w, r, g.ErrArIdNotExist)
 		return
 	}
 
@@ -86,35 +82,35 @@ func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryArInfo(arId)
 	if err != nil {
 		log.Errorf("Query ar from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var m data.M
+	var m g.M
 	if err := json.Unmarshal([]byte(v), &m); err != nil {
 		log.Errorf("Unmarshal ar data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	m["arId"] = arId
 	log.Infof("ar: %+v", m)
 
-	resp := data.NewSuccResponse(map[string]data.M{"ArInfo": m})
+	resp := g.NewSuccResponse(map[string]g.M{"ArInfo": m})
 	render.JSON(w, r, resp)
 }
 
 func UpdateArHander(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("params: %v", m)
 
 	v, ok := m["arId"]
 	if !ok {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No arId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no arId")))
 		return
 	}
 	arId := v.(string)
@@ -124,11 +120,11 @@ func UpdateArHander(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckARId(arId)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrArIdNotExist)
+		render.Render(w, r, g.ErrArIdNotExist)
 		return
 	}
 
@@ -137,14 +133,14 @@ func UpdateArHander(w http.ResponseWriter, r *http.Request) {
 	_, info, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryArInfo(arId)
 	if err != nil {
 		log.Errorf("Query ar from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var ar data.M
+	var ar g.M
 	if err := json.Unmarshal([]byte(info), &ar); err != nil {
 		log.Errorf("Unmarshal ar data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	log.Infof("ar from blockchain: %+v", ar)
@@ -162,11 +158,11 @@ func UpdateArHander(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateARInfo(arId, s)
 	if err != nil {
 		log.Errorf("update ar data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }

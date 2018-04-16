@@ -37,8 +37,7 @@ func ParsePKIXPublicKey(pubPEM string) (*rsa.PublicKey, error) {
 
 	switch pub := pub.(type) {
 	case *rsa.PublicKey:
-		var pk *rsa.PublicKey = pub
-		return pk, nil
+		return pub, nil
 	default:
 		return nil, errors.New("unknown type of public key")
 	}

@@ -14,7 +14,7 @@ import (
 var (
 	keys        = make(map[string]string)
 	lock        = new(sync.RWMutex)
-	ErrNotFound = errors.New("Key not found")
+	ErrNotFound = errors.New("key not found")
 )
 
 func FetchKey(cli blockchain.Client, nodeId string) (string, error) {

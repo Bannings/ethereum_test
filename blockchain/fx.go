@@ -6,19 +6,18 @@ import (
 	"sync/atomic"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
-	"gitlab.chainedfinance.com/chaincore/keychain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-)
-
-var (
-	FxTokenAddr, FxPayBoxAddr, FxBoxFactoryAddr string
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 type FxClient struct {
+	rpcClient *rpc.Client
 	EthClient *ethclient.Client
 	Auth      *bind.TransactOpts
 	nonce     uint64
@@ -28,17 +27,18 @@ type FxClient struct {
 	fxBoxFactory *contract_gen.FuxPayBoxFactory
 }
 
-func NewPersonalClient(rawUrl string, acccount keychain.Account) (*FxClient, error) {
+func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
 	key, err := acccount.GetKey()
 	if err != nil {
 		return nil, err
 	}
 
-	conn, err := ethclient.Dial(rawUrl)
+	cli, err := rpc.Dial(rawUrl)
 	if err != nil {
 		log.Errorf("Fail to connect to the Ethereum client: %v", err)
 		return nil, err
 	}
+	conn := ethclient.NewClient(cli)
 
 	auth := bind.NewKeyedTransactor(key)
 	nonce, err := conn.PendingNonceAt(context.Background(), auth.From)
@@ -47,25 +47,26 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account) (*FxClient, err
 	}
 	log.Debugf("nonce: %v", nonce)
 
-	fxToken, err := contract_gen.NewFuxToken(common.HexToAddress(FxTokenAddr), conn)
+	fxToken, err := contract_gen.NewFuxToken(common.HexToAddress(contractAddrs.FxTokenAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxToken contract: %v", err)
 		return nil, err
 	}
 
-	fxPayBox, err := contract_gen.NewFuxPayBox(common.HexToAddress(FxPayBoxAddr), conn)
+	fxPayBox, err := contract_gen.NewFuxPayBox(common.HexToAddress(contractAddrs.FxPayBoxAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxPayBox contract: %v", err)
 		return nil, err
 	}
 
-	fxBoxFactory, err := contract_gen.NewFuxPayBoxFactory(common.HexToAddress(FxBoxFactoryAddr), conn)
+	fxBoxFactory, err := contract_gen.NewFuxPayBoxFactory(common.HexToAddress(contractAddrs.FxBoxFactoryAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxBoxFactory contract: %v", err)
 		return nil, err
 	}
 
 	c := &FxClient{
+		rpcClient:    cli,
 		EthClient:    conn,
 		Auth:         auth,
 		nonce:        nonce,
@@ -160,4 +161,24 @@ func (c *FxClient) CallWithBoxFactoryCaller(
 	}
 
 	return fn(s)
+}
+
+func (c *FxClient) CallWithFxCaller(
+	ctx context.Context,
+	fn func(*contract_gen.FuxTokenCallerSession) error) error {
+
+	s := &contract_gen.FuxTokenCallerSession{
+		Contract: &c.fxToken.FuxTokenCaller,
+		CallOpts: bind.CallOpts{
+			Pending: true,
+			From:    c.Auth.From,
+			Context: ctx,
+		},
+	}
+
+	return fn(s)
+}
+
+func (c *FxClient) Close() {
+	c.rpcClient.Close()
 }

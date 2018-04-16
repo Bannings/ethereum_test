@@ -27,8 +27,8 @@
   name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
 
 [[constraint]]
-  name = "gitlab.chainedfinance.com/chaincore/keychain"
-  version = "0.0.1"
+  name = "github.com/go-sql-driver/mysql"
+  version = "1.2"
 
 [prune]
   go-tests = true

@@ -8,18 +8,17 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
 
 func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("arPay: %+v", m)
@@ -30,11 +29,11 @@ func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if existed {
-		render.Render(w, r, ex.ErrPayIdAlreadyExist)
+		render.Render(w, r, g.ErrPayIdAlreadyExist)
 		return
 	}
 
@@ -46,12 +45,12 @@ func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).PayByAR(payId, s)
 	if err != nil {
 		log.Errorf("Add arPay data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 
 }
@@ -59,7 +58,7 @@ func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
 func QueryArPayHandler(w http.ResponseWriter, r *http.Request) {
 	payId := r.URL.Query().Get("payId")
 	if payId == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No payId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no payId")))
 		return
 	}
 
@@ -68,11 +67,11 @@ func QueryArPayHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrPayIdNotExist)
+		render.Render(w, r, g.ErrPayIdNotExist)
 		return
 	}
 
@@ -81,35 +80,35 @@ func QueryArPayHandler(w http.ResponseWriter, r *http.Request) {
 	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryPaymentTx(payId)
 	if err != nil {
 		log.Errorf("Query arPay from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var pay data.M
+	var pay g.M
 	if err := json.Unmarshal([]byte(v), &pay); err != nil {
 		log.Errorf("Unmarshal arPay data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	pay["payId"] = payId
 	log.Infof("arPay: %+v", pay)
 
-	resp := data.NewSuccResponse(map[string]data.M{"txInfo": pay})
+	resp := g.NewSuccResponse(map[string]g.M{"txInfo": pay})
 	render.JSON(w, r, resp)
 }
 
 func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("params: %v", m)
 
 	v, ok := m["payId"]
 	if !ok {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No payId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no payId")))
 		return
 	}
 	payId := v.(string)
@@ -119,11 +118,11 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrPayIdNotExist)
+		render.Render(w, r, g.ErrPayIdNotExist)
 		return
 	}
 
@@ -132,14 +131,14 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 	_, p, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryPaymentTx(payId)
 	if err != nil {
 		log.Errorf("Query arPay from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var pay data.M
+	var pay g.M
 	if err := json.Unmarshal([]byte(p), &pay); err != nil {
 		log.Errorf("Unmarshal arPay data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	log.Infof("arPay from blockchain: %s", pay)
@@ -156,11 +155,11 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdatePaymentInfoOfAR(payId, s)
 	if err != nil {
 		log.Errorf("update arPay data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }

@@ -8,18 +8,17 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
 
 func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("discount: %+v", m)
@@ -30,11 +29,11 @@ func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if existed {
-		render.Render(w, r, ex.ErrDiscountIdAlreadyExist)
+		render.Render(w, r, g.ErrDiscountIdAlreadyExist)
 		return
 	}
 
@@ -45,12 +44,12 @@ func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).DiscountByAR(discountId, s)
 	if err != nil {
 		log.Errorf("Add discount data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 
 }
@@ -58,7 +57,7 @@ func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
 func QueryDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	discountId := r.URL.Query().Get("discountId")
 	if discountId == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No discountId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no discountId")))
 		return
 	}
 
@@ -67,11 +66,11 @@ func QueryDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrDiscountIdNotExist)
+		render.Render(w, r, g.ErrDiscountIdNotExist)
 		return
 	}
 
@@ -80,35 +79,35 @@ func QueryDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryDiscountTx(discountId)
 	if err != nil {
 		log.Errorf("Query discount from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var discount data.M
+	var discount g.M
 	if err := json.Unmarshal([]byte(v), &discount); err != nil {
 		log.Errorf("Unmarshal discount data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	discount["discountId"] = discountId
 	log.Infof("discount: %+v", discount)
 
-	resp := data.NewSuccResponse(map[string]data.M{"txInfo": discount})
+	resp := g.NewSuccResponse(map[string]g.M{"txInfo": discount})
 	render.JSON(w, r, resp)
 }
 
 func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("params: %v", m)
 
 	v, ok := m["discountId"]
 	if !ok {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No discountId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no discountId")))
 		return
 	}
 	discountId := v.(string)
@@ -118,11 +117,11 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrDiscountIdNotExist)
+		render.Render(w, r, g.ErrDiscountIdNotExist)
 		return
 	}
 
@@ -131,14 +130,14 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 	_, d, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryDiscountTx(discountId)
 	if err != nil {
 		log.Errorf("Query discount from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var discount data.M
+	var discount g.M
 	if err := json.Unmarshal([]byte(d), &discount); err != nil {
 		log.Errorf("Unmarshal arPay data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	log.Infof("discount from blockchain: %v", discount)
@@ -155,11 +154,11 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateDiscountInfoOfAR(discountId, s)
 	if err != nil {
 		log.Errorf("update discount data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }

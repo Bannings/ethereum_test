@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/getsentry/raven-go"
@@ -75,7 +75,7 @@ func (rec *Recoverer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			default:
 				desc = fmt.Sprint(rval)
 			}
-			render.Render(rw, r, ex.ErrRender(errors.New(desc)))
+			render.Render(rw, r, g.ErrRender(errors.New(desc)))
 
 			func() {
 				defer func() {

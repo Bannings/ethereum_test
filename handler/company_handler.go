@@ -8,18 +8,17 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/data"
-	ex "gitlab.chainedfinance.com/chaincore/r2/error"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
 
 func AddCompanyHandler(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("company: %+v", m)
@@ -30,11 +29,11 @@ func AddCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if existed {
-		render.Render(w, r, ex.ErrCompanyIdAlreadyExist)
+		render.Render(w, r, g.ErrCompanyIdAlreadyExist)
 		return
 	}
 
@@ -46,19 +45,19 @@ func AddCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).AddCompany(companyId, s)
 	if err != nil {
 		log.Errorf("Add company data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }
 
 func QueryCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	companyId := r.URL.Query().Get("companyId")
 	if companyId == "" {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No companyId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no companyId")))
 		return
 	}
 
@@ -67,11 +66,11 @@ func QueryCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrCompanyIdNotExist)
+		render.Render(w, r, g.ErrCompanyIdNotExist)
 		return
 	}
 
@@ -80,35 +79,35 @@ func QueryCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryCompanyInfo(companyId)
 	if err != nil {
 		log.Errorf("Query company from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var company data.M
+	var company g.M
 	if err := json.Unmarshal([]byte(v), &company); err != nil {
 		log.Errorf("Unmarshal company data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	company["companyId"] = companyId
 	log.Infof("company: %+v", company)
 
-	resp := data.NewSuccResponse(map[string]data.M{"CompanyInfo": company})
+	resp := g.NewSuccResponse(map[string]g.M{"CompanyInfo": company})
 	render.JSON(w, r, resp)
 }
 
 func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
-	var m data.M
+	var m g.M
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed. %s", err.Error())
-		render.Render(w, r, ex.ErrBadRequest(err))
+		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
 	log.Infof("params: %v", m)
 
 	v, ok := m["companyId"]
 	if !ok {
-		render.Render(w, r, ex.ErrBadRequest(errors.New("No companyId")))
+		render.Render(w, r, g.ErrBadRequest(errors.New("no companyId")))
 		return
 	}
 	companyId := v.(string)
@@ -118,11 +117,11 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	if !existed {
-		render.Render(w, r, ex.ErrCompanyIdNotExist)
+		render.Render(w, r, g.ErrCompanyIdNotExist)
 		return
 	}
 
@@ -131,14 +130,14 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 	_, c, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryCompanyInfo(companyId)
 	if err != nil {
 		log.Errorf("Query company from block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 
-	var company data.M
+	var company g.M
 	if err := json.Unmarshal([]byte(c), &company); err != nil {
 		log.Errorf("Unmarshal company data failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	log.Infof("company from blockchain: %+v", company)
@@ -155,11 +154,11 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateCompanyInfo(companyId, s)
 	if err != nil {
 		log.Errorf("update company data to block chain failed: %s", err.Error())
-		render.Render(w, r, ex.ErrRender(err))
+		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	txHash := tx.Hash().Hex()
 
-	resp := data.NewSuccResponse(map[string]string{"txHash": txHash})
+	resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
 	render.JSON(w, r, resp)
 }

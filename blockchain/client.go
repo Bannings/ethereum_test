@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 
 	"gitlab.chainedfinance.com/chaincore/dr-contracts"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -90,7 +91,7 @@ func (c *EthClient) NodesTransactorSession(ctx context.Context) *contracts.CfNod
 	return s
 }
 
-func NewEthClient(conf *Config) (*EthClient, error) {
+func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
 	privKey, err := crypto.HexToECDSA(conf.Key)
 	if err != nil {
 		log.Errorf("Failed to convert private key: %v", err)

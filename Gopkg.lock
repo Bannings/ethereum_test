@@ -14,12 +14,6 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
-  name = "github.com/boltdb/bolt"
-  packages = ["."]
-  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
-  version = "v1.3.1"
-
-[[projects]]
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
@@ -87,6 +81,12 @@
   packages = ["."]
   revision = "9f855fadd4b8cde7773f9ef51f6b2705af239519"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  revision = "a0583e0143b1624142adab07e0e97fe106d99561"
+  version = "v1.3"
 
 [[projects]]
   name = "github.com/go-stack/stack"
@@ -204,10 +204,10 @@
   revision = "0d8be6d0ad9cf439457ba663133807cf28bb37bb"
 
 [[projects]]
-  name = "gitlab.chainedfinance.com/chaincore/keychain"
-  packages = ["."]
-  revision = "32c3a49896db04eae4125c8377708cbfba2b60bf"
-  version = "v0.0.1"
+  branch = "master"
+  name = "gitlab.chainedfinance.com/infra/gocommons"
+  packages = ["lru"]
+  revision = "c7bb2eb260db36e64a8059f3d42a4a413815495d"
 
 [[projects]]
   branch = "master"
@@ -260,6 +260,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "078c98f4b897ddd0e27dc115d591d7aa34c8233c839cca029a962dbfe87d113a"
+  inputs-digest = "aaf1f1653fbe3af8465ca63bcc56466b100c58b2f555a878f729a8533c476ef2"
   solver-name = "gps-cdcl"
   solver-version = 1
