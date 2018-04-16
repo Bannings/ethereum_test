@@ -3,9 +3,9 @@ package fx
 import (
 	"sync"
 
-	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"gitlab.chainedfinance.com/infra/gocommons/lru"
 )
 

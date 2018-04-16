@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -15,7 +15,6 @@ import (
 const (
 	cfKey      = "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b"
 	ethUrl     = "http://127.0.0.1:8545"
-	dir        = "/tmp"
 	passphrase = "123456"
 )
 
@@ -23,6 +22,14 @@ var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
 	frozenRate = 0.2
 	feeRate    = 0.001
+
+	dbConfig = g.DbConfig{
+		Schema:   "keystore",
+		Host:     "127.0.0.1",
+		Port:     "3306",
+		Username: "root",
+		Password: "chou1103",
+	}
 )
 
 var cfAccount keychain.Account
@@ -41,7 +48,7 @@ func init() {
 }
 
 func TestFX(t *testing.T) {
-	store, err := keychain.NewStore(cfAccount, ethUrl, dir)
+	store, err := keychain.NewStore(cfAccount, ethUrl, dbConfig)
 	if err != nil {
 		t.Fatal(err)
 	}

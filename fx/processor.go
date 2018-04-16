@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
-	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"

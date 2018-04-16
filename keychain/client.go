@@ -32,16 +32,16 @@ func newClient(account Account, rawUrl string, timeout time.Duration) (*Client, 
 		return nil, err
 	}
 
-	ethclient := ethclient.NewClient(c)
+	ethClient := ethclient.NewClient(c)
 
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	nonce, err := ethclient.PendingNonceAt(ctx, account.Address)
+	nonce, err := ethClient.PendingNonceAt(ctx, account.Address)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{account, c, ethclient, timeout, nonce}, nil
+	return &Client{account, c, ethClient, timeout, nonce}, nil
 }
 
 func (c *Client) PersonalImportRawKey(keyHex, passphrase string) (string, error) {

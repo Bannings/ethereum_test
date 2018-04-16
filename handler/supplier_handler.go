@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"

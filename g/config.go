@@ -2,13 +2,8 @@ package g
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"sync"
-
-	"gitlab.chainedfinance.com/chaincore/keychain"
-
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var (
@@ -22,6 +17,11 @@ type Config struct {
 }
 
 type DbConfig struct {
+	Schema   string `json:"schema"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type BlockChainConfig struct {
@@ -32,23 +32,6 @@ type BlockChainConfig struct {
 	AdminPassphrase string `json:"adminPassphrase"`
 
 	ContractAddrs ContractAddrs `json:"contractAddrs"`
-}
-
-func (c *BlockChainConfig) ObtainAdminAccount() (keychain.Account, error) {
-	configLock.RLock()
-	defer configLock.RUnlock()
-
-	if c.AdminKey == "" {
-		return keychain.Account{}, errors.New("no admin account config")
-	}
-
-	key, err := crypto.HexToECDSA(c.AdminKey)
-	if err != nil {
-		return keychain.Account{}, err
-	}
-
-	address := crypto.PubkeyToAddress(key.PublicKey)
-	return keychain.Account{Address: address, Key: c.AdminKey, Passphrase: c.AdminPassphrase}, nil
 }
 
 type ContractAddrs struct {

@@ -11,10 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/keychain"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
 
 	"github.com/eddyzhou/log"
@@ -32,7 +32,6 @@ var (
 	logLevel = flag.String("L", "info", "log level: info, debug, warn, error, fatal")
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
-	keydir   = flag.String("keydir", "/tmp", "accounts store path")
 )
 
 var keystore *keychain.Store
@@ -68,8 +67,8 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if adminAccount, err := conf.BlockchainConfig.ObtainAdminAccount(); err == nil {
-		keystore, err = keychain.NewStore(adminAccount, blockchainConf.RawUrl, *keydir)
+	if adminAccount, err := keychain.GetAccount(blockchainConf.AdminKey, blockchainConf.AdminPassphrase); err == nil {
+		keystore, err = keychain.NewStore(adminAccount, blockchainConf.RawUrl, conf.DbConfig)
 		if err != nil {
 			log.Fatal(err)
 		}

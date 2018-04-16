@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	conf = &g.BlockChainConfig{
+	conf = g.BlockChainConfig{
 		key,
 		rawUrl,
 		"",
