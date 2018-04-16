@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -29,6 +30,7 @@ func newClient(account Account, rawUrl string, timeout time.Duration) (*Client, 
 	defer cancel()
 	c, err := rpc.DialContext(ctx, rawUrl)
 	if err != nil {
+		log.Errorf("dial rawUrl:%s failed: %s", rawUrl, err)
 		return nil, err
 	}
 
@@ -38,6 +40,7 @@ func newClient(account Account, rawUrl string, timeout time.Duration) (*Client, 
 	defer cancel()
 	nonce, err := ethClient.PendingNonceAt(ctx, account.Address)
 	if err != nil {
+		log.Errorf("get pending nonce failed: %v", err)
 		return nil, err
 	}
 
