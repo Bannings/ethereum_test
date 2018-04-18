@@ -98,8 +98,8 @@ func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
 	token2 := Token{inputId, 50000, "supplier002", Normal, expireTime}
 	input := []Token{token1}
 	output := []Token{token2}
-	t := Transaction{input, output, txId}
-	cmd := Command{t, Confirm}
+	t := Transaction{input, output, txId, Confirm}
+	cmd := Command{Tx: t}
 	return executor.Execute(cmd)
 }
 
@@ -112,8 +112,8 @@ func pay(executor *EthExecutor, inputIds [2]big.Int, txId uint64) error {
 	token4 := Token{inputIds[1], 50, "cf", Normal, expireTime}
 	output := []Token{token3, token4}
 
-	t := Transaction{input, output, txId}
-	cmd := Command{t, Payment}
+	t := Transaction{input, output, txId, Payment}
+	cmd := Command{Tx: t}
 	return executor.Execute(cmd)
 }
 
@@ -131,8 +131,8 @@ func splitFX4Pay(executor *EthExecutor, inTokenID int64) (*big.Int, *big.Int, er
 
 	input := []Token{inToken}
 	output := []Token{outToken1, outToken2}
-	t := Transaction{input, output, 0}
-	cmd := Command{t, SplitFX}
+	t := Transaction{input, output, 0, SplitFX}
+	cmd := Command{Tx: t}
 
 	err := executor.Execute(cmd)
 	return tokenId1, tokenId2, err
@@ -149,8 +149,8 @@ func splitFX4Fee(executor *EthExecutor, inTokenID *big.Int) (*big.Int, *big.Int,
 
 	input := []Token{inToken}
 	output := []Token{outToken1, outToken2}
-	t := Transaction{input, output, 0}
-	cmd := Command{t, SplitFX}
+	t := Transaction{input, output, 0, SplitFX}
+	cmd := Command{Tx: t}
 
 	err := executor.Execute(cmd)
 	return tokenId1, tokenId2, err
@@ -164,8 +164,8 @@ func mintFX(executor *EthExecutor, tokenId int64, amount uint64) error {
 	token2 := Token{*big.NewInt(tokenId + 1), frozenAmount, "supplier001", Normal, expireTime}
 	tokens := [2]Token{token1, token2}
 
-	t := Transaction{Output: tokens[:]}
-	cmd := Command{t, MintFX}
+	t := Transaction{Output: tokens[:], TxType: MintFX}
+	cmd := Command{Tx: t}
 	return executor.Execute(cmd)
 }
 

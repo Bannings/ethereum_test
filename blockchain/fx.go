@@ -81,7 +81,6 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g
 func (c *FxClient) CallWithFxTransactor(
 	ctx context.Context,
 	fn func(*contract_gen.FuxTokenTransactorSession) error) error {
-
 	s := &contract_gen.FuxTokenTransactorSession{
 		Contract: &c.fxToken.FuxTokenTransactor,
 		TransactOpts: bind.TransactOpts{
@@ -104,7 +103,6 @@ func (c *FxClient) CallWithFxTransactor(
 func (c *FxClient) CallWithBoxTransactor(
 	ctx context.Context,
 	fn func(*contract_gen.FuxPayBoxTransactorSession) error) error {
-
 	s := &contract_gen.FuxPayBoxTransactorSession{
 		Contract: &c.fxPayBox.FuxPayBoxTransactor,
 		TransactOpts: bind.TransactOpts{
@@ -127,7 +125,6 @@ func (c *FxClient) CallWithBoxTransactor(
 func (c *FxClient) CallWithBoxFactoryTransactor(
 	ctx context.Context,
 	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) error) error {
-
 	s := &contract_gen.FuxPayBoxFactoryTransactorSession{
 		Contract: &c.fxBoxFactory.FuxPayBoxFactoryTransactor,
 		TransactOpts: bind.TransactOpts{
@@ -150,7 +147,6 @@ func (c *FxClient) CallWithBoxFactoryTransactor(
 func (c *FxClient) CallWithBoxFactoryCaller(
 	ctx context.Context,
 	fn func(*contract_gen.FuxPayBoxFactoryCallerSession) error) error {
-
 	s := &contract_gen.FuxPayBoxFactoryCallerSession{
 		Contract: &c.fxBoxFactory.FuxPayBoxFactoryCaller,
 		CallOpts: bind.CallOpts{
@@ -166,7 +162,6 @@ func (c *FxClient) CallWithBoxFactoryCaller(
 func (c *FxClient) CallWithFxCaller(
 	ctx context.Context,
 	fn func(*contract_gen.FuxTokenCallerSession) error) error {
-
 	s := &contract_gen.FuxTokenCallerSession{
 		Contract: &c.fxToken.FuxTokenCaller,
 		CallOpts: bind.CallOpts{
@@ -177,6 +172,10 @@ func (c *FxClient) CallWithFxCaller(
 	}
 
 	return fn(s)
+}
+
+func (c *FxClient) GetNonce() uint64 {
+	return c.nonce
 }
 
 func (c *FxClient) Close() {
