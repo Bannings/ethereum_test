@@ -85,6 +85,7 @@ type Token struct {
 }
 
 type Transaction struct {
+	Id     uint
 	Input  []Token
 	Output []Token
 	TxId   uint64
@@ -99,5 +100,5 @@ type Command struct {
 	Tx         Transaction
 	startNonce uint64
 	currNonce  uint64
-	receipts   map[uint64]*ethTypes.Receipt
+	receipts   map[string]*ethTypes.Receipt // key: string(nonce)
 }

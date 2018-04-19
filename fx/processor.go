@@ -2,6 +2,7 @@ package fx
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"math/big"
@@ -12,6 +13,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
+	"encoding/json"
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -22,9 +24,15 @@ var (
 	ErrTxExecuteFailed = errors.New("transaction execute failed")
 )
 
+const (
+	stateProcessing = "processing"
+	stateProcessed  = "processed"
+)
+
 type CmdProcessor struct {
 	fxClient *blockchain.FxClient
 	cmd      Command
+	db       *sql.DB
 }
 
 func (p *CmdProcessor) CallWithFxTransactor(
@@ -47,8 +55,55 @@ func (p *CmdProcessor) initCmdNonce() {
 		currNonce := p.fxClient.GetNonce()
 		p.cmd.startNonce = currNonce
 		p.cmd.currNonce = currNonce
-		// TODO: write to db
+		log.Infof("init command procedure and write to db: command_id: %v, start_nonce: %v",
+			p.cmd.Tx.Id, p.cmd.startNonce)
+		p.createProcedure()
 	}
+}
+
+func (p *CmdProcessor) createProcedure() error {
+	stmt, err := p.db.Prepare("INSERT INTO cmd_procedure(command_id, start_nonce, state) VALUES(?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err = stmt.ExecContext(ctx, p.cmd.Tx.Id, p.cmd.startNonce, stateProcessing)
+	return err
+}
+
+func (p *CmdProcessor) finishProcedure() error {
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE command_id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err = stmt.ExecContext(ctx, stateProcessed, p.cmd.Tx.Id)
+	return err
+}
+
+func (p *CmdProcessor) updateReceipt(receipt *ethTypes.Receipt) error {
+	b, err := json.Marshal(receipt)
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf(
+		"UPDATE cmd_procedure set receipts = JSON_SET(COALESCE(receipts, '{}'), '$.\"%v\"', '%s') WHERE command_id = %v",
+		p.cmd.currNonce,
+		string(b),
+		p.cmd.Tx.Id)
+	log.Debugf(query)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err = p.db.ExecContext(ctx, query)
+	return err
 }
 
 func (p *CmdProcessor) CallWithBoxTransactor(
@@ -81,46 +136,17 @@ func (p *CmdProcessor) CallWithBoxFactoryTransactor(
 	return nil
 }
 
-func (p *CmdProcessor) CallWithBoxFactoryCaller(
-	ctx context.Context,
-	fn func(*contract_gen.FuxPayBoxFactoryCallerSession) error) error {
-	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.GetNonce() {
-		err := p.fxClient.CallWithBoxFactoryCaller(ctx, fn)
-		if err == nil {
-			p.cmd.currNonce += 1
-		}
-		return err
-	}
-	p.cmd.currNonce += 1
-	return nil
-}
-
-func (p *CmdProcessor) CallWithFxCaller(
-	ctx context.Context,
-	fn func(*contract_gen.FuxTokenCallerSession) error) error {
-	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.GetNonce() {
-		err := p.fxClient.CallWithFxCaller(ctx, fn)
-		if err == nil {
-			p.cmd.currNonce += 1
-		}
-		return err
-	}
-	p.cmd.currNonce += 1
-	return nil
-}
-
 func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) (*ethTypes.Receipt, error) {
 	nonce := p.cmd.currNonce
-	if r, ok := p.cmd.receipts[nonce]; ok {
+	if r, ok := p.cmd.receipts[string(nonce)]; ok {
 		return r, nil
 	}
 
 	receipt, err := bind.WaitMined(ctx, p.fxClient.EthClient, tx)
 	if err == nil && receipt.Status == ethTypes.ReceiptStatusSuccessful {
-		p.cmd.receipts[nonce] = receipt
-		// TODO: write to db
+		p.cmd.receipts[string(nonce)] = receipt
+		log.Infof("update receipt to db: %s", receipt)
+		p.updateReceipt(receipt)
 	}
 
 	return receipt, err
@@ -136,6 +162,7 @@ type EthExecutor struct {
 	ethUrl        string
 	contractAddrs g.ContractAddrs
 	keystore      *keychain.Store
+	db            *sql.DB
 }
 
 func (e *EthExecutor) Execute(cmd Command) error {
@@ -153,42 +180,56 @@ func (e *EthExecutor) Execute(cmd Command) error {
 
 func (e *EthExecutor) executeBySupplier(cmd Command) error {
 	companyID := cmd.Tx.Sponsor()
-	c, err := clientCache.GetOrCreate(companyID)
-	if err != nil {
-		log.Errorf("create personal client failed: %v", err)
-		return err
+	c, err1 := clientCache.GetOrCreate(companyID)
+	if err1 != nil {
+		log.Errorf("create personal client failed: %v", err1)
+		return err1
 	}
-	p := &CmdProcessor{fxClient: c, cmd: cmd}
+	p := &CmdProcessor{fxClient: c, cmd: cmd, db: e.db}
 
+	var err error
 	switch cmd.Tx.TxType {
 	case SplitFX:
-		return e.splitFX(p)
+		err = e.splitFX(p)
 	case Discount:
-		return e.pay(p)
+		err = e.pay(p)
 	case Payment:
-		return e.pay(p)
+		err = e.pay(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
 	}
+
+	if err == nil {
+		p.finishProcedure()
+	}
+
+	return err
 }
 
 func (e *EthExecutor) executeByPlatform(cmd Command) error {
 	acc := e.keystore.GetAdminAccount()
-	c, err := blockchain.NewPersonalClient(e.ethUrl, acc, e.contractAddrs)
-	if err != nil {
-		log.Errorf("create admin client failed: %v", err)
-		return err
+	c, err1 := blockchain.NewPersonalClient(e.ethUrl, acc, e.contractAddrs)
+	if err1 != nil {
+		log.Errorf("create admin client failed: %v", err1)
+		return err1
 	}
-	p := &CmdProcessor{fxClient: c, cmd: cmd}
+	p := &CmdProcessor{fxClient: c, cmd: cmd, db: e.db}
 
+	var err error
 	switch cmd.Tx.TxType {
 	case MintFX:
-		return e.mintFX(p)
+		err = e.mintFX(p)
 	case Confirm:
-		return e.confirm(p)
+		err = e.confirm(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
 	}
+
+	if err == nil {
+		p.finishProcedure()
+	}
+
+	return err
 }
 
 func (e *EthExecutor) splitFX(p *CmdProcessor) error {
@@ -306,7 +347,7 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	p.CallWithBoxFactoryCaller(
+	p.fxClient.CallWithBoxFactoryCaller(
 		ctx,
 		func(session *contract_gen.FuxPayBoxFactoryCallerSession) error {
 			boxAddr, err = session.GetPayBoxAddress(new(big.Int).SetUint64(boxId))

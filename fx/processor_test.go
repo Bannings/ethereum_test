@@ -1,6 +1,7 @@
 package fx
 
 import (
+	"database/sql"
 	"math/big"
 	"testing"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -24,7 +26,7 @@ var (
 	feeRate    = 0.001
 
 	dbConfig = g.DbConfig{
-		Schema:   "keystore",
+		Schema:   "fx_blockchain",
 		Host:     "127.0.0.1",
 		Port:     "3306",
 		Username: "root",
@@ -32,8 +34,11 @@ var (
 	}
 )
 
-var cfAccount keychain.Account
-var contractAddrs g.ContractAddrs
+var (
+	cfAccount     keychain.Account
+	contractAddrs g.ContractAddrs
+	db            *sql.DB
+)
 
 func init() {
 	privKey, _ := crypto.HexToECDSA(cfKey)
@@ -44,6 +49,35 @@ func init() {
 		FxTokenAddr:      "0x77227767836175e4799262607Cbe2F9957fE5B0E",
 		FxPayBoxAddr:     "0x5DE012D26771173038138c30764b4E62F5D643df",
 		FxBoxFactoryAddr: "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B",
+	}
+
+	var err error
+	if db, err = g.OpenDB(dbConfig); err != nil {
+		panic(err)
+	}
+}
+
+func TestDB(t *testing.T) {
+	tx := Transaction{Id: 1}
+	cmd := Command{Tx: tx, startNonce: 1, receipts: make(map[string]*ethTypes.Receipt)}
+	p := &CmdProcessor{cmd: cmd, db: db}
+	if err := p.createProcedure(); err != nil {
+		t.Fatal(err)
+	}
+
+	r := &ethTypes.Receipt{Status: 0}
+	if err := p.updateReceipt(r); err != nil {
+		t.Fatal(err)
+	}
+
+	r.Status = 1
+	p.cmd.currNonce += 1
+	if err := p.updateReceipt(r); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := p.finishProcedure(); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -63,7 +97,7 @@ func TestFX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	executor := &EthExecutor{ethUrl, contractAddrs, store}
+	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: store}
 
 	tokenId1 := generateTokenId()
 	err = mintFX(executor, tokenId1, 100000)
@@ -98,7 +132,7 @@ func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
 	token2 := Token{inputId, 50000, "supplier002", Normal, expireTime}
 	input := []Token{token1}
 	output := []Token{token2}
-	t := Transaction{input, output, txId, Confirm}
+	t := Transaction{Input: input, Output: output, TxId: txId, TxType: Confirm}
 	cmd := Command{Tx: t}
 	return executor.Execute(cmd)
 }
@@ -112,7 +146,7 @@ func pay(executor *EthExecutor, inputIds [2]big.Int, txId uint64) error {
 	token4 := Token{inputIds[1], 50, "cf", Normal, expireTime}
 	output := []Token{token3, token4}
 
-	t := Transaction{input, output, txId, Payment}
+	t := Transaction{Input: input, Output: output, TxId: txId, TxType: Payment}
 	cmd := Command{Tx: t}
 	return executor.Execute(cmd)
 }
@@ -131,7 +165,7 @@ func splitFX4Pay(executor *EthExecutor, inTokenID int64) (*big.Int, *big.Int, er
 
 	input := []Token{inToken}
 	output := []Token{outToken1, outToken2}
-	t := Transaction{input, output, 0, SplitFX}
+	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
 	cmd := Command{Tx: t}
 
 	err := executor.Execute(cmd)
@@ -149,7 +183,7 @@ func splitFX4Fee(executor *EthExecutor, inTokenID *big.Int) (*big.Int, *big.Int,
 
 	input := []Token{inToken}
 	output := []Token{outToken1, outToken2}
-	t := Transaction{input, output, 0, SplitFX}
+	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
 	cmd := Command{Tx: t}
 
 	err := executor.Execute(cmd)
