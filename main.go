@@ -169,5 +169,8 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	srv.Shutdown(ctx)
+
+	keystore.Close()
+	fx.Close()
 	log.Println("Server gracefully stopped")
 }

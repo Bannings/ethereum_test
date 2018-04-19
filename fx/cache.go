@@ -9,6 +9,18 @@ import (
 	"gitlab.chainedfinance.com/infra/gocommons/lru"
 )
 
+var clientCache *ClientCache
+
+func Init(rawUrl string, keystore *keychain.Store) {
+	clientCache = NewCache(rawUrl, keystore, 30)
+}
+
+func Close() {
+	clientCache.FlushAll()
+}
+
+// ----------------
+
 // ClientCache is a wrapper around an *lru.Cache that adds synchronization
 // makes values always be FxClient
 type ClientCache struct {

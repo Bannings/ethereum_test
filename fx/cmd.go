@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
-type CmdType uint8
+type TxType uint8
 
 const (
-	Payment CmdType = iota
+	Payment TxType = iota
 	Discount
 	SplitFX
 	MintFX
@@ -24,7 +26,7 @@ var types = []string{
 	"Confirm",
 }
 
-func ParseType(typ string) (CmdType, error) {
+func ParseType(typ string) (TxType, error) {
 	switch strings.ToLower(typ) {
 	case "payment":
 		return Payment, nil
@@ -38,7 +40,7 @@ func ParseType(typ string) (CmdType, error) {
 		return Confirm, nil
 	}
 
-	var t CmdType
+	var t TxType
 	return t, fmt.Errorf("err type: %q", typ)
 }
 
@@ -83,9 +85,11 @@ type Token struct {
 }
 
 type Transaction struct {
+	Id     uint
 	Input  []Token
 	Output []Token
 	TxId   uint64
+	TxType TxType
 }
 
 func (t *Transaction) Sponsor() string {
@@ -93,26 +97,8 @@ func (t *Transaction) Sponsor() string {
 }
 
 type Command struct {
-	T    Transaction
-	Type CmdType
-}
-
-// -------------
-
-type ContractType uint8
-
-const (
-	CreateFX ContractType = iota
-	CreateBox
-	Transfer
-	Split
-)
-
-// Instruction corresponds a call to an Ethernet contract
-type Instruction struct {
-	From  string
-	To    string
-	Nonce uint64
-	Input []string
-	Type  ContractType
+	Tx         Transaction
+	startNonce uint64
+	currNonce  uint64
+	receipts   map[string]*ethTypes.Receipt // key: string(nonce)
 }
