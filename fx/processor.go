@@ -27,6 +27,8 @@ var (
 const (
 	stateProcessing = "processing"
 	stateProcessed  = "processed"
+
+	batchSize = 30
 )
 
 type CmdProcessor struct {
@@ -35,12 +37,42 @@ type CmdProcessor struct {
 	db       *sql.DB
 }
 
-func (p *CmdProcessor) CallWithFxTransactor(
+func (p *CmdProcessor) CallWithFxTokenTransactor(
 	ctx context.Context,
 	fn func(*contract_gen.FuxTokenTransactorSession) error) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.GetNonce() {
-		err := p.fxClient.CallWithFxTransactor(ctx, fn)
+		err := p.fxClient.CallWithFxTokenTransactor(ctx, fn)
+		if err == nil {
+			p.cmd.currNonce += 1
+		}
+		return err
+	}
+	p.cmd.currNonce += 1
+	return nil
+}
+
+func (p *CmdProcessor) CallWithFxSplitTransactor(
+	ctx context.Context,
+	fn func(*contract_gen.FuxSplitTransactorSession) error) error {
+	p.initCmdNonce()
+	if p.cmd.currNonce >= p.fxClient.GetNonce() {
+		err := p.fxClient.CallWithFxSplitTransactor(ctx, fn)
+		if err == nil {
+			p.cmd.currNonce += 1
+		}
+		return err
+	}
+	p.cmd.currNonce += 1
+	return nil
+}
+
+func (p *CmdProcessor) CallWithFxBatchTransactor(
+	ctx context.Context,
+	fn func(*contract_gen.FuxBatchTransactorSession) error) error {
+	p.initCmdNonce()
+	if p.cmd.currNonce >= p.fxClient.GetNonce() {
+		err := p.fxClient.CallWithFxBatchTransactor(ctx, fn)
 		if err == nil {
 			p.cmd.currNonce += 1
 		}
@@ -251,10 +283,10 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
-	var innerErr error
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	err := p.CallWithFxTransactor(ctx, func(session *contract_gen.FuxTokenTransactorSession) error {
+	err := p.CallWithFxSplitTransactor(ctx, func(session *contract_gen.FuxSplitTransactorSession) error {
+		var innerErr error
 		tx, innerErr = session.SplitFux(&tokenId, newTokenIds, amounts, states)
 		return innerErr
 	})
@@ -283,12 +315,18 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 	var innerErr error
 	for idx, t := range output {
 		boxID := generateBoxId(cmd.Tx.TxId, idx)
-		log.Infof("create box: %v", boxID)
+		to := t.Owner
+		toAcc, err := e.keystore.GetAccount(to)
+		if err != nil {
+			log.Errorf("get account of %v failed: %v", to, err)
+			return err
+		}
+		log.Infof("create box: %v for %s", boxID, to)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		err := p.CallWithBoxFactoryTransactor(ctx,
+		err = p.CallWithBoxFactoryTransactor(ctx,
 			func(session *contract_gen.FuxPayBoxFactoryTransactorSession) error {
-				tx, innerErr = session.CreatePayBox(new(big.Int).SetUint64(boxID))
+				tx, innerErr = session.CreatePayBox(new(big.Int).SetUint64(boxID), toAcc.Address)
 				return innerErr
 			})
 		cancel()
@@ -303,7 +341,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 			return err
 		}
 
-		n, err := e.boxing(p, t.Amount, input, r.ContractAddress)
+		n, err := e.boxing(p, t.Amount, input, r.ContractAddress, boxID)
 		if err != nil {
 			log.Errorf("transfer to box(id: %v) failed: %v", boxID, err)
 			return err
@@ -363,11 +401,11 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	}
 
 	var tx *ethTypes.Transaction
-	var innerErr error
 	for _, t := range input {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		err = p.CallWithBoxTransactor(ctx,
 			func(session *contract_gen.FuxPayBoxTransactorSession) error {
+				var innerErr error
 				tx, innerErr = session.Transfer(toAcc.Address, &t.ID)
 				return innerErr
 			})
@@ -383,6 +421,7 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	defer cancel()
 	err = p.CallWithBoxFactoryTransactor(ctx,
 		func(session *contract_gen.FuxPayBoxFactoryTransactorSession) error {
+			var innerErr error
 			tx, innerErr = session.CloseBox(boxAddr)
 			return innerErr
 		})
@@ -406,7 +445,6 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 	cmd := p.cmd
 	output := cmd.Tx.Output
 	var tx *ethTypes.Transaction
-	var innerErr error
 	for _, t := range output {
 		log.Infof("mint fx: id: %v, owner: %v, amount: %v, state: %v", t.ID.String(), t.Owner, t.Amount, t.State)
 		acc, err := e.keystore.GetAccount(t.Owner)
@@ -416,9 +454,10 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		err = p.CallWithFxTransactor(ctx,
+		err = p.CallWithFxTokenTransactor(ctx,
 			func(session *contract_gen.FuxTokenTransactorSession) error {
-				tx, innerErr = session.CreateFux(
+				var innerErr error
+				tx, innerErr = session.Mint(
 					acc.Address,
 					&t.ID, new(big.Int).SetUint64(t.Amount),
 					new(big.Int).SetInt64(t.ExpireTime),
@@ -428,7 +467,7 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 			})
 		cancel()
 		if err != nil {
-			log.Errorf("call FuxToken.CreateFux contract failed: %v", err)
+			log.Errorf("call FuxToken.Mint contract failed: %v", err)
 			return err
 		}
 	}
@@ -436,31 +475,67 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 
 }
 
-func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Token, boxAddr common.Address) (int, error) {
+func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Token, boxAddr common.Address, boxId uint64) (int, error) {
+	companyID := p.cmd.Tx.Sponsor()
+	fromAcc, err := e.keystore.GetAccount(companyID)
+	if err != nil {
+		log.Errorf("get account of %v failed: %v", companyID, err)
+		return 0, err
+	}
+
 	var actualAmount uint64
 	var consumedNum int
 	var tx *ethTypes.Transaction
-	var innerErr error
-	for _, t := range tokens {
-		if actualAmount < targetAmount {
-			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-			err := p.CallWithFxTransactor(ctx,
-				func(session *contract_gen.FuxTokenTransactorSession) error {
-					tx, innerErr = session.Transfer(boxAddr, &t.ID)
-					return innerErr
-				})
-			cancel()
-			if err != nil {
-				log.Errorf("call FuxToken.Transfer contract failed: %v", err)
-				return 0, err
-			}
+	var tokenIds []*big.Int
 
-			actualAmount += t.Amount
-			consumedNum += 1
+	packing := func() error {
+		jobId := new(big.Int).SetUint64(boxId*10 + uint64(consumedNum/batchSize))
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		err := p.CallWithFxBatchTransactor(ctx,
+			func(session *contract_gen.FuxBatchTransactorSession) error {
+				var innerErr error
+				tx, innerErr = session.AddJob(jobId, fromAcc.Address, boxAddr, tokenIds)
+				return innerErr
+			})
+		cancel()
+		if err != nil {
+			log.Errorf("call FuxBatch.AddJob contract failed: %v", err)
+			return err
+		}
+
+		ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
+		err = p.CallWithFxBatchTransactor(ctx,
+			func(session *contract_gen.FuxBatchTransactorSession) error {
+				var innerErr error
+				tx, innerErr = session.RunJob(jobId)
+				return innerErr
+			})
+		cancel()
+		if err != nil {
+			log.Errorf("call FuxBatch.RunJob contract failed: %v", err)
+			return err
+		}
+
+		return nil
+	}
+
+	for _, t := range tokens {
+		if actualAmount >= targetAmount {
+			break
+		}
+
+		actualAmount += t.Amount
+		consumedNum += 1
+		tokenIds = append(tokenIds, &t.ID)
+		if actualAmount%batchSize == 0 {
+			packing()
 		}
 	}
 
-	// TODO: WaitMined?
+	if actualAmount%batchSize > 0 {
+		packing()
+	}
+
 	return consumedNum, nil
 }
 

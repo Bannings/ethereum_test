@@ -26,7 +26,7 @@ func CreateArHandler(w http.ResponseWriter, r *http.Request) {
 	arId := m["arId"].(string)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckARId(arId)
+	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasAR(arId)
 	log.Debugf("existed: %v", existed)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
@@ -66,7 +66,7 @@ func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckARId(arId)
+	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasAR(arId)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -79,7 +79,7 @@ func QueryArHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryArInfo(arId)
+	v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryARInfo(arId)
 	if err != nil {
 		log.Errorf("Query ar from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -117,7 +117,7 @@ func UpdateArHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckARId(arId)
+	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasAR(arId)
 	if err != nil {
 		log.Errorf("Check arId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -130,7 +130,7 @@ func UpdateArHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, info, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryArInfo(arId)
+	info, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryARInfo(arId)
 	if err != nil {
 		log.Errorf("Query ar from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))

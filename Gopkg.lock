@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/aristanetworks/goarista"
   packages = ["monotime"]
-  revision = "c4abbbe01ef7ae5ffd295b3a85493582e704cfa2"
+  revision = "7744847ed4e70ed5e50090f9094ed621b4f305d6"
 
 [[projects]]
   branch = "master"
@@ -17,7 +17,7 @@
   branch = "master"
   name = "github.com/btcsuite/btcd"
   packages = ["btcec"]
-  revision = "2be2f12b358dc57d70b8f501b00be450192efbc3"
+  revision = "675abc5df3c5531bc741b56a765e35623459da6d"
 
 [[projects]]
   name = "github.com/certifi/gocertifi"
@@ -53,19 +53,20 @@
     "event",
     "log",
     "metrics",
+    "p2p/netutil",
     "params",
     "rlp",
     "rpc",
     "trie"
   ]
-  revision = "329ac18ef617d0238f71637bffe78f028b0f13f7"
-  version = "v1.8.3"
+  revision = "cbdaa0ca2a955012274bd2c47bd52b24b2beb66c"
+  version = "v1.8.5"
 
 [[projects]]
   branch = "master"
   name = "github.com/getsentry/raven-go"
   packages = ["."]
-  revision = "7562301a6763c9ac631b0a2011b4aa0e064e45d4"
+  revision = "d1470f50d3a3a38533355a9fab7393e25a3b4226"
 
 [[projects]]
   name = "github.com/go-chi/chi"
@@ -147,7 +148,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
+  revision = "d0f7cd64bda49e08b22ae8a730aa57aa0db125d6"
 
 [[projects]]
   branch = "master"
@@ -158,7 +159,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "780932d4fbbe0e69b84c34c20f5c8d0981e109ea"
+  revision = "8b1c2da0d56deffdbb9e48d4414b4e674bd8083e"
 
 [[projects]]
   branch = "master"
@@ -189,19 +190,19 @@
     "leveldb/table",
     "leveldb/util"
   ]
-  revision = "169b1b37be738edb2813dab48c97a549bcf99bb5"
+  revision = "714f901b98fdb3aa954b4193d8cbd64a28d80cad"
 
 [[projects]]
-  branch = "master"
+  branch = "develop"
   name = "gitlab.chainedfinance.com/chaincore/contract-gen"
   packages = ["."]
-  revision = "d32b5d1bbb584af435a3578ebe9db81eca73206a"
+  revision = "66563a35506b2c0a0202f8b56571353381ea9b18"
 
 [[projects]]
   branch = "develop"
   name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
   packages = ["."]
-  revision = "0d8be6d0ad9cf439457ba663133807cf28bb37bb"
+  revision = "4f05cde8f40079e8486fc6a89a3650140593fcbe"
 
 [[projects]]
   branch = "master"
@@ -216,28 +217,29 @@
     "pbkdf2",
     "scrypt"
   ]
-  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
+  revision = "e73bf333ef8920dbb52ad18d4bd38ad9d9bc76d7"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["websocket"]
-  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
+  revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "91ee8cde435411ca3f1cd365e8f20131aed4d0a1"
+  revision = "79b0c6888797020a994db17c8510466c72fe75d9"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
-    "imports"
+    "imports",
+    "internal/fastwalk"
   ]
-  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
+  revision = "94b14834a20132093826ea5e2da5502a13908ad3"
 
 [[projects]]
   name = "gopkg.in/fatih/set.v0"
@@ -260,6 +262,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aaf1f1653fbe3af8465ca63bcc56466b100c58b2f555a878f729a8533c476ef2"
+  inputs-digest = "b5e8d8323570fddb266c3650b54f41e7eca362e2fb56cc9219c198bb479fb9ef"
   solver-name = "gps-cdcl"
   solver-version = 1

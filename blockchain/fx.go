@@ -25,6 +25,8 @@ type FxClient struct {
 	fxToken      *contract_gen.FuxToken
 	fxPayBox     *contract_gen.FuxPayBox
 	fxBoxFactory *contract_gen.FuxPayBoxFactory
+	fxSplit      *contract_gen.FuxSplit
+	fxBatch      *contract_gen.FuxBatch
 }
 
 func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
@@ -78,11 +80,55 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g
 	return c, nil
 }
 
-func (c *FxClient) CallWithFxTransactor(
+func (c *FxClient) CallWithFxTokenTransactor(
 	ctx context.Context,
 	fn func(*contract_gen.FuxTokenTransactorSession) error) error {
 	s := &contract_gen.FuxTokenTransactorSession{
 		Contract: &c.fxToken.FuxTokenTransactor,
+		TransactOpts: bind.TransactOpts{
+			From:     c.Auth.From,
+			Signer:   c.Auth.Signer,
+			Nonce:    big.NewInt(int64(c.nonce)),
+			GasLimit: gasLimit,
+			Context:  ctx,
+		},
+	}
+
+	if err := fn(s); err != nil {
+		return err
+	}
+
+	atomic.AddUint64(&c.nonce, 1)
+	return nil
+}
+
+func (c *FxClient) CallWithFxSplitTransactor(
+	ctx context.Context,
+	fn func(*contract_gen.FuxSplitTransactorSession) error) error {
+	s := &contract_gen.FuxSplitTransactorSession{
+		Contract: &c.fxSplit.FuxSplitTransactor,
+		TransactOpts: bind.TransactOpts{
+			From:     c.Auth.From,
+			Signer:   c.Auth.Signer,
+			Nonce:    big.NewInt(int64(c.nonce)),
+			GasLimit: gasLimit,
+			Context:  ctx,
+		},
+	}
+
+	if err := fn(s); err != nil {
+		return err
+	}
+
+	atomic.AddUint64(&c.nonce, 1)
+	return nil
+}
+
+func (c *FxClient) CallWithFxBatchTransactor(
+	ctx context.Context,
+	fn func(*contract_gen.FuxBatchTransactorSession) error) error {
+	s := &contract_gen.FuxBatchTransactorSession{
+		Contract: &c.fxBatch.FuxBatchTransactor,
 		TransactOpts: bind.TransactOpts{
 			From:     c.Auth.From,
 			Signer:   c.Auth.Signer,
@@ -159,7 +205,7 @@ func (c *FxClient) CallWithBoxFactoryCaller(
 	return fn(s)
 }
 
-func (c *FxClient) CallWithFxCaller(
+func (c *FxClient) CallWithFxTokenCaller(
 	ctx context.Context,
 	fn func(*contract_gen.FuxTokenCallerSession) error) error {
 	s := &contract_gen.FuxTokenCallerSession{
