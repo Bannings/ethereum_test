@@ -20,7 +20,7 @@ var (
 func FetchKey(cli blockchain.Client, nodeId string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	v, _, err := cli.NodesCallerSession(ctx).GetNodeKey(nodeId)
+	v, err := cli.NodesCallerSession(ctx).GetNodeKey(nodeId)
 	if err != nil {
 		log.Error(err)
 		return "", err

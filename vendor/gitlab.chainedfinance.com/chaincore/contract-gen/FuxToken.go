@@ -29,13 +29,14 @@ func DeployFuxToken(auth *bind.TransactOpts, backend bind.ContractBackend, _prox
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	return address, tx, &FuxToken{FuxTokenCaller: FuxTokenCaller{contract: contract}, FuxTokenTransactor: FuxTokenTransactor{contract: contract}}, nil
+	return address, tx, &FuxToken{FuxTokenCaller: FuxTokenCaller{contract: contract}, FuxTokenTransactor: FuxTokenTransactor{contract: contract}, FuxTokenFilterer: FuxTokenFilterer{contract: contract}}, nil
 }
 
 // FuxToken is an auto generated Go binding around an Ethereum contract.
 type FuxToken struct {
 	FuxTokenCaller     // Read-only binding to the contract
 	FuxTokenTransactor // Write-only binding to the contract
+	FuxTokenFilterer   // Log filterer for contract events
 }
 
 // FuxTokenCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -45,6 +46,11 @@ type FuxTokenCaller struct {
 
 // FuxTokenTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type FuxTokenTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// FuxTokenFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
+type FuxTokenFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -87,16 +93,16 @@ type FuxTokenTransactorRaw struct {
 
 // NewFuxToken creates a new instance of FuxToken, bound to a specific deployed contract.
 func NewFuxToken(address common.Address, backend bind.ContractBackend) (*FuxToken, error) {
-	contract, err := bindFuxToken(address, backend, backend)
+	contract, err := bindFuxToken(address, backend, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &FuxToken{FuxTokenCaller: FuxTokenCaller{contract: contract}, FuxTokenTransactor: FuxTokenTransactor{contract: contract}}, nil
+	return &FuxToken{FuxTokenCaller: FuxTokenCaller{contract: contract}, FuxTokenTransactor: FuxTokenTransactor{contract: contract}, FuxTokenFilterer: FuxTokenFilterer{contract: contract}}, nil
 }
 
 // NewFuxTokenCaller creates a new read-only instance of FuxToken, bound to a specific deployed contract.
 func NewFuxTokenCaller(address common.Address, caller bind.ContractCaller) (*FuxTokenCaller, error) {
-	contract, err := bindFuxToken(address, caller, nil)
+	contract, err := bindFuxToken(address, caller, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -105,20 +111,29 @@ func NewFuxTokenCaller(address common.Address, caller bind.ContractCaller) (*Fux
 
 // NewFuxTokenTransactor creates a new write-only instance of FuxToken, bound to a specific deployed contract.
 func NewFuxTokenTransactor(address common.Address, transactor bind.ContractTransactor) (*FuxTokenTransactor, error) {
-	contract, err := bindFuxToken(address, nil, transactor)
+	contract, err := bindFuxToken(address, nil, transactor, nil)
 	if err != nil {
 		return nil, err
 	}
 	return &FuxTokenTransactor{contract: contract}, nil
 }
 
+// NewFuxTokenFilterer creates a new log filterer instance of FuxToken, bound to a specific deployed contract.
+func NewFuxTokenFilterer(address common.Address, filterer bind.ContractFilterer) (*FuxTokenFilterer, error) {
+	contract, err := bindFuxToken(address, nil, nil, filterer)
+	if err != nil {
+		return nil, err
+	}
+	return &FuxTokenFilterer{contract: contract}, nil
+}
+
 // bindFuxToken binds a generic wrapper to an already deployed contract.
-func bindFuxToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+func bindFuxToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(FuxTokenABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -159,10 +174,10 @@ func (_FuxToken *FuxTokenTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _FuxToken.Contract.contract.Transact(opts, method, params...)
 }
 
-// ROLE_FUX_BC_GROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
+// ROLEFUXBCGROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
 //
 // Solidity: function ROLE_FUX_BC_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROLE_FUX_BC_GROUP(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROLEFUXBCGROUP(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -171,24 +186,24 @@ func (_FuxToken *FuxTokenCaller) ROLE_FUX_BC_GROUP(opts *bind.CallOpts) (string,
 	return *ret0, err
 }
 
-// ROLE_FUX_BC_GROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
+// ROLEFUXBCGROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
 //
 // Solidity: function ROLE_FUX_BC_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROLE_FUX_BC_GROUP() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_BC_GROUP(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROLEFUXBCGROUP() (string, error) {
+	return _FuxToken.Contract.ROLEFUXBCGROUP(&_FuxToken.CallOpts)
 }
 
-// ROLE_FUX_BC_GROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
+// ROLEFUXBCGROUP is a free data retrieval call binding the contract method 0x09c4b0fa.
 //
 // Solidity: function ROLE_FUX_BC_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROLE_FUX_BC_GROUP() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_BC_GROUP(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROLEFUXBCGROUP() (string, error) {
+	return _FuxToken.Contract.ROLEFUXBCGROUP(&_FuxToken.CallOpts)
 }
 
-// ROLE_FUX_HUB is a free data retrieval call binding the contract method 0xd6b419fb.
+// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
 //
 // Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROLE_FUX_HUB(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROLEFUXHUB(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -197,24 +212,24 @@ func (_FuxToken *FuxTokenCaller) ROLE_FUX_HUB(opts *bind.CallOpts) (string, erro
 	return *ret0, err
 }
 
-// ROLE_FUX_HUB is a free data retrieval call binding the contract method 0xd6b419fb.
+// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
 //
 // Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROLE_FUX_HUB() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_HUB(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROLEFUXHUB() (string, error) {
+	return _FuxToken.Contract.ROLEFUXHUB(&_FuxToken.CallOpts)
 }
 
-// ROLE_FUX_HUB is a free data retrieval call binding the contract method 0xd6b419fb.
+// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
 //
 // Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROLE_FUX_HUB() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_HUB(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROLEFUXHUB() (string, error) {
+	return _FuxToken.Contract.ROLEFUXHUB(&_FuxToken.CallOpts)
 }
 
-// ROLE_FUX_ISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
+// ROLEFUXISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
 //
 // Solidity: function ROLE_FUX_ISSUER() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROLE_FUX_ISSUER(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROLEFUXISSUER(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -223,24 +238,24 @@ func (_FuxToken *FuxTokenCaller) ROLE_FUX_ISSUER(opts *bind.CallOpts) (string, e
 	return *ret0, err
 }
 
-// ROLE_FUX_ISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
+// ROLEFUXISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
 //
 // Solidity: function ROLE_FUX_ISSUER() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROLE_FUX_ISSUER() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_ISSUER(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROLEFUXISSUER() (string, error) {
+	return _FuxToken.Contract.ROLEFUXISSUER(&_FuxToken.CallOpts)
 }
 
-// ROLE_FUX_ISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
+// ROLEFUXISSUER is a free data retrieval call binding the contract method 0x0daaf6e4.
 //
 // Solidity: function ROLE_FUX_ISSUER() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROLE_FUX_ISSUER() (string, error) {
-	return _FuxToken.Contract.ROLE_FUX_ISSUER(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROLEFUXISSUER() (string, error) {
+	return _FuxToken.Contract.ROLEFUXISSUER(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_COIN is a free data retrieval call binding the contract method 0x33e653e8.
+// ROUTEFUXCOIN is a free data retrieval call binding the contract method 0x33e653e8.
 //
 // Solidity: function ROUTE_FUX_COIN() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_COIN(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXCOIN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -249,24 +264,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_COIN(opts *bind.CallOpts) (string, er
 	return *ret0, err
 }
 
-// ROUTE_FUX_COIN is a free data retrieval call binding the contract method 0x33e653e8.
+// ROUTEFUXCOIN is a free data retrieval call binding the contract method 0x33e653e8.
 //
 // Solidity: function ROUTE_FUX_COIN() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_COIN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_COIN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXCOIN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXCOIN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_COIN is a free data retrieval call binding the contract method 0x33e653e8.
+// ROUTEFUXCOIN is a free data retrieval call binding the contract method 0x33e653e8.
 //
 // Solidity: function ROUTE_FUX_COIN() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_COIN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_COIN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXCOIN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXCOIN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_CONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
+// ROUTEFUXCONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
 //
 // Solidity: function ROUTE_FUX_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_CONFIG(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXCONFIG(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -275,24 +290,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_CONFIG(opts *bind.CallOpts) (string, 
 	return *ret0, err
 }
 
-// ROUTE_FUX_CONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
+// ROUTEFUXCONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
 //
 // Solidity: function ROUTE_FUX_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_CONFIG() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_CONFIG(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXCONFIG() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXCONFIG(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_CONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
+// ROUTEFUXCONFIG is a free data retrieval call binding the contract method 0xf5ac8fb9.
 //
 // Solidity: function ROUTE_FUX_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_CONFIG() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_CONFIG(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXCONFIG() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXCONFIG(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_ERC721_TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
+// ROUTEFUXERC721TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
 //
 // Solidity: function ROUTE_FUX_ERC721_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_ERC721_TOKEN(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXERC721TOKEN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -301,24 +316,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_ERC721_TOKEN(opts *bind.CallOpts) (st
 	return *ret0, err
 }
 
-// ROUTE_FUX_ERC721_TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
+// ROUTEFUXERC721TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
 //
 // Solidity: function ROUTE_FUX_ERC721_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_ERC721_TOKEN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_ERC721_TOKEN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXERC721TOKEN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXERC721TOKEN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_ERC721_TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
+// ROUTEFUXERC721TOKEN is a free data retrieval call binding the contract method 0xf43a6d24.
 //
 // Solidity: function ROUTE_FUX_ERC721_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_ERC721_TOKEN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_ERC721_TOKEN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXERC721TOKEN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXERC721TOKEN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_PAYBOX_FACTORY is a free data retrieval call binding the contract method 0xe941ed61.
+// ROUTEFUXPAYBOXFACTORY is a free data retrieval call binding the contract method 0xe941ed61.
 //
 // Solidity: function ROUTE_FUX_PAYBOX_FACTORY() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_PAYBOX_FACTORY(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXPAYBOXFACTORY(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -327,24 +342,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_PAYBOX_FACTORY(opts *bind.CallOpts) (
 	return *ret0, err
 }
 
-// ROUTE_FUX_PAYBOX_FACTORY is a free data retrieval call binding the contract method 0xe941ed61.
+// ROUTEFUXPAYBOXFACTORY is a free data retrieval call binding the contract method 0xe941ed61.
 //
 // Solidity: function ROUTE_FUX_PAYBOX_FACTORY() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_PAYBOX_FACTORY() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_PAYBOX_FACTORY(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXPAYBOXFACTORY() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXPAYBOXFACTORY(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_PAYBOX_FACTORY is a free data retrieval call binding the contract method 0xe941ed61.
+// ROUTEFUXPAYBOXFACTORY is a free data retrieval call binding the contract method 0xe941ed61.
 //
 // Solidity: function ROUTE_FUX_PAYBOX_FACTORY() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_PAYBOX_FACTORY() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_PAYBOX_FACTORY(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXPAYBOXFACTORY() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXPAYBOXFACTORY(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_RBAC is a free data retrieval call binding the contract method 0x0c7bba78.
+// ROUTEFUXRBAC is a free data retrieval call binding the contract method 0x0c7bba78.
 //
 // Solidity: function ROUTE_FUX_RBAC() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_RBAC(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXRBAC(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -353,24 +368,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_RBAC(opts *bind.CallOpts) (string, er
 	return *ret0, err
 }
 
-// ROUTE_FUX_RBAC is a free data retrieval call binding the contract method 0x0c7bba78.
+// ROUTEFUXRBAC is a free data retrieval call binding the contract method 0x0c7bba78.
 //
 // Solidity: function ROUTE_FUX_RBAC() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_RBAC() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_RBAC(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXRBAC() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXRBAC(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_RBAC is a free data retrieval call binding the contract method 0x0c7bba78.
+// ROUTEFUXRBAC is a free data retrieval call binding the contract method 0x0c7bba78.
 //
 // Solidity: function ROUTE_FUX_RBAC() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_RBAC() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_RBAC(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXRBAC() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXRBAC(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_SPLIT is a free data retrieval call binding the contract method 0x88f7748d.
+// ROUTEFUXSPLIT is a free data retrieval call binding the contract method 0x88f7748d.
 //
 // Solidity: function ROUTE_FUX_SPLIT() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_SPLIT(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXSPLIT(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -379,24 +394,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_SPLIT(opts *bind.CallOpts) (string, e
 	return *ret0, err
 }
 
-// ROUTE_FUX_SPLIT is a free data retrieval call binding the contract method 0x88f7748d.
+// ROUTEFUXSPLIT is a free data retrieval call binding the contract method 0x88f7748d.
 //
 // Solidity: function ROUTE_FUX_SPLIT() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_SPLIT() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_SPLIT(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXSPLIT() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXSPLIT(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_SPLIT is a free data retrieval call binding the contract method 0x88f7748d.
+// ROUTEFUXSPLIT is a free data retrieval call binding the contract method 0x88f7748d.
 //
 // Solidity: function ROUTE_FUX_SPLIT() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_SPLIT() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_SPLIT(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXSPLIT() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXSPLIT(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_STORAGE is a free data retrieval call binding the contract method 0xc0d19325.
+// ROUTEFUXSTORAGE is a free data retrieval call binding the contract method 0xc0d19325.
 //
 // Solidity: function ROUTE_FUX_STORAGE() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_STORAGE(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXSTORAGE(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -405,24 +420,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_STORAGE(opts *bind.CallOpts) (string,
 	return *ret0, err
 }
 
-// ROUTE_FUX_STORAGE is a free data retrieval call binding the contract method 0xc0d19325.
+// ROUTEFUXSTORAGE is a free data retrieval call binding the contract method 0xc0d19325.
 //
 // Solidity: function ROUTE_FUX_STORAGE() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_STORAGE() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_STORAGE(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXSTORAGE() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXSTORAGE(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_STORAGE is a free data retrieval call binding the contract method 0xc0d19325.
+// ROUTEFUXSTORAGE is a free data retrieval call binding the contract method 0xc0d19325.
 //
 // Solidity: function ROUTE_FUX_STORAGE() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_STORAGE() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_STORAGE(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXSTORAGE() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXSTORAGE(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_TOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
+// ROUTEFUXTOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
 //
 // Solidity: function ROUTE_FUX_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_TOKEN(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXTOKEN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -431,24 +446,24 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_TOKEN(opts *bind.CallOpts) (string, e
 	return *ret0, err
 }
 
-// ROUTE_FUX_TOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
+// ROUTEFUXTOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
 //
 // Solidity: function ROUTE_FUX_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_TOKEN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_TOKEN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXTOKEN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXTOKEN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_TOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
+// ROUTEFUXTOKEN is a free data retrieval call binding the contract method 0x4aa03a35.
 //
 // Solidity: function ROUTE_FUX_TOKEN() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_TOKEN() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_TOKEN(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXTOKEN() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXTOKEN(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_TRANSFER_ROLE is a free data retrieval call binding the contract method 0x071db561.
+// ROUTEFUXTRANSFERROLE is a free data retrieval call binding the contract method 0x071db561.
 //
 // Solidity: function ROUTE_FUX_TRANSFER_ROLE() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTE_FUX_TRANSFER_ROLE(opts *bind.CallOpts) (string, error) {
+func (_FuxToken *FuxTokenCaller) ROUTEFUXTRANSFERROLE(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -457,18 +472,18 @@ func (_FuxToken *FuxTokenCaller) ROUTE_FUX_TRANSFER_ROLE(opts *bind.CallOpts) (s
 	return *ret0, err
 }
 
-// ROUTE_FUX_TRANSFER_ROLE is a free data retrieval call binding the contract method 0x071db561.
+// ROUTEFUXTRANSFERROLE is a free data retrieval call binding the contract method 0x071db561.
 //
 // Solidity: function ROUTE_FUX_TRANSFER_ROLE() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTE_FUX_TRANSFER_ROLE() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_TRANSFER_ROLE(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenSession) ROUTEFUXTRANSFERROLE() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXTRANSFERROLE(&_FuxToken.CallOpts)
 }
 
-// ROUTE_FUX_TRANSFER_ROLE is a free data retrieval call binding the contract method 0x071db561.
+// ROUTEFUXTRANSFERROLE is a free data retrieval call binding the contract method 0x071db561.
 //
 // Solidity: function ROUTE_FUX_TRANSFER_ROLE() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTE_FUX_TRANSFER_ROLE() (string, error) {
-	return _FuxToken.Contract.ROUTE_FUX_TRANSFER_ROLE(&_FuxToken.CallOpts)
+func (_FuxToken *FuxTokenCallerSession) ROUTEFUXTRANSFERROLE() (string, error) {
+	return _FuxToken.Contract.ROUTEFUXTRANSFERROLE(&_FuxToken.CallOpts)
 }
 
 // BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
