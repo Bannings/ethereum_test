@@ -77,7 +77,7 @@ func ParseState(state string) (State, error) {
 // ----------------
 
 type Token struct {
-	ID         big.Int
+	Id         big.Int
 	Amount     uint64
 	Owner      string // companyID
 	State      State

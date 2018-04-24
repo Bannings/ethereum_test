@@ -9,14 +9,26 @@ import (
 	"gitlab.chainedfinance.com/infra/gocommons/lru"
 )
 
-var clientCache *ClientCache
+var (
+	clientCache *ClientCache
+	adminClient *blockchain.FxClient
+)
 
 func Init(rawUrl string, keystore *keychain.Store) {
 	clientCache = NewCache(rawUrl, keystore, 30)
+
+	acc := keystore.GetAdminAccount()
+	conf := g.GetConfig()
+	var err error
+	adminClient, err = blockchain.NewPersonalClient(rawUrl, acc, conf.BlockchainConfig.ContractAddrs)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Close() {
 	clientCache.FlushAll()
+	adminClient.Close()
 }
 
 // ----------------

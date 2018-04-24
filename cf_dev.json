@@ -8,15 +8,16 @@
 
     "contractAddrs": {
       "fxTokenAddr": "0x9904001342F4780F22DbBD71625dE97e81139dF1",
-      "fxPayBoxAddr": "0xe20F413eB74FA3B4A63C29555C00c9FeFF8f0bb9",
       "fxBoxFactoryAddr": "0xbb5994460883b77B36BF02b01b55EDb0c2238157",
+      "fxSplitAddr": "",
+      "fxBatchAddr": "",
       "nodeAddr" : "0x4d07fd58970b6254bb500ace0a1d15b9394513af",
       "storeAddr": "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
     }
   },
 
   "db": {
-    "schema": "keystore",
+    "schema": "fx_blockchain",
     "host": "127.0.0.1",
     "port": "3306",
     "username": "root",
