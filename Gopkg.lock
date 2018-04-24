@@ -195,8 +195,8 @@
 [[projects]]
   name = "gitlab.chainedfinance.com/chaincore/contract-gen"
   packages = ["."]
-  revision = "42fbbe1e820d077fe572c9d13d88fd8f75c0532e"
-  version = "0.0.2"
+  revision = "a65afdcc5f721ae4abf8bbddb7f6e3b09a225e99"
+  version = "0.0.3"
 
 [[projects]]
   branch = "develop"
@@ -262,6 +262,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c599e6947bc171f0f38915a3395b3e35fa2708041f7bc1d44872b6606feddcb3"
+  inputs-digest = "1713457bb35e8e7607f19398797852ddce6f3a5eb5c8e2e9c2c2e290a19fc6a4"
   solver-name = "gps-cdcl"
   solver-version = 1
