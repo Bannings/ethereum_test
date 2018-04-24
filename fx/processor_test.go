@@ -47,13 +47,44 @@ func init() {
 
 	contractAddrs = g.ContractAddrs{
 		FxTokenAddr:      "0x77227767836175e4799262607Cbe2F9957fE5B0E",
-		FxPayBoxAddr:     "0x5DE012D26771173038138c30764b4E62F5D643df",
 		FxBoxFactoryAddr: "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B",
 	}
 
 	var err error
 	if db, err = g.OpenDB(dbConfig); err != nil {
 		panic(err)
+	}
+}
+
+func TestClosure(t *testing.T) {
+	var consumedNum int
+	tokenIds := make([]*big.Int, 3)
+	packing := func() {
+		jobId := new(big.Int).SetUint64(uint64(consumedNum / 3))
+		t.Logf("jobId: %v", jobId)
+		t.Logf("tokens: %+v", tokenIds)
+	}
+
+	var actualAmount uint64
+	tokens := []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	for idx, t := range tokens {
+		actualAmount += 1
+		consumedNum += 1
+		i := idx % 3
+		tokenIds[i] = new(big.Int).SetInt64(t)
+		if actualAmount%3 == 0 {
+			packing()
+
+			size := len(tokens) - consumedNum
+			if size > 3 {
+				size = 3
+			}
+			tokenIds = make([]*big.Int, size)
+		}
+	}
+
+	if actualAmount%3 > 0 {
+		packing()
 	}
 }
 
