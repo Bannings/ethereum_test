@@ -1,16 +1,16 @@
 {
   "blockchain": {
-    "key": "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b",
-    "rawUrl": "http://127.0.0.1:8545",
+    "key": "769a4001e52fc390036a73fa1ccae318bdc1b1baf598720a4481904364055e69",
+    "rawUrl": "http://127.0.0.1:9545",
 
-    "adminKey": "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b",
+    "adminKey": "769a4001e52fc390036a73fa1ccae318bdc1b1baf598720a4481904364055e69",
     "adminPassphrase": "",
 
     "contractAddrs": {
-      "fxTokenAddr": "0x9904001342F4780F22DbBD71625dE97e81139dF1",
-      "fxBoxFactoryAddr": "0xbb5994460883b77B36BF02b01b55EDb0c2238157",
-      "fxSplitAddr": "",
-      "fxBatchAddr": "",
+      "fxTokenAddr": "0xfe8f48e599849152cec1f7297d4ca676c904c711",
+      "fxBoxFactoryAddr": "0xb1fdac0edeb8f408aea482b9ca4766726f936dec",
+      "fxSplitAddr": "0x5bdb7676aebf743473d0779a45834b855a70863c",
+      "fxBatchAddr": "0xa8fd6668cbdeb20724099b92d7d2e228ab11f84a",
       "nodeAddr" : "0x4d07fd58970b6254bb500ace0a1d15b9394513af",
       "storeAddr": "0x6aae7364a12fc276f454f42d90c8bdac0cdfb7f5"
     }

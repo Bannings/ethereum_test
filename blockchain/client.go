@@ -19,16 +19,16 @@ const (
 	gasLimit uint64 = 4712357
 )
 
-var DefaultClient Client
+var DefaultClient StoreClient
 
-type Client interface {
+type StoreClient interface {
 	StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession
 	StoreTransactorSession(ctx context.Context) *dr_contracts.ARStoreTransactorSession
 	NodesCallerSession(ctx context.Context) *dr_contracts.CFNodesCallerSession
 	NodesTransactorSession(ctx context.Context) *dr_contracts.CFNodesTransactorSession
 }
 
-type EthClient struct {
+type EthStoreClient struct {
 	ec    *ethclient.Client
 	auth  *bind.TransactOpts
 	nonce uint64
@@ -37,7 +37,7 @@ type EthClient struct {
 	nodes *dr_contracts.CFNodes
 }
 
-func (c *EthClient) StoreTransactorSession(ctx context.Context) *dr_contracts.ARStoreTransactorSession {
+func (c *EthStoreClient) StoreTransactorSession(ctx context.Context) *dr_contracts.ARStoreTransactorSession {
 	s := &dr_contracts.ARStoreTransactorSession{
 		Contract: &c.store.ARStoreTransactor,
 		TransactOpts: bind.TransactOpts{
@@ -53,7 +53,7 @@ func (c *EthClient) StoreTransactorSession(ctx context.Context) *dr_contracts.AR
 	return s
 }
 
-func (c *EthClient) StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession {
+func (c *EthStoreClient) StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession {
 	return &dr_contracts.ARStoreCallerSession{
 		Contract: &c.store.ARStoreCaller,
 		CallOpts: bind.CallOpts{
@@ -64,7 +64,7 @@ func (c *EthClient) StoreCallerSession(ctx context.Context) *dr_contracts.ARStor
 	}
 }
 
-func (c *EthClient) NodesCallerSession(ctx context.Context) *dr_contracts.CFNodesCallerSession {
+func (c *EthStoreClient) NodesCallerSession(ctx context.Context) *dr_contracts.CFNodesCallerSession {
 	return &dr_contracts.CFNodesCallerSession{
 		Contract: &c.nodes.CFNodesCaller,
 		CallOpts: bind.CallOpts{
@@ -75,7 +75,7 @@ func (c *EthClient) NodesCallerSession(ctx context.Context) *dr_contracts.CFNode
 	}
 }
 
-func (c *EthClient) NodesTransactorSession(ctx context.Context) *dr_contracts.CFNodesTransactorSession {
+func (c *EthStoreClient) NodesTransactorSession(ctx context.Context) *dr_contracts.CFNodesTransactorSession {
 	s := &dr_contracts.CFNodesTransactorSession{
 		Contract: &c.nodes.CFNodesTransactor,
 		TransactOpts: bind.TransactOpts{
@@ -91,7 +91,7 @@ func (c *EthClient) NodesTransactorSession(ctx context.Context) *dr_contracts.CF
 	return s
 }
 
-func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
+func NewEthStoreClient(conf g.BlockChainConfig) (*EthStoreClient, error) {
 	privKey, err := crypto.HexToECDSA(conf.Key)
 	if err != nil {
 		log.Errorf("Failed to convert private key: %v", err)
@@ -124,7 +124,7 @@ func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
 	}
 	log.Debugf("nonce: %v", nonce)
 
-	c := &EthClient{
+	c := &EthStoreClient{
 		ec:    conn,
 		auth:  auth,
 		nonce: nonce,

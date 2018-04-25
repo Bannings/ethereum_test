@@ -62,7 +62,7 @@ func init() {
 	}
 
 	blockchainConf := conf.BlockchainConfig
-	blockchain.DefaultClient, err = blockchain.NewEthClient(blockchainConf)
+	blockchain.DefaultClient, err = blockchain.NewEthStoreClient(blockchainConf)
 	if err != nil {
 		log.Fatal(err)
 	}

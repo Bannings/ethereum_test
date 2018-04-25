@@ -31,7 +31,7 @@ func Auth() func(http.Handler) http.Handler {
 
 type author struct {
 	h      http.Handler
-	client blockchain.Client
+	client blockchain.StoreClient
 }
 
 func (a *author) ServeHTTP(w http.ResponseWriter, r *http.Request) {

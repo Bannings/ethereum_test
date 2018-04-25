@@ -29,7 +29,7 @@ var (
 )
 
 func init() {
-	DefaultClient, _ = NewEthClient(conf)
+	DefaultClient, _ = NewEthStoreClient(conf)
 }
 
 func TestExistedNode(t *testing.T) {
@@ -47,7 +47,7 @@ func TestAddNode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := bind.WaitMined(context.Background(), DefaultClient.(*EthClient).ec, tx); err != nil {
+	if _, err := bind.WaitMined(context.Background(), DefaultClient.(*EthStoreClient).ec, tx); err != nil {
 		t.Fatal(err)
 	}
 
@@ -61,7 +61,7 @@ U5Al54VGuEfJQ5y8PQIDAQAB
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := bind.WaitMined(context.Background(), DefaultClient.(*EthClient).ec, tx); err != nil {
+	if _, err := bind.WaitMined(context.Background(), DefaultClient.(*EthStoreClient).ec, tx); err != nil {
 		t.Fatal(err)
 	}
 
