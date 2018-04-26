@@ -86,7 +86,8 @@ func (s *Store) transferEther(to common.Address, amount *big.Int) error {
 
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	nonce := s.adminClient.nonce
+	nonce := s.adminClient.Nonce()
+	log.Debugf("nonce: %v", nonce)
 	tx := types.NewTransaction(nonce, to, amount, 100000, new(big.Int), nil)
 	signTx, err := types.SignTx(tx, types.HomesteadSigner{}, key)
 	//signTx, err := types.SignTx(tx, types.NewEIP155Signer(chainId), s.adminPrivKey)
@@ -98,12 +99,14 @@ func (s *Store) transferEther(to common.Address, amount *big.Int) error {
 		return err
 	}
 
-	atomic.AddUint64(&s.adminClient.nonce, 1)
+	s.adminClient.IncrNonce()
 	go func() {
 		if _, err := bind.WaitMined(context.Background(), s.adminClient.EthClient, tx); err != nil {
-			atomic.StoreUint64(&s.adminClient.nonce, nonce)
+			log.Errorf("tx execute failed: %v", err)
+			atomic.StoreUint64(s.adminClient.nonce, nonce)
 		}
 	}()
+	log.Debugf("now nonce: %v", s.adminClient.Nonce())
 
 	return nil
 }

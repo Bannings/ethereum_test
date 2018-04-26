@@ -17,7 +17,7 @@ type AccountClient struct {
 	rpcClient *rpc.Client
 	EthClient *ethclient.Client
 	Timeout   time.Duration
-	nonce     uint64
+	nonce     *uint64
 }
 
 func NewAccountClient(account Account, rawUrl string, timeout time.Duration) (*AccountClient, error) {
@@ -39,7 +39,7 @@ func NewAccountClient(account Account, rawUrl string, timeout time.Duration) (*A
 		return nil, err
 	}
 
-	return &AccountClient{account, c, ethClient, timeout, nonce}, nil
+	return &AccountClient{account, c, ethClient, timeout, &nonce}, nil
 }
 
 func (c *AccountClient) PersonalImportRawKey(keyHex, passphrase string) (string, error) {
@@ -74,12 +74,12 @@ func (c *AccountClient) PendingNonceAt(account common.Address) (uint64, error) {
 	return c.EthClient.PendingNonceAt(ctx, account)
 }
 
-func (c *AccountClient) Nonce() *uint64 {
-	return &c.nonce
+func (c *AccountClient) Nonce() uint64 {
+	return *c.nonce
 }
 
 func (c *AccountClient) IncrNonce() {
-	atomic.AddUint64(&c.nonce, 1)
+	atomic.AddUint64(c.nonce, 1)
 }
 
 func (c *AccountClient) Close() {

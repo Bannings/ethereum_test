@@ -3,7 +3,6 @@ package blockchain
 import (
 	"context"
 	"math/big"
-	"sync/atomic"
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
@@ -26,7 +25,7 @@ type FxClient struct {
 	fxBatch      *contract_gen.FuxBatch
 }
 
-func NewAdminClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
+func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
 	key, err := acccount.GetKey()
 	if err != nil {
 		return nil, err
@@ -70,49 +69,15 @@ func NewAdminClient(cli *keychain.AccountClient, acccount keychain.Account, cont
 }
 
 func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
-	key, err := acccount.GetKey()
-	if err != nil {
-		return nil, err
-	}
-	auth := bind.NewKeyedTransactor(key)
-
 	cli, err := keychain.NewAccountClient(acccount, rawUrl, 5*time.Second)
 	if err != nil {
 		log.Errorf("new client failed: %v", err)
 		return nil, err
 	}
 
-	fxToken, err := contract_gen.NewFuxToken(common.HexToAddress(contractAddrs.FxTokenAddr), cli.EthClient)
+	c, err := NewFxClient(cli, acccount, contractAddrs)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxToken contract: %v", err)
 		return nil, err
-	}
-
-	fxBoxFactory, err := contract_gen.NewFuxPayBoxFactory(common.HexToAddress(contractAddrs.FxBoxFactoryAddr), cli.EthClient)
-	if err != nil {
-		log.Errorf("Failed to instantiate a fxBoxFactory contract: %v", err)
-		return nil, err
-	}
-
-	fxSplit, err := contract_gen.NewFuxSplit(common.HexToAddress(contractAddrs.FxSplitAddr), cli.EthClient)
-	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
-		return nil, err
-	}
-
-	fxBatch, err := contract_gen.NewFuxBatch(common.HexToAddress(contractAddrs.FxBatchAddr), cli.EthClient)
-	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
-		return nil, err
-	}
-
-	c := &FxClient{
-		cli:          cli,
-		auth:         auth,
-		fxToken:      fxToken,
-		fxBoxFactory: fxBoxFactory,
-		fxSplit:      fxSplit,
-		fxBatch:      fxBatch,
 	}
 
 	return c, nil
@@ -126,7 +91,7 @@ func (c *FxClient) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenTrans
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
-			Nonce:    big.NewInt(int64(*c.cli.Nonce())),
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
@@ -136,7 +101,7 @@ func (c *FxClient) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenTrans
 		return err
 	}
 
-	atomic.AddUint64(c.cli.Nonce(), 1)
+	c.cli.IncrNonce()
 	return nil
 }
 
@@ -148,7 +113,7 @@ func (c *FxClient) CallWithFxSplitTransactor(fn func(*contract_gen.FuxSplitTrans
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
-			Nonce:    big.NewInt(int64(*c.cli.Nonce())),
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
@@ -170,7 +135,7 @@ func (c *FxClient) CallWithFxBatchTransactor(fn func(*contract_gen.FuxBatchTrans
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
-			Nonce:    big.NewInt(int64(*c.cli.Nonce())),
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
@@ -192,7 +157,7 @@ func (c *FxClient) CallWithBoxTransactor(box *contract_gen.FuxPayBox, fn func(*c
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
-			Nonce:    big.NewInt(int64(*c.cli.Nonce())),
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
@@ -214,7 +179,7 @@ func (c *FxClient) CallWithBoxFactoryTransactor(fn func(*contract_gen.FuxPayBoxF
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
-			Nonce:    big.NewInt(int64(*c.cli.Nonce())),
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
@@ -257,7 +222,7 @@ func (c *FxClient) CallWithFxTokenCaller(ctx context.Context, fn func(*contract_
 }
 
 func (c *FxClient) Nonce() uint64 {
-	return *c.cli.Nonce()
+	return c.cli.Nonce()
 }
 
 func (c *FxClient) EthClient() *ethclient.Client {

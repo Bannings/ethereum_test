@@ -31,6 +31,7 @@ var (
 	dbConfig      g.DbConfig
 	ethUrl        string
 	contractAddrs g.ContractAddrs
+	keystore      *keychain.Store
 )
 
 func init() {
@@ -50,7 +51,7 @@ func init() {
 	}
 
 	ethUrl = conf.BlockchainConfig.RawUrl
-	keystore, err := keychain.NewStore(cfAccount, ethUrl, dbConfig)
+	keystore, err = keychain.NewStore(cfAccount, ethUrl, dbConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -114,22 +115,18 @@ func TestDB(t *testing.T) {
 }
 
 func TestFX(t *testing.T) {
-	store, err := keychain.NewStore(cfAccount, ethUrl, dbConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
+	defer keystore.Close()
 
-	_, err = settleIn(store, "supplier001")
+	_, err := settleIn(keystore, "supplier001")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = settleIn(store, "supplier002")
+	_, err = settleIn(keystore, "supplier002")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: store, db: db}
+	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: keystore, db: db}
 
 	tokenId1 := generateTokenId()
 	err = mintFX(executor, tokenId1, 100000)

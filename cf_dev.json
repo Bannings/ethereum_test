@@ -1,9 +1,9 @@
 {
   "blockchain": {
-    "key": "769a4001e52fc390036a73fa1ccae318bdc1b1baf598720a4481904364055e69",
+    "key": "b5803a6f3abef1c64354ce5b1fe7bd883229fc8579b688bb852dd64493c5a627",
     "rawUrl": "http://127.0.0.1:9545",
 
-    "adminKey": "769a4001e52fc390036a73fa1ccae318bdc1b1baf598720a4481904364055e69",
+    "adminKey": "b5803a6f3abef1c64354ce5b1fe7bd883229fc8579b688bb852dd64493c5a627",
     "adminPassphrase": "",
 
     "contractAddrs": {
