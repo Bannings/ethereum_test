@@ -3,8 +3,9 @@ package keychain
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/crypto"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (

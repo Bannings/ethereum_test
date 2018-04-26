@@ -2,6 +2,7 @@ package fx
 
 import (
 	"database/sql"
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -9,51 +10,52 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
-	"github.com/eddyzhou/log"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
-	cfKey      = "a1532f1be58eb3ad43d02f4c5f837f62ded6322886c9348702798f08d6cb751b"
-	ethUrl     = "http://127.0.0.1:8545"
 	passphrase = "123456"
+
+	frozenRate = 0.2
+	feeRate    = 0.001
 )
 
 var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
-	frozenRate = 0.2
-	feeRate    = 0.001
-
-	dbConfig = g.DbConfig{
-		Schema:   "fx_blockchain",
-		Host:     "127.0.0.1",
-		Port:     "3306",
-		Username: "root",
-		Password: "chou1103",
-	}
 )
 
 var (
 	cfAccount     keychain.Account
-	contractAddrs g.ContractAddrs
 	db            *sql.DB
+	dbConfig      g.DbConfig
+	ethUrl        string
+	contractAddrs g.ContractAddrs
+	keystore      *keychain.Store
 )
 
 func init() {
+	g.LoadConfig("../cf_dev.json")
+	conf := g.GetConfig()
+
+	cfKey := conf.BlockchainConfig.AdminKey
 	privKey, _ := crypto.HexToECDSA(cfKey)
 	address := crypto.PubkeyToAddress(privKey.PublicKey)
 	cfAccount = keychain.Account{Address: address, Key: cfKey}
 
-	contractAddrs = g.ContractAddrs{
-		FxTokenAddr:      "0x77227767836175e4799262607Cbe2F9957fE5B0E",
-		FxBoxFactoryAddr: "0xaFE3FfE684ff35436195D9947c7eEB002E40C60B",
-	}
-
+	dbConfig = conf.DbConfig
+	contractAddrs = conf.BlockchainConfig.ContractAddrs
 	var err error
 	if db, err = g.OpenDB(dbConfig); err != nil {
 		panic(err)
 	}
+
+	ethUrl = conf.BlockchainConfig.RawUrl
+	keystore, err = keychain.NewStore(cfAccount, ethUrl, dbConfig)
+	if err != nil {
+		panic(err)
+	}
+	Init(ethUrl, keystore)
 }
 
 func TestClosure(t *testing.T) {
@@ -113,22 +115,18 @@ func TestDB(t *testing.T) {
 }
 
 func TestFX(t *testing.T) {
-	store, err := keychain.NewStore(cfAccount, ethUrl, dbConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer store.Close()
+	defer keystore.Close()
 
-	_, err = settleIn(store, "supplier001")
+	_, err := settleIn(keystore, "supplier001")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = settleIn(store, "supplier002")
+	_, err = settleIn(keystore, "supplier002")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: store}
+	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: keystore, db: db}
 
 	tokenId1 := generateTokenId()
 	err = mintFX(executor, tokenId1, 100000)
@@ -237,12 +235,12 @@ func mintFX(executor *EthExecutor, tokenId int64, amount uint64) error {
 func settleIn(store *keychain.Store, supplierId string) (keychain.Account, error) {
 	acc, err := store.CreateAccount(passphrase)
 	if err != nil {
-		log.Errorf("create account failed: %v", err)
+		fmt.Printf("create account failed: %v", err)
 		return keychain.Account{}, err
 	}
 
 	if err := store.StoreAccount(supplierId, acc); err != nil {
-		log.Errorf("store account failed: %v", err)
+		fmt.Printf("store account failed: %v", err)
 		return keychain.Account{}, err
 	}
 

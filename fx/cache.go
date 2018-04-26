@@ -18,9 +18,10 @@ func Init(rawUrl string, keystore *keychain.Store) {
 	clientCache = NewCache(rawUrl, keystore, 30)
 
 	acc := keystore.GetAdminAccount()
+	cli := keystore.GetAdminClient()
 	conf := g.GetConfig()
 	var err error
-	adminClient, err = blockchain.NewPersonalClient(rawUrl, acc, conf.BlockchainConfig.ContractAddrs)
+	adminClient, err = blockchain.NewFxClient(cli, acc, conf.BlockchainConfig.ContractAddrs)
 	if err != nil {
 		panic(err)
 	}
