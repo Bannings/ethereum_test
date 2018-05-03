@@ -1,0 +1,83 @@
+package fx
+
+import (
+	"math/rand"
+	"time"
+
+	"github.com/eddyzhou/log"
+)
+
+var (
+	doNothing   = func(err error, cmd Command, processor *CmdProcessor) error { return nil }
+	alwaysRetry = func(err error) bool { return true }
+
+	defaultOptions = &options{
+		max:          5,
+		retryIf:      alwaysRetry,
+		preRetryHook: doNothing,
+		backoff:      backoffUniformRandom(50*time.Millisecond, 0.10),
+	}
+)
+
+type RetryIfFunc func(error) bool
+
+type PreRetryFunc func(err error, cmd Command, processor *CmdProcessor) error
+
+type BackoffFunc func(attempt uint) time.Duration
+
+type options struct {
+	max          uint
+	retryIf      RetryIfFunc
+	preRetryHook PreRetryFunc
+	backoff      BackoffFunc
+}
+
+type ExecuteOption func(*options)
+
+func WithRetryDisable() ExecuteOption {
+	return WithRetryMax(0)
+}
+
+func WithRetryMax(maxRetries uint) ExecuteOption {
+	return func(o *options) {
+		o.max = maxRetries
+	}
+}
+
+func WithRetryBackoff(bf BackoffFunc) ExecuteOption {
+	return func(o *options) {
+		o.backoff = bf
+	}
+}
+
+func RetryIf(retryIf RetryIfFunc) ExecuteOption {
+	return func(c *options) {
+		c.retryIf = retryIf
+	}
+}
+
+func PreRetryHook(hook PreRetryFunc) ExecuteOption {
+	return func(c *options) {
+		c.preRetryHook = hook
+	}
+}
+
+func backoffUniformRandom(backoff time.Duration, jitter float64) BackoffFunc {
+	return func(attempt uint) time.Duration {
+		multiplier := jitter * (rand.Float64() - 0.5) * 2
+		return time.Duration(float64(backoff) * (1 + multiplier))
+	}
+}
+
+func waitRetryBackoff(attempt uint, opts *options) {
+	var waitTime time.Duration = 0
+	if attempt > 0 {
+		waitTime = opts.backoff(attempt)
+	}
+	if waitTime > 0 {
+		log.Infof("executor retry attempt: %d, backoff for %v", attempt, waitTime)
+		select {
+		case <-time.Tick(waitTime):
+		}
+	}
+}
