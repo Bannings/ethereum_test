@@ -82,6 +82,16 @@ func (c *AccountClient) IncrNonce() {
 	atomic.AddUint64(c.nonce, 1)
 }
 
+func (c *AccountClient) RefreshNonce() error {
+	nonce, err := c.PendingNonceAt(c.account.Address)
+	if err != nil {
+		return err
+	}
+
+	atomic.StoreUint64(c.nonce, nonce)
+	return nil
+}
+
 func (c *AccountClient) Close() {
 	c.rpcClient.Close()
 }

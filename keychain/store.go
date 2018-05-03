@@ -70,7 +70,7 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 
 	v := new(big.Int)
 	v = v.Mul(Eth1(), big.NewInt(10))
-	if err := s.transferEther(address, v); err != nil {
+	if err := s.TransferEther(address, v); err != nil {
 		log.Errorf("transfer Ether failed: %v", err)
 		return Account{}, err
 	}
@@ -78,7 +78,7 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 	return Account{address, keyHex, passphrase}, nil
 }
 
-func (s *Store) transferEther(to common.Address, amount *big.Int) error {
+func (s *Store) TransferEther(to common.Address, amount *big.Int) error {
 	key, err := crypto.HexToECDSA(s.adminAccount.Key)
 	if err != nil {
 		return err

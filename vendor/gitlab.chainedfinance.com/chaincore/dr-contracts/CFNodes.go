@@ -16,23 +16,7 @@ import (
 )
 
 // CFNodesABI is the input ABI used to generate the binding from.
-const CFNodesABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"publicKey\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherNodeInfo\",\"type\":\"string\"}],\"name\":\"AddNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"UpdateNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"}],\"name\":\"DeleteNode\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"},{\"name\":\"_publicKey\",\"type\":\"string\"},{\"name\":\"_otherNodeInfo\",\"type\":\"string\"}],\"name\":\"addNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"isNodeExisted\",\"outputs\":[{\"name\":\"existed\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"deleteNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"getNodeKey\",\"outputs\":[{\"name\":\"publicKey\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getNodeCount\",\"outputs\":[{\"name\":\"totalNodes\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"},{\"name\":\"_publicKey\",\"type\":\"string\"}],\"name\":\"updateNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
-
-// CFNodesBin is the compiled bytecode used for deploying new contracts.
-const CFNodesBin = `0x6060604052341561000f57600080fd5b610f168061001e6000396000f300606060405260043610610078576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806303f1bc4f1461007d57806339bf397e14610160578063517fb2031461018957806393d5badf14610229578063a0c15b77146102ff578063f99101f51461035c575b600080fd5b341561008857600080fd5b61015e600480803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509190803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509190803590602001908201803590602001908080601f016020809104026020016040519081016040528093929190818152602001838380828437820191505050505050919050506103d1565b005b341561016b57600080fd5b6101736106f7565b6040518082815260200191505060405180910390f35b341561019457600080fd5b610227600480803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509190803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610701565b005b341561023457600080fd5b610284600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610915565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156102c45780820151818401526020810190506102a9565b50505050905090810190601f1680156102f15780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b341561030a57600080fd5b61035a600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610aaf565b005b341561036757600080fd5b6103b7600480803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091905050610c94565b604051808215151515815260200191505060405180910390f35b6103d9610d18565b6000846040518082805190602001908083835b60208310151561041157805182526020820191506020810190506020830392506103ec565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060010160009054906101000a900460ff1615151561045e57fe5b608060405190810160405280858152602001600115158152602001848152602001838152509050806000856040518082805190602001908083835b6020831015156104be5780518252602082019150602081019050602083039250610499565b6001836020036101000a0380198251168184511680821785525050505050509050019150509081526020016040518091039020600082015181600001908051906020019061050d929190610d55565b5060208201518160010160006101000a81548160ff021916908315150217905550604082015181600201908051906020019061054a929190610d55565b506060820151816003019080519060200190610567929190610d55565b50905050600180600082825401925050819055507f92be66c0964e32dbb66cfb7c427ebd70418b6786b3d95b18ef07611a349edacd84848460405180806020018060200180602001848103845287818151815260200191508051906020019080838360005b838110156105e75780820151818401526020810190506105cc565b50505050905090810190601f1680156106145780820380516001836020036101000a031916815260200191505b50848103835286818151815260200191508051906020019080838360005b8381101561064d578082015181840152602081019050610632565b50505050905090810190601f16801561067a5780820380516001836020036101000a031916815260200191505b50848103825285818151815260200191508051906020019080838360005b838110156106b3578082015181840152602081019050610698565b50505050905090810190601f1680156106e05780820380516001836020036101000a031916815260200191505b50965050505050505060405180910390a150505050565b6000600154905090565b6000826040518082805190602001908083835b6020831015156107395780518252602082019150602081019050602083039250610714565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060010160009054906101000a900460ff16151561078557fe5b806000836040518082805190602001908083835b6020831015156107be5780518252602082019150602081019050602083039250610799565b6001836020036101000a03801982511681845116808217855250505050505090500191505090815260200160405180910390206002019080519060200190610807929190610dd5565b507fddd749469df4ef4f7716c20ad7266424f3217042b222980d3f2b62655124a76a8282604051808060200180602001838103835285818151815260200191508051906020019080838360005b8381101561086f578082015181840152602081019050610854565b50505050905090810190601f16801561089c5780820380516001836020036101000a031916815260200191505b50838103825284818151815260200191508051906020019080838360005b838110156108d55780820151818401526020810190506108ba565b50505050905090810190601f1680156109025780820380516001836020036101000a031916815260200191505b5094505050505060405180910390a15050565b61091d610e55565b6000826040518082805190602001908083835b6020831015156109555780518252602082019150602081019050602083039250610930565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060010160009054906101000a900460ff1615156109a157fe5b6000826040518082805190602001908083835b6020831015156109d957805182526020820191506020810190506020830392506109b4565b6001836020036101000a03801982511681845116808217855250505050505090500191505090815260200160405180910390206002018054600181600116156101000203166002900480601f016020809104026020016040519081016040528092919081815260200182805460018160011615610100020316600290048015610aa35780601f10610a7857610100808354040283529160200191610aa3565b820191906000526020600020905b815481529060010190602001808311610a8657829003601f168201915b50505050509050919050565b6000816040518082805190602001908083835b602083101515610ae75780518252602082019150602081019050602083039250610ac2565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060010160009054906101000a900460ff161515610b3357fe5b6000816040518082805190602001908083835b602083101515610b6b5780518252602082019150602081019050602083039250610b46565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060008082016000610baf9190610e69565b6001820160006101000a81549060ff0219169055600282016000610bd39190610e69565b600382016000610be39190610e69565b5050600180600082825403925050819055507fba443e89754ccbbfbdc44ab21d223373615fd710d0b11376d860814b15e7cd0a816040518080602001828103825283818151815260200191508051906020019080838360005b83811015610c57578082015181840152602081019050610c3c565b50505050905090810190601f168015610c845780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b600080826040518082805190602001908083835b602083101515610ccd5780518252602082019150602081019050602083039250610ca8565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060010160009054906101000a900460ff169050919050565b608060405190810160405280610d2c610eb1565b8152602001600015158152602001610d42610eb1565b8152602001610d4f610eb1565b81525090565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f10610d9657805160ff1916838001178555610dc4565b82800160010185558215610dc4579182015b82811115610dc3578251825591602001919060010190610da8565b5b509050610dd19190610ec5565b5090565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f10610e1657805160ff1916838001178555610e44565b82800160010185558215610e44579182015b82811115610e43578251825591602001919060010190610e28565b5b509050610e519190610ec5565b5090565b602060405190810160405280600081525090565b50805460018160011615610100020316600290046000825580601f10610e8f5750610eae565b601f016020900490600052602060002090810190610ead9190610ec5565b5b50565b602060405190810160405280600081525090565b610ee791905b80821115610ee3576000816000905550600101610ecb565b5090565b905600a165627a7a72305820afbdd424e3e0db615cd28bf1f4dcdceaf799a12a9cbce07a5ce04fd36937c14a0029`
-
-// DeployCFNodes deploys a new Ethereum contract, binding an instance of CFNodes to it.
-func DeployCFNodes(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *CFNodes, error) {
-	parsed, err := abi.JSON(strings.NewReader(CFNodesABI))
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(CFNodesBin), backend)
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	return address, tx, &CFNodes{CFNodesCaller: CFNodesCaller{contract: contract}, CFNodesTransactor: CFNodesTransactor{contract: contract}, CFNodesFilterer: CFNodesFilterer{contract: contract}}, nil
-}
+const CFNodesABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInDRGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_router\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"publicKey\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherNodeInfo\",\"type\":\"string\"}],\"name\":\"AddNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"publicKey\",\"type\":\"string\"}],\"name\":\"UpdateNode\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"nodeName\",\"type\":\"string\"}],\"name\":\"DeleteNode\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"},{\"name\":\"_publicKey\",\"type\":\"string\"},{\"name\":\"_otherNodeInfo\",\"type\":\"string\"}],\"name\":\"addNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"isNodeExisted\",\"outputs\":[{\"name\":\"existed\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"deleteNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"}],\"name\":\"getNodeKey\",\"outputs\":[{\"name\":\"publicKey\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getNodeCount\",\"outputs\":[{\"name\":\"totalNodes\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_nodeName\",\"type\":\"string\"},{\"name\":\"_publicKey\",\"type\":\"string\"}],\"name\":\"updateNode\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // CFNodes is an auto generated Go binding around an Ethereum contract.
 type CFNodes struct {
@@ -176,6 +160,84 @@ func (_CFNodes *CFNodesTransactorRaw) Transact(opts *bind.TransactOpts, method s
 	return _CFNodes.Contract.contract.Transact(opts, method, params...)
 }
 
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_CFNodes *CFNodesCaller) ROUTECFRBAC(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "ROUTE_CFRBAC")
+	return *ret0, err
+}
+
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_CFNodes *CFNodesSession) ROUTECFRBAC() (string, error) {
+	return _CFNodes.Contract.ROUTECFRBAC(&_CFNodes.CallOpts)
+}
+
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_CFNodes *CFNodesCallerSession) ROUTECFRBAC() (string, error) {
+	return _CFNodes.Contract.ROUTECFRBAC(&_CFNodes.CallOpts)
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_CFNodes *CFNodesCaller) ROUTECONFIG(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "ROUTE_CONFIG")
+	return *ret0, err
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_CFNodes *CFNodesSession) ROUTECONFIG() (string, error) {
+	return _CFNodes.Contract.ROUTECONFIG(&_CFNodes.CallOpts)
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_CFNodes *CFNodesCallerSession) ROUTECONFIG() (string, error) {
+	return _CFNodes.Contract.ROUTECONFIG(&_CFNodes.CallOpts)
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_CFNodes *CFNodesCaller) IsInDRGroup(opts *bind.CallOpts, _addr common.Address) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "_isInDRGroup", _addr)
+	return *ret0, err
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_CFNodes *CFNodesSession) IsInDRGroup(_addr common.Address) (bool, error) {
+	return _CFNodes.Contract.IsInDRGroup(&_CFNodes.CallOpts, _addr)
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_CFNodes *CFNodesCallerSession) IsInDRGroup(_addr common.Address) (bool, error) {
+	return _CFNodes.Contract.IsInDRGroup(&_CFNodes.CallOpts, _addr)
+}
+
 // GetNodeCount is a free data retrieval call binding the contract method 0x39bf397e.
 //
 // Solidity: function getNodeCount() constant returns(totalNodes uint256)
@@ -228,6 +290,32 @@ func (_CFNodes *CFNodesCallerSession) GetNodeKey(_nodeName string) (string, erro
 	return _CFNodes.Contract.GetNodeKey(&_CFNodes.CallOpts, _nodeName)
 }
 
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_CFNodes *CFNodesCaller) GetRouterAddress(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "getRouterAddress")
+	return *ret0, err
+}
+
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_CFNodes *CFNodesSession) GetRouterAddress() (common.Address, error) {
+	return _CFNodes.Contract.GetRouterAddress(&_CFNodes.CallOpts)
+}
+
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_CFNodes *CFNodesCallerSession) GetRouterAddress() (common.Address, error) {
+	return _CFNodes.Contract.GetRouterAddress(&_CFNodes.CallOpts)
+}
+
 // IsNodeExisted is a free data retrieval call binding the contract method 0xf99101f5.
 //
 // Solidity: function isNodeExisted(_nodeName string) constant returns(existed bool)
@@ -252,6 +340,58 @@ func (_CFNodes *CFNodesSession) IsNodeExisted(_nodeName string) (bool, error) {
 // Solidity: function isNodeExisted(_nodeName string) constant returns(existed bool)
 func (_CFNodes *CFNodesCallerSession) IsNodeExisted(_nodeName string) (bool, error) {
 	return _CFNodes.Contract.IsNodeExisted(&_CFNodes.CallOpts, _nodeName)
+}
+
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
+//
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_CFNodes *CFNodesCaller) IsUsingRouter(opts *bind.CallOpts) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "isUsingRouter")
+	return *ret0, err
+}
+
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
+//
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_CFNodes *CFNodesSession) IsUsingRouter() (bool, error) {
+	return _CFNodes.Contract.IsUsingRouter(&_CFNodes.CallOpts)
+}
+
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
+//
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_CFNodes *CFNodesCallerSession) IsUsingRouter() (bool, error) {
+	return _CFNodes.Contract.IsUsingRouter(&_CFNodes.CallOpts)
+}
+
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+//
+// Solidity: function sysRouter() constant returns(address)
+func (_CFNodes *CFNodesCaller) SysRouter(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _CFNodes.contract.Call(opts, out, "sysRouter")
+	return *ret0, err
+}
+
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+//
+// Solidity: function sysRouter() constant returns(address)
+func (_CFNodes *CFNodesSession) SysRouter() (common.Address, error) {
+	return _CFNodes.Contract.SysRouter(&_CFNodes.CallOpts)
+}
+
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+//
+// Solidity: function sysRouter() constant returns(address)
+func (_CFNodes *CFNodesCallerSession) SysRouter() (common.Address, error) {
+	return _CFNodes.Contract.SysRouter(&_CFNodes.CallOpts)
 }
 
 // AddNode is a paid mutator transaction binding the contract method 0x03f1bc4f.

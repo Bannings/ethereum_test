@@ -15,7 +15,11 @@ type Account struct {
 }
 
 func (a *Account) GetKey() (*ecdsa.PrivateKey, error) {
-	key, err := crypto.HexToECDSA(a.Key)
+	s := a.Key
+	if s[0:2] == "0x" || s[0:2] == "0X" {
+		s = s[2:]
+	}
+	key, err := crypto.HexToECDSA(s)
 	if err != nil {
 		return nil, err
 	}
