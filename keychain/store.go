@@ -3,6 +3,7 @@ package keychain
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"math/big"
 	"sync"
@@ -52,7 +53,7 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 		return Account{}, err
 	}
 
-	keyHex := common.ToHex(crypto.FromECDSA(key))
+	keyHex := hex.EncodeToString(crypto.FromECDSA(key))
 	log.Debugf("key: %s", keyHex)
 	addr, err := s.adminClient.PersonalImportRawKey(keyHex, passphrase)
 	if err != nil {

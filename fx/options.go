@@ -5,31 +5,34 @@ import (
 	"time"
 
 	"github.com/eddyzhou/log"
+	"github.com/ethereum/go-ethereum/core"
 )
 
 var (
-	doNothing   = func(err error, cmd Command, processor *CmdProcessor) error { return nil }
-	alwaysRetry = func(err error) bool { return true }
+	defaultRetriableErrors = []error{core.ErrInsufficientFunds}
 
 	defaultOptions = &options{
-		max:          5,
-		retryIf:      alwaysRetry,
-		preRetryHook: doNothing,
-		backoff:      backoffUniformRandom(50*time.Millisecond, 0.10),
+		max: 1,
+		retryIf: func(err error) bool {
+			for _, e := range defaultRetriableErrors {
+				if e == err {
+					return true
+				}
+			}
+			return false
+		},
+		backoff: backoffUniformRandom(50*time.Millisecond, 0.10),
 	}
 )
 
 type RetryIfFunc func(error) bool
 
-type PreRetryFunc func(err error, cmd Command, processor *CmdProcessor) error
-
 type BackoffFunc func(attempt uint) time.Duration
 
 type options struct {
-	max          uint
-	retryIf      RetryIfFunc
-	preRetryHook PreRetryFunc
-	backoff      BackoffFunc
+	max     uint
+	retryIf RetryIfFunc
+	backoff BackoffFunc
 }
 
 type ExecuteOption func(*options)
@@ -53,12 +56,6 @@ func WithRetryBackoff(bf BackoffFunc) ExecuteOption {
 func RetryIf(retryIf RetryIfFunc) ExecuteOption {
 	return func(c *options) {
 		c.retryIf = retryIf
-	}
-}
-
-func PreRetryHook(hook PreRetryFunc) ExecuteOption {
-	return func(c *options) {
-		c.preRetryHook = hook
 	}
 }
 

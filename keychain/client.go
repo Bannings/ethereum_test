@@ -43,10 +43,15 @@ func NewAccountClient(account Account, rawUrl string, timeout time.Duration) (*A
 }
 
 func (c *AccountClient) PersonalImportRawKey(keyHex, passphrase string) (string, error) {
+	key := keyHex
+	if keyHex[0:2] != "0x" && keyHex[0:2] != "0X" {
+		key = "0x" + keyHex
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 	var addr string
-	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", keyHex, passphrase); err != nil {
+	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", key, passphrase); err != nil {
 		return "", err
 	}
 	return addr, nil

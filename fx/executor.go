@@ -43,7 +43,6 @@ func NewEthExecutor(eos ...ExecuteOption) (*EthExecutor, error) {
 	// TODO
 
 	executor.opts = defaultOptions
-	executor.opts.preRetryHook = executor.preRetryHook
 	for _, o := range eos {
 		o(executor.opts)
 	}
@@ -51,23 +50,19 @@ func NewEthExecutor(eos ...ExecuteOption) (*EthExecutor, error) {
 	return executor, nil
 }
 
-func (e *EthExecutor) preRetryHook(error error, cmd Command, processor *CmdProcessor) error {
-	if err1 := processor.fxClient.RefreshNonce(); err1 != nil {
-		return err1
-	}
+func (e *EthExecutor) handleError(error error, cmd Command, processor *CmdProcessor) {
+	processor.fxClient.RefreshNonce()
 
 	switch error {
 	case core.ErrInsufficientFunds:
 		companyId := cmd.Tx.Sponsor()
-		acc, err := e.keystore.GetAccount(companyId)
-		if err != nil {
-			return err
+		if acc, err := e.keystore.GetAccount(companyId); err == nil {
+			amount := new(big.Int)
+			amount = amount.Mul(keychain.Eth1(), big.NewInt(10))
+			e.keystore.TransferEther(acc.Address, amount)
 		}
-		amount := new(big.Int)
-		amount = amount.Mul(keychain.Eth1(), big.NewInt(10))
-		return e.keystore.TransferEther(acc.Address, amount)
 	default:
-		return nil
+		// TODO: send to sentry and monitor
 	}
 }
 
@@ -93,33 +88,37 @@ func (e *EthExecutor) executeBySupplier(cmd Command) error {
 	}
 	p := &CmdProcessor{fxClient: c, cmd: cmd, db: e.db}
 
-	return e.run(cmd, p)
+	return e.process(cmd, p)
 }
 
-func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
+func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 	if e.opts.max == 0 {
-		return e.do(cmd, p)
+		if err := e.run(cmd, p); err != nil {
+			e.handleError(err, cmd, p)
+		}
 	}
 
 	var lastErr error
 	for attempt := uint(0); attempt < e.opts.max; attempt++ {
 		waitRetryBackoff(attempt, e.opts)
-		lastErr = e.do(cmd, p)
+
+		lastErr = e.run(cmd, p)
 		if lastErr == nil {
 			return nil
 		}
 
-		log.Warnf("executor retry attempt: %d, err: %v", attempt, lastErr)
-
-		if e.opts.retryIf(lastErr) {
-			e.opts.preRetryHook(lastErr, cmd, p)
+		e.handleError(lastErr, cmd, p)
+		if !e.opts.retryIf(lastErr) {
+			return lastErr
 		}
+
+		log.Warnf("executor retry attempt: %d, err: %v", attempt+1, lastErr)
 	}
 
 	return lastErr
 }
 
-func (e *EthExecutor) do(cmd Command, p *CmdProcessor) error {
+func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	var err error
 	switch cmd.Tx.TxType {
 	case SplitFX:
@@ -145,7 +144,7 @@ func (e *EthExecutor) do(cmd Command, p *CmdProcessor) error {
 
 func (e *EthExecutor) executeByPlatform(cmd Command) error {
 	p := &CmdProcessor{fxClient: adminClient, cmd: cmd, db: e.db}
-	return e.run(cmd, p)
+	return e.process(cmd, p)
 }
 
 func (e *EthExecutor) splitFX(p *CmdProcessor) error {
