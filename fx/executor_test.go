@@ -25,31 +25,28 @@ var (
 )
 
 var (
-	cfAccount     keychain.Account
-	db            *sql.DB
-	dbConfig      g.DbConfig
-	ethUrl        string
-	contractAddrs g.ContractAddrs
-	keystore      *keychain.Store
+	db       *sql.DB
+	bcConfig g.BlockChainConfig
+	keystore *keychain.Store
 )
 
 func init() {
 	g.LoadConfig("../cf_dev.json")
 	conf := g.GetConfig()
+	bcConfig = conf.BlockchainConfig
 
 	cfKey := conf.BlockchainConfig.AdminKey
 	privKey, _ := crypto.HexToECDSA(cfKey)
 	address := crypto.PubkeyToAddress(privKey.PublicKey)
-	cfAccount = keychain.Account{Address: address, Key: cfKey}
+	cfAccount := keychain.Account{Address: address, Key: cfKey}
 
-	dbConfig = conf.DbConfig
-	contractAddrs = conf.BlockchainConfig.ContractAddrs
+	dbConfig := conf.DbConfig
 	var err error
 	if db, err = g.OpenDB(dbConfig); err != nil {
 		panic(err)
 	}
 
-	ethUrl = conf.BlockchainConfig.RawUrl
+	ethUrl := conf.BlockchainConfig.RawUrl
 	keystore, err = keychain.NewStore(cfAccount, ethUrl, dbConfig)
 	if err != nil {
 		panic(err)
@@ -69,7 +66,10 @@ func TestFX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	executor := &EthExecutor{ethUrl: ethUrl, contractAddrs: contractAddrs, keystore: keystore, db: db}
+	executor, err := NewEthExecutor(keystore, bcConfig, db)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tokenId1 := generateTokenId()
 	err = mintFX(executor, tokenId1, 100000)

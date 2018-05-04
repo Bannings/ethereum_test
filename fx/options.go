@@ -53,7 +53,7 @@ func WithRetryBackoff(bf BackoffFunc) ExecuteOption {
 	}
 }
 
-func RetryIf(retryIf RetryIfFunc) ExecuteOption {
+func WithRetryIf(retryIf RetryIfFunc) ExecuteOption {
 	return func(c *options) {
 		c.retryIf = retryIf
 	}

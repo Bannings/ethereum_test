@@ -9,31 +9,6 @@ import (
 	"gitlab.chainedfinance.com/infra/gocommons/lru"
 )
 
-var (
-	clientCache *ClientCache
-	adminClient *blockchain.FxClient
-)
-
-func Init(rawUrl string, keystore *keychain.Store) {
-	clientCache = NewCache(rawUrl, keystore, 30)
-
-	acc := keystore.GetAdminAccount()
-	cli := keystore.GetAdminClient()
-	conf := g.GetConfig()
-	var err error
-	adminClient, err = blockchain.NewFxClient(cli, acc, conf.BlockchainConfig.ContractAddrs)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func Close() {
-	clientCache.FlushAll()
-	adminClient.Close()
-}
-
-// ----------------
-
 // ClientCache is a wrapper around an *lru.Cache that adds synchronization
 // makes values always be FxClient
 type ClientCache struct {

@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/getsentry/raven-go"
 )
 
 var (
@@ -37,10 +38,12 @@ type EthExecutor struct {
 	opts          *options
 }
 
-func NewEthExecutor(eos ...ExecuteOption) (*EthExecutor, error) {
+func NewEthExecutor(keystore *keychain.Store, conf g.BlockChainConfig, db *sql.DB, eos ...ExecuteOption) (*EthExecutor, error) {
 	executor := new(EthExecutor)
-
-	// TODO
+	executor.keystore = keystore
+	executor.ethUrl = conf.RawUrl
+	executor.contractAddrs = conf.ContractAddrs
+	executor.db = db
 
 	executor.opts = defaultOptions
 	for _, o := range eos {
@@ -50,19 +53,20 @@ func NewEthExecutor(eos ...ExecuteOption) (*EthExecutor, error) {
 	return executor, nil
 }
 
-func (e *EthExecutor) handleError(error error, cmd Command, processor *CmdProcessor) {
+func (e *EthExecutor) handleError(err error, cmd Command, processor *CmdProcessor) {
 	processor.fxClient.RefreshNonce()
 
-	switch error {
+	switch err {
 	case core.ErrInsufficientFunds:
 		companyId := cmd.Tx.Sponsor()
-		if acc, err := e.keystore.GetAccount(companyId); err == nil {
+		if acc, err1 := e.keystore.GetAccount(companyId); err1 == nil {
 			amount := new(big.Int)
 			amount = amount.Mul(keychain.Eth1(), big.NewInt(10))
 			e.keystore.TransferEther(acc.Address, amount)
 		}
 	default:
-		// TODO: send to sentry and monitor
+		raven.CaptureError(err, nil)
+
 	}
 }
 

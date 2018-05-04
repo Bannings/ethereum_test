@@ -18,6 +18,7 @@ import (
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
 
 	"github.com/eddyzhou/log"
+	"github.com/getsentry/raven-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -55,6 +56,10 @@ func init() {
 		log.Std = log.New(os.Stderr, "", log.Ldefault, lvl)
 	}
 
+	if err := raven.SetDSN(sentryDSN); err != nil {
+		log.Fatal(err)
+	}
+
 	configFile := args[0]
 	conf, err := g.LoadConfig(configFile)
 	if err != nil {
@@ -73,7 +78,9 @@ func init() {
 			log.Fatal(err)
 		}
 
-		fx.Init(blockchainConf.RawUrl, keystore)
+		if err := fx.Init(blockchainConf.RawUrl, keystore); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	pid2file()
@@ -98,7 +105,7 @@ func main() {
 	m := mw.NewMonitor("r2", *port)
 
 	r := chi.NewRouter()
-	r.Use(mw.Recovery(m, sentryDSN))
+	r.Use(mw.Recovery(m))
 	r.Use(mw.Monitoring(m))
 	r.Use(mw.Logging(log.Std))
 
