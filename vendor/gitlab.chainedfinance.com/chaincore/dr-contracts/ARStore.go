@@ -15,7 +15,7 @@ import (
 )
 
 // ARStoreABI is the input ABI used to generate the binding from.
-const ARStoreABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"addValidAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"isAdmin\",\"outputs\":[{\"name\":\"admin\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"addAdmin\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"queryValidAddress\",\"outputs\":[{\"name\":\"valid\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"deleteValidAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"userId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"bcAccount\",\"type\":\"string\"}],\"name\":\"RegisterUser\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"payId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARPayInfo\",\"type\":\"string\"}],\"name\":\"ARPay\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractNo\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherContractInfo\",\"type\":\"string\"}],\"name\":\"AddContract\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"discountId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountInfo\",\"type\":\"string\"}],\"name\":\"ARDiscountTxUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"arId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountId\",\"type\":\"string\"}],\"name\":\"ARInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"companyId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherCompanyInfo\",\"type\":\"string\"}],\"name\":\"CompanyInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractNo\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherContractInfo\",\"type\":\"string\"}],\"name\":\"ContractInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"payId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARPayInfo\",\"type\":\"string\"}],\"name\":\"ARPaymentTxUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"companyId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherCompanyInfo\",\"type\":\"string\"}],\"name\":\"AddCompany\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"discountId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountInfo\",\"type\":\"string\"}],\"name\":\"ARDiscount\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"arId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARInfo\",\"type\":\"string\"}],\"name\":\"CreateAR\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"inputAddress\",\"type\":\"address\"}],\"name\":\"AddValidAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"inputAddress\",\"type\":\"address\"}],\"name\":\"DeleteValiAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"inputAddress\",\"type\":\"address\"}],\"name\":\"AddAdmin\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"}],\"name\":\"queryARInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateARInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"createAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateCompanyInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"}],\"name\":\"queryCompanyInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"addCompany\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateContractInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"}],\"name\":\"queryContractInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"addContract\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updatePaymentInfoOfAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateDiscountInfoOfAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"payByAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"}],\"name\":\"queryPaymentTx\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"discountByAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"}],\"name\":\"queryDiscountTx\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasAR\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasCompany\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasContract\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasPayment\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasDiscount\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const ARStoreABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInDRGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_router\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"userId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"bcAccount\",\"type\":\"string\"}],\"name\":\"RegisterUser\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"payId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARPayInfo\",\"type\":\"string\"}],\"name\":\"ARPay\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractNo\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherContractInfo\",\"type\":\"string\"}],\"name\":\"AddContract\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"discountId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountInfo\",\"type\":\"string\"}],\"name\":\"ARDiscountTxUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"arId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountId\",\"type\":\"string\"}],\"name\":\"ARInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"companyId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherCompanyInfo\",\"type\":\"string\"}],\"name\":\"CompanyInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractNo\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherContractInfo\",\"type\":\"string\"}],\"name\":\"ContractInfoUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"payId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARPayInfo\",\"type\":\"string\"}],\"name\":\"ARPaymentTxUpdate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"companyId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherCompanyInfo\",\"type\":\"string\"}],\"name\":\"AddCompany\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"discountId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherDiscountInfo\",\"type\":\"string\"}],\"name\":\"ARDiscount\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"arId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"otherARInfo\",\"type\":\"string\"}],\"name\":\"CreateAR\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"}],\"name\":\"queryARInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateARInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_arId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"createAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateCompanyInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"}],\"name\":\"queryCompanyInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_companyId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"addCompany\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateContractInfo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"}],\"name\":\"queryContractInfo\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contractNo\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"addContract\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updatePaymentInfoOfAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"updateDiscountInfoOfAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"payByAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_payId\",\"type\":\"string\"}],\"name\":\"queryPaymentTx\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"discountByAR\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_discountId\",\"type\":\"string\"}],\"name\":\"queryDiscountTx\",\"outputs\":[{\"name\":\"otherInfo\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasAR\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasCompany\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasContract\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasPayment\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"string\"}],\"name\":\"hasDiscount\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // ARStore is an auto generated Go binding around an Ethereum contract.
 type ARStore struct {
@@ -159,6 +159,110 @@ func (_ARStore *ARStoreTransactorRaw) Transact(opts *bind.TransactOpts, method s
 	return _ARStore.Contract.contract.Transact(opts, method, params...)
 }
 
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_ARStore *ARStoreCaller) ROUTECFRBAC(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _ARStore.contract.Call(opts, out, "ROUTE_CFRBAC")
+	return *ret0, err
+}
+
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_ARStore *ARStoreSession) ROUTECFRBAC() (string, error) {
+	return _ARStore.Contract.ROUTECFRBAC(&_ARStore.CallOpts)
+}
+
+// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
+//
+// Solidity: function ROUTE_CFRBAC() constant returns(string)
+func (_ARStore *ARStoreCallerSession) ROUTECFRBAC() (string, error) {
+	return _ARStore.Contract.ROUTECFRBAC(&_ARStore.CallOpts)
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_ARStore *ARStoreCaller) ROUTECONFIG(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _ARStore.contract.Call(opts, out, "ROUTE_CONFIG")
+	return *ret0, err
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_ARStore *ARStoreSession) ROUTECONFIG() (string, error) {
+	return _ARStore.Contract.ROUTECONFIG(&_ARStore.CallOpts)
+}
+
+// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
+//
+// Solidity: function ROUTE_CONFIG() constant returns(string)
+func (_ARStore *ARStoreCallerSession) ROUTECONFIG() (string, error) {
+	return _ARStore.Contract.ROUTECONFIG(&_ARStore.CallOpts)
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_ARStore *ARStoreCaller) IsInDRGroup(opts *bind.CallOpts, _addr common.Address) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _ARStore.contract.Call(opts, out, "_isInDRGroup", _addr)
+	return *ret0, err
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_ARStore *ARStoreSession) IsInDRGroup(_addr common.Address) (bool, error) {
+	return _ARStore.Contract.IsInDRGroup(&_ARStore.CallOpts, _addr)
+}
+
+// IsInDRGroup is a free data retrieval call binding the contract method 0xacd11b60.
+//
+// Solidity: function _isInDRGroup(_addr address) constant returns(bool)
+func (_ARStore *ARStoreCallerSession) IsInDRGroup(_addr common.Address) (bool, error) {
+	return _ARStore.Contract.IsInDRGroup(&_ARStore.CallOpts, _addr)
+}
+
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_ARStore *ARStoreCaller) GetRouterAddress(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _ARStore.contract.Call(opts, out, "getRouterAddress")
+	return *ret0, err
+}
+
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_ARStore *ARStoreSession) GetRouterAddress() (common.Address, error) {
+	return _ARStore.Contract.GetRouterAddress(&_ARStore.CallOpts)
+}
+
+// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+//
+// Solidity: function getRouterAddress() constant returns(address)
+func (_ARStore *ARStoreCallerSession) GetRouterAddress() (common.Address, error) {
+	return _ARStore.Contract.GetRouterAddress(&_ARStore.CallOpts)
+}
+
 // HasAR is a free data retrieval call binding the contract method 0x8c1fdea5.
 //
 // Solidity: function hasAR(_id string) constant returns(bool)
@@ -289,56 +393,30 @@ func (_ARStore *ARStoreCallerSession) HasPayment(_id string) (bool, error) {
 	return _ARStore.Contract.HasPayment(&_ARStore.CallOpts, _id)
 }
 
-// IsAdmin is a free data retrieval call binding the contract method 0x24d7806c.
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
 //
-// Solidity: function isAdmin(_address address) constant returns(admin bool)
-func (_ARStore *ARStoreCaller) IsAdmin(opts *bind.CallOpts, _address common.Address) (bool, error) {
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_ARStore *ARStoreCaller) IsUsingRouter(opts *bind.CallOpts) (bool, error) {
 	var (
 		ret0 = new(bool)
 	)
 	out := ret0
-	err := _ARStore.contract.Call(opts, out, "isAdmin", _address)
+	err := _ARStore.contract.Call(opts, out, "isUsingRouter")
 	return *ret0, err
 }
 
-// IsAdmin is a free data retrieval call binding the contract method 0x24d7806c.
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
 //
-// Solidity: function isAdmin(_address address) constant returns(admin bool)
-func (_ARStore *ARStoreSession) IsAdmin(_address common.Address) (bool, error) {
-	return _ARStore.Contract.IsAdmin(&_ARStore.CallOpts, _address)
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_ARStore *ARStoreSession) IsUsingRouter() (bool, error) {
+	return _ARStore.Contract.IsUsingRouter(&_ARStore.CallOpts)
 }
 
-// IsAdmin is a free data retrieval call binding the contract method 0x24d7806c.
+// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
 //
-// Solidity: function isAdmin(_address address) constant returns(admin bool)
-func (_ARStore *ARStoreCallerSession) IsAdmin(_address common.Address) (bool, error) {
-	return _ARStore.Contract.IsAdmin(&_ARStore.CallOpts, _address)
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() constant returns(address)
-func (_ARStore *ARStoreCaller) Owner(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _ARStore.contract.Call(opts, out, "owner")
-	return *ret0, err
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() constant returns(address)
-func (_ARStore *ARStoreSession) Owner() (common.Address, error) {
-	return _ARStore.Contract.Owner(&_ARStore.CallOpts)
-}
-
-// Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
-//
-// Solidity: function owner() constant returns(address)
-func (_ARStore *ARStoreCallerSession) Owner() (common.Address, error) {
-	return _ARStore.Contract.Owner(&_ARStore.CallOpts)
+// Solidity: function isUsingRouter() constant returns(bool)
+func (_ARStore *ARStoreCallerSession) IsUsingRouter() (bool, error) {
+	return _ARStore.Contract.IsUsingRouter(&_ARStore.CallOpts)
 }
 
 // QueryARInfo is a free data retrieval call binding the contract method 0x4e32904e.
@@ -471,51 +549,30 @@ func (_ARStore *ARStoreCallerSession) QueryPaymentTx(_payId string) (string, err
 	return _ARStore.Contract.QueryPaymentTx(&_ARStore.CallOpts, _payId)
 }
 
-// QueryValidAddress is a free data retrieval call binding the contract method 0x8aade303.
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
 //
-// Solidity: function queryValidAddress(_address address) constant returns(valid bool)
-func (_ARStore *ARStoreCaller) QueryValidAddress(opts *bind.CallOpts, _address common.Address) (bool, error) {
+// Solidity: function sysRouter() constant returns(address)
+func (_ARStore *ARStoreCaller) SysRouter(opts *bind.CallOpts) (common.Address, error) {
 	var (
-		ret0 = new(bool)
+		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _ARStore.contract.Call(opts, out, "queryValidAddress", _address)
+	err := _ARStore.contract.Call(opts, out, "sysRouter")
 	return *ret0, err
 }
 
-// QueryValidAddress is a free data retrieval call binding the contract method 0x8aade303.
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
 //
-// Solidity: function queryValidAddress(_address address) constant returns(valid bool)
-func (_ARStore *ARStoreSession) QueryValidAddress(_address common.Address) (bool, error) {
-	return _ARStore.Contract.QueryValidAddress(&_ARStore.CallOpts, _address)
+// Solidity: function sysRouter() constant returns(address)
+func (_ARStore *ARStoreSession) SysRouter() (common.Address, error) {
+	return _ARStore.Contract.SysRouter(&_ARStore.CallOpts)
 }
 
-// QueryValidAddress is a free data retrieval call binding the contract method 0x8aade303.
+// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
 //
-// Solidity: function queryValidAddress(_address address) constant returns(valid bool)
-func (_ARStore *ARStoreCallerSession) QueryValidAddress(_address common.Address) (bool, error) {
-	return _ARStore.Contract.QueryValidAddress(&_ARStore.CallOpts, _address)
-}
-
-// AddAdmin is a paid mutator transaction binding the contract method 0x70480275.
-//
-// Solidity: function addAdmin(_address address) returns()
-func (_ARStore *ARStoreTransactor) AddAdmin(opts *bind.TransactOpts, _address common.Address) (*types.Transaction, error) {
-	return _ARStore.contract.Transact(opts, "addAdmin", _address)
-}
-
-// AddAdmin is a paid mutator transaction binding the contract method 0x70480275.
-//
-// Solidity: function addAdmin(_address address) returns()
-func (_ARStore *ARStoreSession) AddAdmin(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.AddAdmin(&_ARStore.TransactOpts, _address)
-}
-
-// AddAdmin is a paid mutator transaction binding the contract method 0x70480275.
-//
-// Solidity: function addAdmin(_address address) returns()
-func (_ARStore *ARStoreTransactorSession) AddAdmin(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.AddAdmin(&_ARStore.TransactOpts, _address)
+// Solidity: function sysRouter() constant returns(address)
+func (_ARStore *ARStoreCallerSession) SysRouter() (common.Address, error) {
+	return _ARStore.Contract.SysRouter(&_ARStore.CallOpts)
 }
 
 // AddCompany is a paid mutator transaction binding the contract method 0x6559c310.
@@ -560,27 +617,6 @@ func (_ARStore *ARStoreTransactorSession) AddContract(_contractNo string, _other
 	return _ARStore.Contract.AddContract(&_ARStore.TransactOpts, _contractNo, _otherInfo)
 }
 
-// AddValidAddress is a paid mutator transaction binding the contract method 0x02bb62e3.
-//
-// Solidity: function addValidAddress(_address address) returns()
-func (_ARStore *ARStoreTransactor) AddValidAddress(opts *bind.TransactOpts, _address common.Address) (*types.Transaction, error) {
-	return _ARStore.contract.Transact(opts, "addValidAddress", _address)
-}
-
-// AddValidAddress is a paid mutator transaction binding the contract method 0x02bb62e3.
-//
-// Solidity: function addValidAddress(_address address) returns()
-func (_ARStore *ARStoreSession) AddValidAddress(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.AddValidAddress(&_ARStore.TransactOpts, _address)
-}
-
-// AddValidAddress is a paid mutator transaction binding the contract method 0x02bb62e3.
-//
-// Solidity: function addValidAddress(_address address) returns()
-func (_ARStore *ARStoreTransactorSession) AddValidAddress(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.AddValidAddress(&_ARStore.TransactOpts, _address)
-}
-
 // CreateAR is a paid mutator transaction binding the contract method 0xd627325e.
 //
 // Solidity: function createAR(_arId string, _otherInfo string) returns()
@@ -600,27 +636,6 @@ func (_ARStore *ARStoreSession) CreateAR(_arId string, _otherInfo string) (*type
 // Solidity: function createAR(_arId string, _otherInfo string) returns()
 func (_ARStore *ARStoreTransactorSession) CreateAR(_arId string, _otherInfo string) (*types.Transaction, error) {
 	return _ARStore.Contract.CreateAR(&_ARStore.TransactOpts, _arId, _otherInfo)
-}
-
-// DeleteValidAddress is a paid mutator transaction binding the contract method 0xaab0205d.
-//
-// Solidity: function deleteValidAddress(_address address) returns()
-func (_ARStore *ARStoreTransactor) DeleteValidAddress(opts *bind.TransactOpts, _address common.Address) (*types.Transaction, error) {
-	return _ARStore.contract.Transact(opts, "deleteValidAddress", _address)
-}
-
-// DeleteValidAddress is a paid mutator transaction binding the contract method 0xaab0205d.
-//
-// Solidity: function deleteValidAddress(_address address) returns()
-func (_ARStore *ARStoreSession) DeleteValidAddress(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.DeleteValidAddress(&_ARStore.TransactOpts, _address)
-}
-
-// DeleteValidAddress is a paid mutator transaction binding the contract method 0xaab0205d.
-//
-// Solidity: function deleteValidAddress(_address address) returns()
-func (_ARStore *ARStoreTransactorSession) DeleteValidAddress(_address common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.DeleteValidAddress(&_ARStore.TransactOpts, _address)
 }
 
 // DiscountByAR is a paid mutator transaction binding the contract method 0x86672ae0.
@@ -663,27 +678,6 @@ func (_ARStore *ARStoreSession) PayByAR(_payId string, _otherInfo string) (*type
 // Solidity: function payByAR(_payId string, _otherInfo string) returns()
 func (_ARStore *ARStoreTransactorSession) PayByAR(_payId string, _otherInfo string) (*types.Transaction, error) {
 	return _ARStore.Contract.PayByAR(&_ARStore.TransactOpts, _payId, _otherInfo)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(newOwner address) returns()
-func (_ARStore *ARStoreTransactor) TransferOwnership(opts *bind.TransactOpts, newOwner common.Address) (*types.Transaction, error) {
-	return _ARStore.contract.Transact(opts, "transferOwnership", newOwner)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(newOwner address) returns()
-func (_ARStore *ARStoreSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.TransferOwnership(&_ARStore.TransactOpts, newOwner)
-}
-
-// TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
-//
-// Solidity: function transferOwnership(newOwner address) returns()
-func (_ARStore *ARStoreTransactorSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
-	return _ARStore.Contract.TransferOwnership(&_ARStore.TransactOpts, newOwner)
 }
 
 // UpdateARInfo is a paid mutator transaction binding the contract method 0xdc527b1a.
@@ -1406,128 +1400,6 @@ func (_ARStore *ARStoreFilterer) WatchARPaymentTxUpdate(opts *bind.WatchOpts, si
 	}), nil
 }
 
-// ARStoreAddAdminIterator is returned from FilterAddAdmin and is used to iterate over the raw logs and unpacked data for AddAdmin events raised by the ARStore contract.
-type ARStoreAddAdminIterator struct {
-	Event *ARStoreAddAdmin // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ARStoreAddAdminIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ARStoreAddAdmin)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ARStoreAddAdmin)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ARStoreAddAdminIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ARStoreAddAdminIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ARStoreAddAdmin represents a AddAdmin event raised by the ARStore contract.
-type ARStoreAddAdmin struct {
-	InputAddress common.Address
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterAddAdmin is a free log retrieval operation binding the contract event 0xad6de4452a631e641cb59902236607946ce9272b9b981f2f80e8d129cb9084ba.
-//
-// Solidity: event AddAdmin(inputAddress address)
-func (_ARStore *ARStoreFilterer) FilterAddAdmin(opts *bind.FilterOpts) (*ARStoreAddAdminIterator, error) {
-
-	logs, sub, err := _ARStore.contract.FilterLogs(opts, "AddAdmin")
-	if err != nil {
-		return nil, err
-	}
-	return &ARStoreAddAdminIterator{contract: _ARStore.contract, event: "AddAdmin", logs: logs, sub: sub}, nil
-}
-
-// WatchAddAdmin is a free log subscription operation binding the contract event 0xad6de4452a631e641cb59902236607946ce9272b9b981f2f80e8d129cb9084ba.
-//
-// Solidity: event AddAdmin(inputAddress address)
-func (_ARStore *ARStoreFilterer) WatchAddAdmin(opts *bind.WatchOpts, sink chan<- *ARStoreAddAdmin) (event.Subscription, error) {
-
-	logs, sub, err := _ARStore.contract.WatchLogs(opts, "AddAdmin")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ARStoreAddAdmin)
-				if err := _ARStore.contract.UnpackLog(event, "AddAdmin", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
 // ARStoreAddCompanyIterator is returned from FilterAddCompany and is used to iterate over the raw logs and unpacked data for AddCompany events raised by the ARStore contract.
 type ARStoreAddCompanyIterator struct {
 	Event *ARStoreAddCompany // Event containing the contract specifics and raw log
@@ -1754,128 +1626,6 @@ func (_ARStore *ARStoreFilterer) WatchAddContract(opts *bind.WatchOpts, sink cha
 				// New log arrived, parse the event and forward to the user
 				event := new(ARStoreAddContract)
 				if err := _ARStore.contract.UnpackLog(event, "AddContract", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ARStoreAddValidAddressIterator is returned from FilterAddValidAddress and is used to iterate over the raw logs and unpacked data for AddValidAddress events raised by the ARStore contract.
-type ARStoreAddValidAddressIterator struct {
-	Event *ARStoreAddValidAddress // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ARStoreAddValidAddressIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ARStoreAddValidAddress)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ARStoreAddValidAddress)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ARStoreAddValidAddressIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ARStoreAddValidAddressIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ARStoreAddValidAddress represents a AddValidAddress event raised by the ARStore contract.
-type ARStoreAddValidAddress struct {
-	InputAddress common.Address
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterAddValidAddress is a free log retrieval operation binding the contract event 0xfd99d369d59043ec7e7e684eb3b64fb389349bb7f358b45d2488486186096c88.
-//
-// Solidity: event AddValidAddress(inputAddress address)
-func (_ARStore *ARStoreFilterer) FilterAddValidAddress(opts *bind.FilterOpts) (*ARStoreAddValidAddressIterator, error) {
-
-	logs, sub, err := _ARStore.contract.FilterLogs(opts, "AddValidAddress")
-	if err != nil {
-		return nil, err
-	}
-	return &ARStoreAddValidAddressIterator{contract: _ARStore.contract, event: "AddValidAddress", logs: logs, sub: sub}, nil
-}
-
-// WatchAddValidAddress is a free log subscription operation binding the contract event 0xfd99d369d59043ec7e7e684eb3b64fb389349bb7f358b45d2488486186096c88.
-//
-// Solidity: event AddValidAddress(inputAddress address)
-func (_ARStore *ARStoreFilterer) WatchAddValidAddress(opts *bind.WatchOpts, sink chan<- *ARStoreAddValidAddress) (event.Subscription, error) {
-
-	logs, sub, err := _ARStore.contract.WatchLogs(opts, "AddValidAddress")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ARStoreAddValidAddress)
-				if err := _ARStore.contract.UnpackLog(event, "AddValidAddress", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -2245,269 +1995,6 @@ func (_ARStore *ARStoreFilterer) WatchCreateAR(opts *bind.WatchOpts, sink chan<-
 				// New log arrived, parse the event and forward to the user
 				event := new(ARStoreCreateAR)
 				if err := _ARStore.contract.UnpackLog(event, "CreateAR", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ARStoreDeleteValiAddressIterator is returned from FilterDeleteValiAddress and is used to iterate over the raw logs and unpacked data for DeleteValiAddress events raised by the ARStore contract.
-type ARStoreDeleteValiAddressIterator struct {
-	Event *ARStoreDeleteValiAddress // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ARStoreDeleteValiAddressIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ARStoreDeleteValiAddress)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ARStoreDeleteValiAddress)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ARStoreDeleteValiAddressIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ARStoreDeleteValiAddressIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ARStoreDeleteValiAddress represents a DeleteValiAddress event raised by the ARStore contract.
-type ARStoreDeleteValiAddress struct {
-	InputAddress common.Address
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterDeleteValiAddress is a free log retrieval operation binding the contract event 0x72ede53e22deabdaeb35c49c5acff65c914fbbc6694de2b3968f6a47ac46471b.
-//
-// Solidity: event DeleteValiAddress(inputAddress address)
-func (_ARStore *ARStoreFilterer) FilterDeleteValiAddress(opts *bind.FilterOpts) (*ARStoreDeleteValiAddressIterator, error) {
-
-	logs, sub, err := _ARStore.contract.FilterLogs(opts, "DeleteValiAddress")
-	if err != nil {
-		return nil, err
-	}
-	return &ARStoreDeleteValiAddressIterator{contract: _ARStore.contract, event: "DeleteValiAddress", logs: logs, sub: sub}, nil
-}
-
-// WatchDeleteValiAddress is a free log subscription operation binding the contract event 0x72ede53e22deabdaeb35c49c5acff65c914fbbc6694de2b3968f6a47ac46471b.
-//
-// Solidity: event DeleteValiAddress(inputAddress address)
-func (_ARStore *ARStoreFilterer) WatchDeleteValiAddress(opts *bind.WatchOpts, sink chan<- *ARStoreDeleteValiAddress) (event.Subscription, error) {
-
-	logs, sub, err := _ARStore.contract.WatchLogs(opts, "DeleteValiAddress")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ARStoreDeleteValiAddress)
-				if err := _ARStore.contract.UnpackLog(event, "DeleteValiAddress", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ARStoreOwnershipTransferredIterator is returned from FilterOwnershipTransferred and is used to iterate over the raw logs and unpacked data for OwnershipTransferred events raised by the ARStore contract.
-type ARStoreOwnershipTransferredIterator struct {
-	Event *ARStoreOwnershipTransferred // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ARStoreOwnershipTransferredIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ARStoreOwnershipTransferred)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ARStoreOwnershipTransferred)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ARStoreOwnershipTransferredIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ARStoreOwnershipTransferredIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ARStoreOwnershipTransferred represents a OwnershipTransferred event raised by the ARStore contract.
-type ARStoreOwnershipTransferred struct {
-	PreviousOwner common.Address
-	NewOwner      common.Address
-	Raw           types.Log // Blockchain specific contextual infos
-}
-
-// FilterOwnershipTransferred is a free log retrieval operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
-//
-// Solidity: event OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
-func (_ARStore *ARStoreFilterer) FilterOwnershipTransferred(opts *bind.FilterOpts, previousOwner []common.Address, newOwner []common.Address) (*ARStoreOwnershipTransferredIterator, error) {
-
-	var previousOwnerRule []interface{}
-	for _, previousOwnerItem := range previousOwner {
-		previousOwnerRule = append(previousOwnerRule, previousOwnerItem)
-	}
-	var newOwnerRule []interface{}
-	for _, newOwnerItem := range newOwner {
-		newOwnerRule = append(newOwnerRule, newOwnerItem)
-	}
-
-	logs, sub, err := _ARStore.contract.FilterLogs(opts, "OwnershipTransferred", previousOwnerRule, newOwnerRule)
-	if err != nil {
-		return nil, err
-	}
-	return &ARStoreOwnershipTransferredIterator{contract: _ARStore.contract, event: "OwnershipTransferred", logs: logs, sub: sub}, nil
-}
-
-// WatchOwnershipTransferred is a free log subscription operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
-//
-// Solidity: event OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
-func (_ARStore *ARStoreFilterer) WatchOwnershipTransferred(opts *bind.WatchOpts, sink chan<- *ARStoreOwnershipTransferred, previousOwner []common.Address, newOwner []common.Address) (event.Subscription, error) {
-
-	var previousOwnerRule []interface{}
-	for _, previousOwnerItem := range previousOwner {
-		previousOwnerRule = append(previousOwnerRule, previousOwnerItem)
-	}
-	var newOwnerRule []interface{}
-	for _, newOwnerItem := range newOwner {
-		newOwnerRule = append(newOwnerRule, newOwnerItem)
-	}
-
-	logs, sub, err := _ARStore.contract.WatchLogs(opts, "OwnershipTransferred", previousOwnerRule, newOwnerRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ARStoreOwnershipTransferred)
-				if err := _ARStore.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
 					return err
 				}
 				event.Raw = log

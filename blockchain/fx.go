@@ -225,6 +225,10 @@ func (c *FxClient) Nonce() uint64 {
 	return c.cli.Nonce()
 }
 
+func (c *FxClient) RefreshNonce() error {
+	return c.cli.RefreshNonce()
+}
+
 func (c *FxClient) EthClient() *ethclient.Client {
 	return c.cli.EthClient
 }

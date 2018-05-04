@@ -43,10 +43,15 @@ func NewAccountClient(account Account, rawUrl string, timeout time.Duration) (*A
 }
 
 func (c *AccountClient) PersonalImportRawKey(keyHex, passphrase string) (string, error) {
+	key := keyHex
+	if keyHex[0:2] != "0x" && keyHex[0:2] != "0X" {
+		key = "0x" + keyHex
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 	var addr string
-	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", keyHex, passphrase); err != nil {
+	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", key, passphrase); err != nil {
 		return "", err
 	}
 	return addr, nil
@@ -80,6 +85,16 @@ func (c *AccountClient) Nonce() uint64 {
 
 func (c *AccountClient) IncrNonce() {
 	atomic.AddUint64(c.nonce, 1)
+}
+
+func (c *AccountClient) RefreshNonce() error {
+	nonce, err := c.PendingNonceAt(c.account.Address)
+	if err != nil {
+		return err
+	}
+
+	atomic.StoreUint64(c.nonce, nonce)
+	return nil
 }
 
 func (c *AccountClient) Close() {

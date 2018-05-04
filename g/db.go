@@ -10,7 +10,7 @@ import (
 // Open the db connection, panic if it fails.
 func OpenDB(dbConfig DbConfig) (*sql.DB, error) {
 	connString := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?allowOldPasswords=true",
+		"%s:%s@tcp(%s:%s)/%s?allowNativePasswords=true",
 		dbConfig.Username,
 		dbConfig.Password,
 		dbConfig.Host,
