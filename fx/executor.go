@@ -95,6 +95,7 @@ func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 	if e.opts.max == 0 {
 		if err := e.run(cmd, p); err != nil {
 			e.handleError(err, cmd, p)
+			return err
 		}
 	}
 
