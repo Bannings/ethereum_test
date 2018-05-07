@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -18,6 +19,10 @@ import (
 const (
 	stateProcessing = "processing"
 	stateProcessed  = "processed"
+)
+
+var (
+	ErrNoReceipt = errors.New("transation executed but not save receipt")
 )
 
 type CmdProcessor struct {
@@ -93,7 +98,12 @@ func (p *CmdProcessor) createProcedure() error {
 }
 
 func (p *CmdProcessor) finishProcedure() error {
-	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE command_id = ?")
+	b, err := json.Marshal(p.cmd.txHashes)
+	if err != nil {
+		return err
+	}
+
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET tx_hashes = ? state = ? WHERE command_id = ?")
 	if err != nil {
 		return err
 	}
@@ -101,7 +111,7 @@ func (p *CmdProcessor) finishProcedure() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, err = stmt.ExecContext(ctx, stateProcessed, p.cmd.Tx.Id)
+	_, err = stmt.ExecContext(ctx, string(b), stateProcessed, p.cmd.Tx.Id)
 	return err
 }
 
@@ -155,6 +165,10 @@ func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) 
 	nonce := p.cmd.currNonce
 	if r, ok := p.cmd.receipts[string(nonce)]; ok {
 		return r, nil
+	}
+
+	if tx == nil {
+		return nil, ErrNoReceipt
 	}
 
 	receipt, err := bind.WaitMined(ctx, p.fxClient.EthClient(), tx)

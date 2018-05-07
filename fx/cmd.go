@@ -101,4 +101,5 @@ type Command struct {
 	startNonce uint64
 	currNonce  uint64
 	receipts   map[string]*ethTypes.Receipt // key: string(nonce)
+	txHashes   map[string]string
 }

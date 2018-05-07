@@ -18,6 +18,7 @@ CREATE TABLE `cmd_procedure` (
   `command_id` int(11) NOT NULL,
   `start_nonce` bigint(20) DEFAULT NULL,
   `receipts` JSON DEFAULT NULL,
+  `tx_hashes` JSON DEFAULT NULL,
   `state` enum('unprocess', 'processing', 'processed') NOT NULL DEFAULT 'unprocess',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
