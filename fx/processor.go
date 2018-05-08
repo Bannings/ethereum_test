@@ -23,7 +23,7 @@ const (
 )
 
 var (
-	ErrNoReceipt = errors.New("transation executed but not save receipt")
+	ErrNoTxHash = errors.New("transation executed but not save txHash")
 )
 
 type CmdProcessor struct {
@@ -190,7 +190,7 @@ func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) 
 	}
 
 	if tx == nil {
-		return nil, ErrNoReceipt
+		return nil, ErrNoTxHash
 	}
 
 	receipt, err := bind.WaitMined(ctx, p.fxClient.EthClient(), tx)
