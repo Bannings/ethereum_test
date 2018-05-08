@@ -13,6 +13,7 @@ import (
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -31,11 +32,16 @@ type CmdProcessor struct {
 	db       *sql.DB
 }
 
-func (p *CmdProcessor) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenTransactorSession) error) error {
+func (p *CmdProcessor) CallWithFxTokenTransactor(
+	fn func(*contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error),
+) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		err := p.fxClient.CallWithFxTokenTransactor(fn)
+		tx, err := p.fxClient.CallWithFxTokenTransactor(fn)
 		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
 		return err
@@ -44,11 +50,16 @@ func (p *CmdProcessor) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenT
 	return nil
 }
 
-func (p *CmdProcessor) CallWithFxSplitTransactor(fn func(*contract_gen.FuxSplitTransactorSession) error) error {
+func (p *CmdProcessor) CallWithFxSplitTransactor(
+	fn func(*contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error),
+) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		err := p.fxClient.CallWithFxSplitTransactor(fn)
+		tx, err := p.fxClient.CallWithFxSplitTransactor(fn)
 		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
 		return err
@@ -57,11 +68,16 @@ func (p *CmdProcessor) CallWithFxSplitTransactor(fn func(*contract_gen.FuxSplitT
 	return nil
 }
 
-func (p *CmdProcessor) CallWithFxBatchTransactor(fn func(*contract_gen.FuxBatchTransactorSession) error) error {
+func (p *CmdProcessor) CallWithFxBatchTransactor(
+	fn func(*contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error),
+) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		err := p.fxClient.CallWithFxBatchTransactor(fn)
+		tx, err := p.fxClient.CallWithFxBatchTransactor(fn)
 		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
 		return err
@@ -103,7 +119,7 @@ func (p *CmdProcessor) finishProcedure() error {
 		return err
 	}
 
-	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET tx_hashes = ? state = ? WHERE command_id = ?")
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE command_id = ?")
 	if err != nil {
 		return err
 	}
@@ -115,31 +131,32 @@ func (p *CmdProcessor) finishProcedure() error {
 	return err
 }
 
-func (p *CmdProcessor) updateReceipt(receipt *ethTypes.Receipt) error {
-	b, err := json.Marshal(receipt)
-	if err != nil {
-		return err
-	}
-
+func (p *CmdProcessor) saveTxHash(txHash string) error {
 	query := fmt.Sprintf(
-		"UPDATE cmd_procedure set receipts = JSON_SET(COALESCE(receipts, '{}'), '$.\"%v\"', '%s') WHERE command_id = %v",
+		"UPDATE cmd_procedure set tx_hashes = JSON_SET(COALESCE(tx_hashes, '{}'), '$.\"%v\"', '%s') WHERE command_id = %v",
 		p.cmd.currNonce,
-		string(b),
+		txHash,
 		p.cmd.Tx.Id,
 	)
 	log.Debugf(query)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, err = p.db.ExecContext(ctx, query)
+	_, err := p.db.ExecContext(ctx, query)
 	return err
 }
 
-func (p *CmdProcessor) CallWithBoxTransactor(box *contract_gen.FuxPayBox, fn func(*contract_gen.FuxPayBoxTransactorSession) error) error {
+func (p *CmdProcessor) CallWithBoxTransactor(
+	box *contract_gen.FuxPayBox,
+	fn func(*contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error),
+) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		err := p.fxClient.CallWithBoxTransactor(box, fn)
+		tx, err := p.fxClient.CallWithBoxTransactor(box, fn)
 		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
 		return err
@@ -148,11 +165,16 @@ func (p *CmdProcessor) CallWithBoxTransactor(box *contract_gen.FuxPayBox, fn fun
 	return nil
 }
 
-func (p *CmdProcessor) CallWithBoxFactoryTransactor(fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) error) error {
+func (p *CmdProcessor) CallWithBoxFactoryTransactor(
+	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error),
+) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		err := p.fxClient.CallWithBoxFactoryTransactor(fn)
+		tx, err := p.fxClient.CallWithBoxFactoryTransactor(fn)
 		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
 		return err
@@ -163,8 +185,8 @@ func (p *CmdProcessor) CallWithBoxFactoryTransactor(fn func(*contract_gen.FuxPay
 
 func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) (*ethTypes.Receipt, error) {
 	nonce := p.cmd.currNonce
-	if r, ok := p.cmd.receipts[string(nonce)]; ok {
-		return r, nil
+	if txHash, ok := p.cmd.txHashes[string(nonce)]; ok {
+		return waitMined(ctx, p.fxClient.EthClient(), txHash)
 	}
 
 	if tx == nil {
@@ -176,13 +198,28 @@ func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) 
 		return nil, err
 	}
 
-	p.cmd.receipts[string(nonce)] = receipt
-	log.Infof("update receipt to db: %s", receipt)
-	p.updateReceipt(receipt)
-
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
 		return receipt, ErrTxExecuteFailed
 	}
 
 	return receipt, nil
+}
+
+func waitMined(ctx context.Context, b bind.DeployBackend, txHash string) (*ethTypes.Receipt, error) {
+	queryTicker := time.NewTicker(time.Second)
+	defer queryTicker.Stop()
+
+	for {
+		receipt, _ := b.TransactionReceipt(ctx, common.HexToHash(txHash))
+		if receipt != nil {
+			return receipt, nil
+		}
+
+		// Wait for the next round.
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-queryTicker.C:
+		}
+	}
 }

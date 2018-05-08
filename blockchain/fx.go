@@ -12,6 +12,7 @@ import (
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -83,7 +84,9 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g
 	return c, nil
 }
 
-func (c *FxClient) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenTransactorSession) error) error {
+func (c *FxClient) CallWithFxTokenTransactor(
+	fn func(*contract_gen.FuxTokenTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
 	s := &contract_gen.FuxTokenTransactorSession{
@@ -97,15 +100,18 @@ func (c *FxClient) CallWithFxTokenTransactor(fn func(*contract_gen.FuxTokenTrans
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
 	c.cli.IncrNonce()
-	return nil
+	return tx, nil
 }
 
-func (c *FxClient) CallWithFxSplitTransactor(fn func(*contract_gen.FuxSplitTransactorSession) error) error {
+func (c *FxClient) CallWithFxSplitTransactor(
+	fn func(*contract_gen.FuxSplitTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
 	s := &contract_gen.FuxSplitTransactorSession{
@@ -119,15 +125,18 @@ func (c *FxClient) CallWithFxSplitTransactor(fn func(*contract_gen.FuxSplitTrans
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
 	c.cli.IncrNonce()
-	return nil
+	return tx, nil
 }
 
-func (c *FxClient) CallWithFxBatchTransactor(fn func(*contract_gen.FuxBatchTransactorSession) error) error {
+func (c *FxClient) CallWithFxBatchTransactor(
+	fn func(*contract_gen.FuxBatchTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
 	s := &contract_gen.FuxBatchTransactorSession{
@@ -141,15 +150,19 @@ func (c *FxClient) CallWithFxBatchTransactor(fn func(*contract_gen.FuxBatchTrans
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
 	c.cli.IncrNonce()
-	return nil
+	return tx, nil
 }
 
-func (c *FxClient) CallWithBoxTransactor(box *contract_gen.FuxPayBox, fn func(*contract_gen.FuxPayBoxTransactorSession) error) error {
+func (c *FxClient) CallWithBoxTransactor(
+	box *contract_gen.FuxPayBox,
+	fn func(*contract_gen.FuxPayBoxTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
 	s := &contract_gen.FuxPayBoxTransactorSession{
@@ -163,15 +176,18 @@ func (c *FxClient) CallWithBoxTransactor(box *contract_gen.FuxPayBox, fn func(*c
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
 	c.cli.IncrNonce()
-	return nil
+	return tx, nil
 }
 
-func (c *FxClient) CallWithBoxFactoryTransactor(fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) error) error {
+func (c *FxClient) CallWithBoxFactoryTransactor(
+	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
 	s := &contract_gen.FuxPayBoxFactoryTransactorSession{
@@ -185,12 +201,13 @@ func (c *FxClient) CallWithBoxFactoryTransactor(fn func(*contract_gen.FuxPayBoxF
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
 	c.cli.IncrNonce()
-	return nil
+	return tx, nil
 }
 
 func (c *FxClient) CallWithBoxFactoryCaller(fn func(*contract_gen.FuxPayBoxFactoryCallerSession) error) error {

@@ -172,10 +172,10 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 
 	var tx *ethTypes.Transaction
 	err := p.CallWithFxSplitTransactor(
-		func(session *contract_gen.FuxSplitTransactorSession) error {
+		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.SplitFux(&tokenId, newTokenIds, amounts, states)
-			return innerErr
+			return tx, innerErr
 		},
 	)
 	if err != nil {
@@ -183,7 +183,6 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 		return err
 	}
 
-	cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
 		return err
@@ -201,7 +200,6 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 	input := cmd.Tx.Input
 
 	var tx *ethTypes.Transaction
-	var innerErr error
 	for idx, t := range output {
 		boxId := generateBoxId(cmd.Tx.TxId, idx)
 		to := t.Owner
@@ -213,9 +211,10 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 		log.Infof("create box: %v for %s", boxId, to)
 
 		err = p.CallWithBoxFactoryTransactor(
-			func(session *contract_gen.FuxPayBoxFactoryTransactorSession) error {
+			func(session *contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error) {
+				var innerErr error
 				tx, innerErr = session.CreatePayBox(new(big.Int).SetUint64(boxId), toAcc.Address)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
@@ -223,7 +222,6 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 			return err
 		}
 
-		cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 		r, err := p.WaitMined(context.Background(), tx)
 		if err != nil {
 			log.Errorf("create payBox(id: %v) failed: %v", boxId, err)
@@ -246,9 +244,10 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 
 		err = p.CallWithBoxTransactor(
 			box,
-			func(session *contract_gen.FuxPayBoxTransactorSession) error {
+			func(session *contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error) {
+				var innerErr error
 				tx, innerErr = session.TransferOwnership(acc.Address)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
@@ -256,7 +255,6 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 			return err
 		}
 
-		cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 		input = input[n:]
 	}
 
@@ -305,26 +303,24 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	for _, t := range input {
 		err := p.CallWithBoxTransactor(
 			box,
-			func(session *contract_gen.FuxPayBoxTransactorSession) error {
+			func(session *contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.Transfer(toAcc.Address, &t.Id)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
 			log.Errorf("call FuxPayBox.Transfer contract failed: %v", err)
 			return err
 		}
-
-		cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 	}
 
 	log.Infof("destroy box: %v", boxId)
 	err = p.CallWithBoxFactoryTransactor(
-		func(session *contract_gen.FuxPayBoxFactoryTransactorSession) error {
+		func(session *contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.CloseBox(boxAddr)
-			return innerErr
+			return tx, innerErr
 		},
 	)
 	if err != nil {
@@ -332,7 +328,6 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 		return err
 	}
 
-	cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
 		return err
@@ -357,7 +352,7 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 		}
 
 		err = p.CallWithFxTokenTransactor(
-			func(session *contract_gen.FuxTokenTransactorSession) error {
+			func(session *contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.Mint(
 					acc.Address,
@@ -367,15 +362,13 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 					new(big.Int).SetUint64(uint64(t.State)),
 					"",
 				)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
 			log.Errorf("call FuxToken.Mint contract failed: %v", err)
 			return err
 		}
-
-		cmd.txHashes[string(cmd.currNonce)] = tx.Hash().Hex()
 	}
 	return nil
 
@@ -397,23 +390,22 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 	packing := func() error {
 		jobId := new(big.Int).SetUint64(boxId*10 + uint64((consumedNum-1)/batchSize))
 		err := p.CallWithFxBatchTransactor(
-			func(session *contract_gen.FuxBatchTransactorSession) error {
+			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.AddJob(jobId, fromAcc.Address, boxAddr, tokenIds)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
 			log.Errorf("call FuxBatch.AddJob contract failed: %v", err)
 			return err
 		}
-		p.cmd.txHashes[string(p.cmd.currNonce)] = tx.Hash().Hex()
 
 		err = p.CallWithFxBatchTransactor(
-			func(session *contract_gen.FuxBatchTransactorSession) error {
+			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.RunJob(jobId)
-				return innerErr
+				return tx, innerErr
 			},
 		)
 		if err != nil {
@@ -421,7 +413,6 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 			return err
 		}
 
-		p.cmd.txHashes[string(p.cmd.currNonce)] = tx.Hash().Hex()
 		return nil
 	}
 
