@@ -97,10 +97,11 @@ func (e *EthExecutor) executeBySupplier(cmd Command) error {
 
 func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 	if e.opts.max == 0 {
-		if err := e.run(cmd, p); err != nil {
+		err := e.run(cmd, p)
+		if err != nil {
 			e.handleError(err, cmd, p)
-			return err
 		}
+		return err
 	}
 
 	var lastErr error
