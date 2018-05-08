@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
-
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type TxType uint8
@@ -100,6 +98,5 @@ type Command struct {
 	Tx         Transaction
 	startNonce uint64
 	currNonce  uint64
-	receipts   map[string]*ethTypes.Receipt // key: string(nonce)
-	txHashes   map[string]string
+	txHashes   map[string]string // key: string(nonce)
 }
