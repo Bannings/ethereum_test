@@ -212,8 +212,8 @@
 [[projects]]
   name = "gitlab.chainedfinance.com/chaincore/contract-gen"
   packages = ["."]
-  revision = "ce3ccb423754b667fddf38ce8f18ce395729f3de"
-  version = "0.0.4"
+  revision = "e2f947dd45deebb1c688cb0b5663eb86a2bbcb86"
+  version = "0.0.5"
 
 [[projects]]
   branch = "develop"
@@ -235,19 +235,19 @@
     "ripemd160",
     "scrypt"
   ]
-  revision = "8b1d31080a7692e075c4681cb2458454a1fe0706"
+  revision = "4ec37c66abab2c7e02ae775328b2ff001c3f025a"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["websocket"]
-  revision = "640f4622ab692b87c2f3a94265e6f579fe38263d"
+  revision = "d11bb6cd8e3c4e60239c9cb20ef68586d74500d0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "78d5f264b493f125018180c204871ecf58a2dce1"
+  revision = "7db1c3b1a98089d0071c84f646ff5c96aad43682"
 
 [[projects]]
   branch = "master"
@@ -257,7 +257,7 @@
     "imports",
     "internal/fastwalk"
   ]
-  revision = "f4ce24f1d8feacab63a0476fc8bee0de7f9dc291"
+  revision = "87723262609ca8fd55d449c027454c29cadefd68"
 
 [[projects]]
   name = "gopkg.in/fatih/set.v0"
@@ -280,6 +280,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6f4016a78d99b773ca3e182b64ec1be4a53c686081b61a985e709cbbfc1b1678"
+  inputs-digest = "6be0161fecc0eba2f118ccd0e7fd72eb29806096e8300cf73a6f95ecc5cc4214"
   solver-name = "gps-cdcl"
   solver-version = 1
