@@ -386,7 +386,11 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 	var actualAmount uint64
 	var consumedNum int
 	var tx *ethTypes.Transaction
-	tokenIds := make([]*big.Int, batchSize)
+	size := len(tokens)
+	if size > batchSize {
+		size = batchSize
+	}
+	tokenIds := make([]*big.Int, size)
 
 	packing := func() error {
 		jobId := new(big.Int).SetUint64(boxId*10 + uint64((consumedNum-1)/batchSize))
