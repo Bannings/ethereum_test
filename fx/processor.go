@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"math/big"
 )
 
 const (
@@ -222,4 +223,19 @@ func waitMined(ctx context.Context, b bind.DeployBackend, txHash string) (*ethTy
 		case <-queryTicker.C:
 		}
 	}
+}
+
+func (p *CmdProcessor)QueryBoxAddress(boxId *big.Int)(*common.Address, error){
+	var address common.Address
+	err:=p.fxClient.CallWithBoxFactoryCaller(
+		func(session *contract_gen.FuxPayBoxFactoryCallerSession)(error){
+			var innerErr error
+			address,innerErr =session.GetPayBoxAddress(boxId)
+			if innerErr ==nil{
+				return nil
+			}
+			return innerErr
+		},
+	)
+	return &address,err
 }
