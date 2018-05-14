@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
@@ -223,13 +224,28 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 			return err
 		}
 
-		r, err := p.WaitMined(context.Background(), tx)
+		var boxAddr common.Address
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+		r, err := p.WaitMined(ctx, tx)
+		cancel()
 		if err != nil {
-			log.Errorf("create payBox(id: %v) failed: %v", boxId, err)
-			return err
+			// for Ganache backend
+			err1 := p.fxClient.CallWithBoxFactoryCaller(
+				func(session *contract_gen.FuxPayBoxFactoryCallerSession) error {
+					addr, innerErr := session.GetPayBoxAddress(new(big.Int).SetUint64(boxId))
+					boxAddr = addr
+					return innerErr
+				},
+			)
+			if err1 != nil {
+				log.Errorf("create payBox(id: %v) failed: %v", boxId, err)
+				return err
+			}
+		} else {
+			boxAddr = r.ContractAddress
 		}
 
-		n, err := e.boxing(p, t.Amount, input, r.ContractAddress, boxId)
+		n, err := e.boxing(p, t.Amount, input, boxAddr, boxId)
 		if err != nil {
 			log.Errorf("transfer to box(id: %v) failed: %v", boxId, err)
 			return err
@@ -237,7 +253,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 
 		log.Infof("transfer box(%v) to %v", boxId, t.Owner)
 		acc := e.keystore.GetAdminAccount()
-		box, err := contract_gen.NewFuxPayBox(r.ContractAddress, p.fxClient.EthClient())
+		box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
 		if err != nil {
 			log.Errorf("Create new FuxPayBox contract failed: %v", err)
 			return err
