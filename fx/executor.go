@@ -431,7 +431,9 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 		i := idx % batchSize
 		tokenIds[i] = &t.Id
 		if actualAmount%batchSize == 0 {
-			packing()
+			if err := packing(); err != nil {
+				return consumedNum, err
+			}
 
 			size := len(tokens) - consumedNum
 			if size > batchSize {
@@ -442,7 +444,9 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 	}
 
 	if actualAmount%batchSize > 0 {
-		packing()
+		if err := packing(); err != nil {
+			return consumedNum, err
+		}
 	}
 
 	return consumedNum, nil
