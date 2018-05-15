@@ -229,7 +229,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 		r, err := p.WaitMined(ctx, tx)
 		cancel()
 		if err != nil {
-			// for Ganache backend
+			// Compatible with Ganache backend
 			err1 := p.fxClient.CallWithBoxFactoryCaller(
 				func(session *contract_gen.FuxPayBoxFactoryCallerSession) error {
 					addr, innerErr := session.GetPayBoxAddress(new(big.Int).SetUint64(boxId))
