@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"sort"
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
@@ -198,13 +199,18 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 
 func (e *EthExecutor) pay(p *CmdProcessor) error {
 	cmd := p.cmd
-	output := cmd.Tx.Output
 	input := cmd.Tx.Input
+	m := mergeToken(cmd.Tx.Output)
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 
 	var tx *ethTypes.Transaction
-	for idx, t := range output {
+	for idx, owner := range keys {
 		boxId := generateBoxId(cmd.Tx.TxId, idx)
-		to := t.Owner
+		to := owner
 		toAcc, err := e.keystore.GetAccount(to)
 		if err != nil {
 			log.Errorf("get account of %v failed: %v", to, err)
@@ -245,13 +251,14 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 			boxAddr = r.ContractAddress
 		}
 
-		n, err := e.boxing(p, t.Amount, input, boxAddr, boxId)
+		amount := m[owner]
+		n, err := e.boxing(p, amount, input, boxAddr, boxId)
 		if err != nil {
 			log.Errorf("transfer to box(id: %v) failed: %v", boxId, err)
 			return err
 		}
 
-		log.Infof("transfer box(%v) to %v", boxId, t.Owner)
+		log.Infof("transfer box(%v) to %v", boxId, owner)
 		acc := e.keystore.GetAdminAccount()
 		box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
 		if err != nil {
@@ -445,4 +452,17 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 
 func generateBoxId(txId uint64, index int) uint64 {
 	return txId*10 + uint64(index)
+}
+
+func mergeToken(input []Token) map[string]uint64 {
+	m := make(map[string]uint64)
+	for _, t := range input {
+		owner := t.Owner
+		v, ok := m[owner]
+		if !ok {
+			v = 0
+		}
+		m[owner] = v + t.Amount
+	}
+	return m
 }
