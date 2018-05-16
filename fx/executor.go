@@ -401,42 +401,7 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 
 	var actualAmount uint64
 	var consumedNum int
-	var tx *ethTypes.Transaction
-	size := len(tokens)
-	if size > batchSize {
-		size = batchSize
-	}
-	tokenIds := make([]*big.Int, size)
-
-	packing := func() error {
-		jobId := new(big.Int).SetUint64(boxId*10 + uint64((consumedNum-1)/batchSize))
-		err := p.CallWithFxBatchTransactor(
-			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
-				var innerErr error
-				tx, innerErr = session.AddJob(jobId, fromAcc.Address, boxAddr, tokenIds)
-				return tx, innerErr
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxBatch.AddJob contract failed: %v", err)
-			return err
-		}
-
-		err = p.CallWithFxBatchTransactor(
-			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
-				var innerErr error
-				tx, innerErr = session.RunJob(jobId)
-				return tx, innerErr
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxBatch.RunJob contract failed: %v", err)
-			return err
-		}
-
-		return nil
-	}
-
+	tokenIds := make([]*big.Int, len(tokens))
 	for idx, t := range tokens {
 		if actualAmount >= targetAmount {
 			break
@@ -444,24 +409,34 @@ func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Toke
 
 		actualAmount += t.Amount
 		consumedNum += 1
-		i := idx % batchSize
-		tokenIds[i] = &t.Id
-		if actualAmount%batchSize == 0 {
-			if err := packing(); err != nil {
-				return consumedNum, err
-			}
-
-			size := len(tokens) - consumedNum
-			if size > batchSize {
-				size = batchSize
-			}
-			tokenIds = make([]*big.Int, size)
-		}
+		tokenIds[idx] = &t.Id
 	}
 
-	if actualAmount%batchSize > 0 {
-		if err := packing(); err != nil {
-			return consumedNum, err
+	tokenIds = tokenIds[:consumedNum]
+	jobId := new(big.Int).SetUint64(boxId)
+	err = p.CallWithFxBatchTransactor(
+		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+			return session.AddJob(jobId, fromAcc.Address, boxAddr, tokenIds)
+		},
+	)
+	if err != nil {
+		log.Errorf("call FuxBatch.AddJob contract failed: %v", err)
+		return 0, err
+	}
+
+	n := consumedNum / batchSize
+	if consumedNum%batchSize > 0 {
+		n += 1
+	}
+	for i := 0; i < n; i++ {
+		err = p.CallWithFxBatchTransactor(
+			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+				return session.RunJob(jobId)
+			},
+		)
+		if err != nil {
+			log.Errorf("call FuxBatch.RunJob contract failed: %v", err)
+			return 0, err
 		}
 	}
 
