@@ -18,6 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/getsentry/raven-go"
+	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 )
 
 var (
@@ -37,15 +38,26 @@ type EthExecutor struct {
 	contractAddrs g.ContractAddrs
 	keystore      *keychain.Store
 	db            *sql.DB
+	clientCache   *ClientCache
+	adminClient   *blockchain.FxClient
 	opts          *options
 }
 
-func NewEthExecutor(keystore *keychain.Store, conf g.BlockChainConfig, db *sql.DB, eos ...ExecuteOption) (*EthExecutor, error) {
+func NewEthExecutor(
+	keystore *keychain.Store,
+	conf g.BlockChainConfig,
+	db *sql.DB,
+	clientCache *ClientCache,
+	adminClient *blockchain.FxClient,
+	eos ...ExecuteOption,
+) (*EthExecutor, error) {
 	executor := new(EthExecutor)
 	executor.keystore = keystore
 	executor.ethUrl = conf.RawUrl
 	executor.contractAddrs = conf.ContractAddrs
 	executor.db = db
+	executor.clientCache = clientCache
+	executor.adminClient = adminClient
 
 	executor.opts = defaultOptions
 	for _, o := range eos {
@@ -87,7 +99,7 @@ func (e *EthExecutor) Execute(cmd Command) error {
 
 func (e *EthExecutor) executeBySupplier(cmd Command) error {
 	companyID := cmd.Tx.Sponsor()
-	c, err1 := clientCache.GetOrCreate(companyID)
+	c, err1 := e.clientCache.GetOrCreate(companyID)
 	if err1 != nil {
 		log.Errorf("create personal client failed: %v", err1)
 		return err1
@@ -151,7 +163,7 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 }
 
 func (e *EthExecutor) executeByPlatform(cmd Command) error {
-	p := &CmdProcessor{fxClient: adminClient, cmd: cmd, db: e.db}
+	p := &CmdProcessor{fxClient: e.adminClient, cmd: cmd, db: e.db}
 	return e.process(cmd, p)
 }
 

@@ -19,6 +19,24 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+var (
+	DefaultStore *Store
+)
+
+func init() {
+	conf := g.GetConfig()
+	bConf := conf.BlockchainConfig
+	acc, err := GetAccount(bConf.AdminKey, bConf.AdminPassphrase)
+	if err != nil {
+		panic(err)
+	}
+	store, err := NewStore(acc, bConf.RawUrl, conf.DbConfig)
+	if err != nil {
+		panic(err)
+	}
+	DefaultStore = store
+}
+
 // Eth1 returns 1 ethereum value (10^18 wei)
 func Eth1() *big.Int {
 	return big.NewInt(1000000000000000000)

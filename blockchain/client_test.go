@@ -20,11 +20,11 @@ const (
 
 var (
 	conf = g.BlockChainConfig{
-		key,
-		rawUrl,
-		"",
-		"",
-		g.ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
+		Key:             key,
+		RawUrl:          rawUrl,
+		AdminKey:        "",
+		AdminPassphrase: "",
+		ContractAddrs:   g.ContractAddrs{NodeAddr: nodeContractAddr, StoreAddr: storeContractAddr},
 	}
 )
 

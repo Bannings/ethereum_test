@@ -11,10 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
 
 	"github.com/eddyzhou/log"
@@ -22,7 +20,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gitlab.chainedfinance.com/chaincore/r2/fx"
 )
 
 const (
@@ -34,8 +31,6 @@ var (
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
 )
-
-var keystore *keychain.Store
 
 func init() {
 	flag.Usage = usage
@@ -61,26 +56,8 @@ func init() {
 	}
 
 	configFile := args[0]
-	conf, err := g.LoadConfig(configFile)
-	if err != nil {
+	if _, err := g.LoadConfig(configFile); err != nil {
 		log.Fatal(err)
-	}
-
-	blockchainConf := conf.BlockchainConfig
-	blockchain.DefaultClient, err = blockchain.NewEthStoreClient(blockchainConf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if adminAccount, err := keychain.GetAccount(blockchainConf.AdminKey, blockchainConf.AdminPassphrase); err == nil {
-		keystore, err = keychain.NewStore(adminAccount, blockchainConf.RawUrl, conf.DbConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if err := fx.Init(blockchainConf.RawUrl, keystore); err != nil {
-			log.Fatal(err)
-		}
 	}
 
 	pid2file()
@@ -149,7 +126,6 @@ func main() {
 	})
 
 	r.Route("/api/fx", func(r chi.Router) {
-		r.Use(middleware.WithValue(handler.StoreKey, keystore))
 		r.Use(mw.Auth())
 		r.Use(mw.OnlyCF)
 
@@ -177,7 +153,5 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 
-	keystore.Close()
-	fx.Close()
 	log.Println("Server gracefully stopped")
 }

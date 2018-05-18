@@ -11,6 +11,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
 	"github.com/ethereum/go-ethereum/crypto"
+	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 )
 
 const (
@@ -25,15 +26,17 @@ var (
 )
 
 var (
-	db       *sql.DB
-	bcConfig g.BlockChainConfig
-	keystore *keychain.Store
+	db          *sql.DB
+	bConf       g.BlockChainConfig
+	keystore    *keychain.Store
+	clientCache *ClientCache
+	adminClient *blockchain.FxClient
 )
 
 func init() {
 	g.LoadConfig("../cf_dev.json")
 	conf := g.GetConfig()
-	bcConfig = conf.BlockchainConfig
+	bConf = conf.BlockchainConfig
 
 	cfKey := conf.BlockchainConfig.AdminKey
 	privKey, _ := crypto.HexToECDSA(cfKey)
@@ -51,7 +54,14 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	Init(ethUrl, keystore)
+
+	clientCache = NewCache(bConf.RawUrl, keystore, 30)
+	acc := keystore.GetAdminAccount()
+	cli := keystore.GetAdminClient()
+	adminClient, err = blockchain.NewFxClient(cli, acc, bConf.ContractAddrs)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestFX(t *testing.T) {
@@ -66,7 +76,7 @@ func TestFX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	executor, err := NewEthExecutor(keystore, bcConfig, db)
+	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
 	if err != nil {
 		t.Fatal(err)
 	}

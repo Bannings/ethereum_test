@@ -19,7 +19,18 @@ const (
 	gasLimit uint64 = 4712357
 )
 
-var DefaultClient StoreClient
+var (
+	DefaultClient StoreClient
+)
+
+func init() {
+	conf := g.GetConfig().BlockchainConfig
+	c, err := NewEthStoreClient(conf)
+	if err != nil {
+		panic(err)
+	}
+	DefaultClient = c
+}
 
 type StoreClient interface {
 	StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession
