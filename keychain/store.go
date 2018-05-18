@@ -20,21 +20,25 @@ import (
 )
 
 var (
-	DefaultStore *Store
+	defaultStore *Store
+	once         sync.Once
 )
 
-func init() {
-	conf := g.GetConfig()
-	bConf := conf.BlockchainConfig
-	acc, err := GetAccount(bConf.AdminKey, bConf.AdminPassphrase)
-	if err != nil {
-		panic(err)
-	}
-	store, err := NewStore(acc, bConf.RawUrl, conf.DbConfig)
-	if err != nil {
-		panic(err)
-	}
-	DefaultStore = store
+func DefaultStore() *Store {
+	once.Do(func() {
+		conf := g.GetConfig()
+		bConf := conf.BlockchainConfig
+		acc, err := GetAccount(bConf.AdminKey, bConf.AdminPassphrase)
+		if err != nil {
+			panic(err)
+		}
+		store, err := NewStore(acc, bConf.RawUrl, conf.DbConfig)
+		if err != nil {
+			panic(err)
+		}
+		defaultStore = store
+	})
+	return defaultStore
 }
 
 // Eth1 returns 1 ethereum value (10^18 wei)

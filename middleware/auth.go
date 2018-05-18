@@ -20,7 +20,7 @@ import (
 
 func Auth() func(http.Handler) http.Handler {
 	a := &author{
-		client: blockchain.DefaultClient,
+		client: blockchain.DefaultClient(),
 	}
 	fn := func(h http.Handler) http.Handler {
 		a.h = h

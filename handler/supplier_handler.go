@@ -33,7 +33,7 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof("companyId: %s", companyId)
 
-	store := keychain.DefaultStore
+	store := keychain.DefaultStore()
 
 	passphrase := companyId + salt
 	acc, err := store.CreateAccount(passphrase)

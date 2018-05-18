@@ -26,7 +26,7 @@ func AddContractHandler(w http.ResponseWriter, r *http.Request) {
 	contractNo := m["contractNo"].(string)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasContract(contractNo)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasContract(contractNo)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -41,7 +41,7 @@ func AddContractHandler(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).AddContract(contractNo, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).AddContract(contractNo, s)
 	if err != nil {
 		log.Errorf("Add contract data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -63,7 +63,7 @@ func QueryContractHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasContract(no)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasContract(no)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -76,7 +76,7 @@ func QueryContractHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryContractInfo(no)
+	v, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryContractInfo(no)
 	if err != nil {
 		log.Errorf("Query contract from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -114,7 +114,7 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).HasContract(no)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasContract(no)
 	if err != nil {
 		log.Errorf("Check contractNo failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -127,7 +127,7 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	c, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryContractInfo(no)
+	c, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryContractInfo(no)
 	if err != nil {
 		log.Errorf("Query contract from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -151,7 +151,7 @@ func UpdateContractHander(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateContractInfo(no, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).UpdateContractInfo(no, s)
 	if err != nil {
 		log.Errorf("update contract data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))

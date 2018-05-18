@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"sync"
 )
 
 const (
@@ -20,16 +21,21 @@ const (
 )
 
 var (
-	DefaultClient StoreClient
+	defaultClient *EthStoreClient
+	once          sync.Once
 )
 
-func init() {
-	conf := g.GetConfig().BlockchainConfig
-	c, err := NewEthStoreClient(conf)
-	if err != nil {
-		panic(err)
-	}
-	DefaultClient = c
+func DefaultClient() *EthStoreClient {
+	once.Do(func() {
+		conf := g.GetConfig().BlockchainConfig
+		c, err := NewEthStoreClient(conf)
+		if err != nil {
+			panic(err)
+		}
+		defaultClient = c
+	})
+
+	return defaultClient
 }
 
 type StoreClient interface {
