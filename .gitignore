@@ -4,3 +4,4 @@
 *.log
 r2
 *.pid
+.testCoverage.txt
