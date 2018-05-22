@@ -1,17 +1,13 @@
 package fx
 
 import (
-	"database/sql"
 	"fmt"
 	"math/big"
 	"testing"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/r2/g"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
-
-	"github.com/ethereum/go-ethereum/crypto"
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 )
 
 const (
@@ -24,45 +20,6 @@ const (
 var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
 )
-
-var (
-	db          *sql.DB
-	bConf       g.BlockChainConfig
-	keystore    *keychain.Store
-	clientCache *ClientCache
-	adminClient *blockchain.FxClient
-)
-
-func init() {
-	g.LoadConfig("../cf_dev.json")
-	conf := g.GetConfig()
-	bConf = conf.BlockchainConfig
-
-	cfKey := conf.BlockchainConfig.AdminKey
-	privKey, _ := crypto.HexToECDSA(cfKey)
-	address := crypto.PubkeyToAddress(privKey.PublicKey)
-	cfAccount := keychain.Account{Address: address, Key: cfKey}
-
-	dbConfig := conf.DbConfig
-	var err error
-	if db, err = g.OpenDB(dbConfig); err != nil {
-		panic(err)
-	}
-
-	ethUrl := conf.BlockchainConfig.RawUrl
-	keystore, err = keychain.NewStore(cfAccount, ethUrl, dbConfig)
-	if err != nil {
-		panic(err)
-	}
-
-	clientCache = NewCache(bConf.RawUrl, keystore, 30)
-	acc := keystore.GetAdminAccount()
-	cli := keystore.GetAdminClient()
-	adminClient, err = blockchain.NewFxClient(cli, acc, bConf.ContractAddrs)
-	if err != nil {
-		panic(err)
-	}
-}
 
 func TestFX(t *testing.T) {
 	defer keystore.Close()
@@ -82,7 +39,7 @@ func TestFX(t *testing.T) {
 	}
 
 	tokenId1 := generateTokenId()
-	err = mintFX(executor, tokenId1, 100000)
+	_, err = mintFX(executor, tokenId1, 100000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,18 +55,18 @@ func TestFX(t *testing.T) {
 
 	txId := time.Now().UnixNano()
 	input := [2]big.Int{*tokenId2, *tokenId4}
-	err = pay(executor, input, uint64(txId))
+	_, err = pay(executor, input, uint64(txId))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = confirm(executor, *tokenId2, uint64(txId))
+	_, err = confirm(executor, *tokenId2, uint64(txId))
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
+func confirm(executor *EthExecutor, inputId big.Int, txId uint64) (*ethTypes.Transaction, error) {
 	token1 := Token{inputId, 50000, "cf", Normal, expireTime}
 	token2 := Token{inputId, 50000, "supplier002", Normal, expireTime}
 	input := []Token{token1}
@@ -119,7 +76,7 @@ func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
 	return executor.Execute(cmd)
 }
 
-func pay(executor *EthExecutor, inputIds [2]big.Int, txId uint64) error {
+func pay(executor *EthExecutor, inputIds [2]big.Int, txId uint64) (*ethTypes.Transaction, error) {
 	token1 := Token{inputIds[0], 50000, "supplier001", Normal, expireTime}
 	token2 := Token{inputIds[1], 50, "supplier001", Normal, expireTime}
 	input := []Token{token1, token2}
@@ -150,7 +107,7 @@ func splitFX4Pay(executor *EthExecutor, inTokenID int64) (*big.Int, *big.Int, er
 	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
 	cmd := Command{Tx: t, txHashes: make(map[string]string)}
 
-	err := executor.Execute(cmd)
+	_, err := executor.Execute(cmd)
 	return tokenId1, tokenId2, err
 }
 
@@ -168,11 +125,11 @@ func splitFX4Fee(executor *EthExecutor, inTokenID *big.Int) (*big.Int, *big.Int,
 	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
 	cmd := Command{Tx: t, txHashes: make(map[string]string)}
 
-	err := executor.Execute(cmd)
+	_, err := executor.Execute(cmd)
 	return tokenId1, tokenId2, err
 }
 
-func mintFX(executor *EthExecutor, tokenId int64, amount uint64) error {
+func mintFX(executor *EthExecutor, tokenId int64, amount uint64) (*ethTypes.Transaction, error) {
 	frozenAmount := uint64(float64(amount) * frozenRate)
 	activeAmount := amount - frozenAmount
 
