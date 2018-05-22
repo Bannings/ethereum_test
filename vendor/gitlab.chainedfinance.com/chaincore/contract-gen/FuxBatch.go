@@ -14,23 +14,7 @@ import (
 )
 
 // FuxBatchABI is the input ABI used to generate the binding from.
-const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isFuxHub\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_HUB\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_GROUP\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInFuxGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_router\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"name\":\"_len\",\"type\":\"uint256\"}],\"name\":\"setMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokens\",\"type\":\"uint256[]\"}],\"name\":\"addJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"runJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"isCompile\",\"outputs\":[{\"name\":\"compile\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
-
-// FuxBatchBin is the compiled bytecode used for deploying new contracts.
-const FuxBatchBin = `0x60806040523480156200001157600080fd5b506040516020806200166f83398101806040528101908080519060200190929190505050620000846040805190810160405280600c81526020017f726f75746572436f6e6669670000000000000000000000000000000000000000815250620000fc640100000000026401000000009004565b620000d36040805190810160405280600981526020017f467578436f6e6669670000000000000000000000000000000000000000000000815250620000fc640100000000026401000000009004565b620000ed8162000118640100000000026401000000009004565b601e6002819055505062000247565b80600190805190602001906200011492919062000198565b5050565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141515156200015557600080fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f10620001db57805160ff19168380011785556200020c565b828001600101855582156200020c579182015b828111156200020b578251825591602001919060010190620001ee565b5b5090506200021b91906200021f565b5090565b6200024491905b808211156200024057600081600090555060010162000226565b5090565b90565b61141880620002576000396000f3006080604052600436106100db576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630d20aa48146100e057806366b9852b1461010f5780636ed56bce146101665780639a1e4822146101f6578063a3c332ab14610223578063abf836fc14610268578063ade6172414610318578063b8d43d2714610373578063c427d38d14610403578063d06a89a414610493578063d54f7d5e146104be578063d6b419fb14610515578063d89e6c4f146105a5578063dc2f786714610635578063f0b15e8214610662575b600080fd5b3480156100ec57600080fd5b506100f56106bd565b604051808215151515815260200191505060405180910390f35b34801561011b57600080fd5b506101246106c6565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561017257600080fd5b5061017b6106eb565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101bb5780820151818401526020810190506101a0565b50505050905090810190601f1680156101e85780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561020257600080fd5b5061022160048036038101908080359060200190929190505050610724565b005b34801561022f57600080fd5b5061024e6004803603810190808035906020019092919050505061094d565b604051808215151515815260200191505060405180910390f35b34801561027457600080fd5b5061031660048036038101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080359060200190820180359060200190808060200260200160405190810160405280939291908181526020018383602002808284378201915050505050509192919290505050610977565b005b34801561032457600080fd5b50610359600480360381019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610b71565b604051808215151515815260200191505060405180910390f35b34801561037f57600080fd5b50610388610cf9565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156103c85780820151818401526020810190506103ad565b50505050905090810190601f1680156103f55780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561040f57600080fd5b50610418610d32565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561045857808201518184015260208101905061043d565b50505050905090810190601f1680156104855780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561049f57600080fd5b506104a8610d6b565b6040518082815260200191505060405180910390f35b3480156104ca57600080fd5b506104d3610d71565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561052157600080fd5b5061052a610d9a565b6040518080602001828103825283818151815260200191508051906020019080838360005b8381101561056a57808201518184015260208101905061054f565b50505050905090810190601f1680156105975780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b3480156105b157600080fd5b506105ba610dd3565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156105fa5780820151818401526020810190506105df565b50505050905090810190601f1680156106275780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561064157600080fd5b5061066060048036038101908080359060200190929190505050610e0c565b005b34801561066e57600080fd5b506106a3600480360381019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610e2a565b604051808215151515815260200191505060405180910390f35b60006001905090565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6040805190810160405280600c81526020017f726f75746572436f6e666967000000000000000000000000000000000000000081525081565b600080600061073233610e2a565b80610742575061074133610fb2565b5b151561074d57600080fd5b6107568461094d565b1561076057610947565b6004600085815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1692506005600085815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16915060016006600086815260200190815260200160002060006101000a81548160ff021916908315150217905550600090505b600360008581526020019081526020016000208054905081101561094657610823611098565b73ffffffffffffffffffffffffffffffffffffffff1663beabacc88484600360008981526020019081526020016000208581548110151561086057fe5b90600052602060002001546040518463ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018281526020019350505050600060405180830381600087803b15801561092357600080fd5b505af1158015610937573d6000803e3d6000fd5b505050508060010190506107fd565b5b50505050565b60006006600083815260200190815260200160002060009054906101000a900460ff169050919050565b61098033610e2a565b80610990575061098f33610fb2565b5b151561099b57600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff16141515156109d757600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff1614151515610a1357600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166004600086815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16141515610a8157600080fd5b6002548151108015610a94575060008151115b1515610a9f57600080fd5b80600360008681526020019081526020016000209080519060200190610ac692919061137a565b50826004600086815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550816005600086815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050505050565b6000610b7b6110dd565b73ffffffffffffffffffffffffffffffffffffffff1663217fe6c6836040805190810160405280600681526020017f66757848756200000000000000000000000000000000000000000000000000008152506040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200180602001828103825283818151815260200191508051906020019080838360005b83811015610c6a578082015181840152602081019050610c4f565b50505050905090810190601f168015610c975780820380516001836020036101000a031916815260200191505b509350505050602060405180830381600087803b158015610cb757600080fd5b505af1158015610ccb573d6000803e3d6000fd5b505050506040513d6020811015610ce157600080fd5b81019080805190602001909291905050509050919050565b6040805190810160405280600b81526020017f726f6c65436c757374657200000000000000000000000000000000000000000081525081565b6040805190810160405280600c81526020017f726f75746572434652424143000000000000000000000000000000000000000081525081565b60025481565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b6040805190810160405280600681526020017f667578487562000000000000000000000000000000000000000000000000000081525081565b6040805190810160405280600c81526020017f726f6c6546757847726f7570000000000000000000000000000000000000000081525081565b610e1533610fb2565b1515610e2057600080fd5b8060028190555050565b6000610e346110dd565b73ffffffffffffffffffffffffffffffffffffffff1663217fe6c6836040805190810160405280600c81526020017f726f6c6546757847726f757000000000000000000000000000000000000000008152506040518363ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200180602001828103825283818151815260200191508051906020019080838360005b83811015610f23578082015181840152602081019050610f08565b50505050905090810190601f168015610f505780820380516001836020036101000a031916815260200191505b509350505050602060405180830381600087803b158015610f7057600080fd5b505af1158015610f84573d6000803e3d6000fd5b505050506040513d6020811015610f9a57600080fd5b81019080805190602001909291905050509050919050565b6000610fbc6110dd565b73ffffffffffffffffffffffffffffffffffffffff166324d7806c836040518263ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001915050602060405180830381600087803b15801561105657600080fd5b505af115801561106a573d6000803e3d6000fd5b505050506040513d602081101561108057600080fd5b81019080805190602001909291905050509050919050565b60006110d86040805190810160405280600881526020017f467578546f6b656e0000000000000000000000000000000000000000000000008152506110ec565b905090565b60006110e7611225565b905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c2511025836040518263ffffffff167c01000000000000000000000000000000000000000000000000000000000281526004018080602001828103825283818151815260200191508051906020019080838360005b8381101561119757808201518184015260208101905061117c565b50505050905090810190601f1680156111c45780820380516001836020036101000a031916815260200191505b5092505050602060405180830381600087803b1580156111e357600080fd5b505af11580156111f7573d6000803e3d6000fd5b505050506040513d602081101561120d57600080fd5b81019080805190602001909291905050509050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c251102560016040518263ffffffff167c0100000000000000000000000000000000000000000000000000000000028152600401808060200182810382528381815460018160011615610100020316600290048152602001915080546001816001161561010002031660029004801561131a5780601f106112ef5761010080835404028352916020019161131a565b820191906000526020600020905b8154815290600101906020018083116112fd57829003601f168201915b505092505050602060405180830381600087803b15801561133a57600080fd5b505af115801561134e573d6000803e3d6000fd5b505050506040513d602081101561136457600080fd5b8101908080519060200190929190505050905090565b8280548282559060005260206000209081019282156113b6579160200282015b828111156113b557825182559160200191906001019061139a565b5b5090506113c391906113c7565b5090565b6113e991905b808211156113e55760008160009055506001016113cd565b5090565b905600a165627a7a72305820413fa7679fdcbf49c34f0deab4f61e89c3ae8284a5b934236193743ecd696cff0029`
-
-// DeployFuxBatch deploys a new Ethereum contract, binding an instance of FuxBatch to it.
-func DeployFuxBatch(auth *bind.TransactOpts, backend bind.ContractBackend, _router common.Address) (common.Address, *types.Transaction, *FuxBatch, error) {
-	parsed, err := abi.JSON(strings.NewReader(FuxBatchABI))
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(FuxBatchBin), backend, _router)
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	return address, tx, &FuxBatch{FuxBatchCaller: FuxBatchCaller{contract: contract}, FuxBatchTransactor: FuxBatchTransactor{contract: contract}, FuxBatchFilterer: FuxBatchFilterer{contract: contract}}, nil
-}
+const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"cursorGas\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isFuxHub\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_HUB\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_GROUP\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"runMaxCount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInFuxGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"transferGas\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_router\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"name\":\"_len\",\"type\":\"uint256\"}],\"name\":\"setMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_cnt\",\"type\":\"uint256\"}],\"name\":\"setRunMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_gas\",\"type\":\"uint256\"}],\"name\":\"setTransferGas\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokens\",\"type\":\"uint256[]\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokens\",\"type\":\"uint256[]\"}],\"name\":\"addJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"runJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"isCompile\",\"outputs\":[{\"name\":\"compile\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // FuxBatch is an auto generated Go binding around an Ethereum contract.
 type FuxBatch struct {
@@ -356,6 +340,32 @@ func (_FuxBatch *FuxBatchCallerSession) IsInFuxGroup(_addr common.Address) (bool
 	return _FuxBatch.Contract.IsInFuxGroup(&_FuxBatch.CallOpts, _addr)
 }
 
+// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
+//
+// Solidity: function cursorGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchCaller) CursorGas(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxBatch.contract.Call(opts, out, "cursorGas")
+	return *ret0, err
+}
+
+// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
+//
+// Solidity: function cursorGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchSession) CursorGas() (*big.Int, error) {
+	return _FuxBatch.Contract.CursorGas(&_FuxBatch.CallOpts)
+}
+
+// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
+//
+// Solidity: function cursorGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchCallerSession) CursorGas() (*big.Int, error) {
+	return _FuxBatch.Contract.CursorGas(&_FuxBatch.CallOpts)
+}
+
 // GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
 //
 // Solidity: function getRouterAddress() constant returns(address)
@@ -460,6 +470,32 @@ func (_FuxBatch *FuxBatchCallerSession) MaxLength() (*big.Int, error) {
 	return _FuxBatch.Contract.MaxLength(&_FuxBatch.CallOpts)
 }
 
+// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
+//
+// Solidity: function runMaxCount() constant returns(uint256)
+func (_FuxBatch *FuxBatchCaller) RunMaxCount(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxBatch.contract.Call(opts, out, "runMaxCount")
+	return *ret0, err
+}
+
+// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
+//
+// Solidity: function runMaxCount() constant returns(uint256)
+func (_FuxBatch *FuxBatchSession) RunMaxCount() (*big.Int, error) {
+	return _FuxBatch.Contract.RunMaxCount(&_FuxBatch.CallOpts)
+}
+
+// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
+//
+// Solidity: function runMaxCount() constant returns(uint256)
+func (_FuxBatch *FuxBatchCallerSession) RunMaxCount() (*big.Int, error) {
+	return _FuxBatch.Contract.RunMaxCount(&_FuxBatch.CallOpts)
+}
+
 // SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
 //
 // Solidity: function sysRouter() constant returns(address)
@@ -484,6 +520,32 @@ func (_FuxBatch *FuxBatchSession) SysRouter() (common.Address, error) {
 // Solidity: function sysRouter() constant returns(address)
 func (_FuxBatch *FuxBatchCallerSession) SysRouter() (common.Address, error) {
 	return _FuxBatch.Contract.SysRouter(&_FuxBatch.CallOpts)
+}
+
+// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+//
+// Solidity: function transferGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchCaller) TransferGas(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxBatch.contract.Call(opts, out, "transferGas")
+	return *ret0, err
+}
+
+// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+//
+// Solidity: function transferGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchSession) TransferGas() (*big.Int, error) {
+	return _FuxBatch.Contract.TransferGas(&_FuxBatch.CallOpts)
+}
+
+// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+//
+// Solidity: function transferGas() constant returns(uint256)
+func (_FuxBatch *FuxBatchCallerSession) TransferGas() (*big.Int, error) {
+	return _FuxBatch.Contract.TransferGas(&_FuxBatch.CallOpts)
 }
 
 // AddJob is a paid mutator transaction binding the contract method 0xabf836fc.
@@ -547,4 +609,67 @@ func (_FuxBatch *FuxBatchSession) SetMaxLength(_len *big.Int) (*types.Transactio
 // Solidity: function setMaxLength(_len uint256) returns()
 func (_FuxBatch *FuxBatchTransactorSession) SetMaxLength(_len *big.Int) (*types.Transaction, error) {
 	return _FuxBatch.Contract.SetMaxLength(&_FuxBatch.TransactOpts, _len)
+}
+
+// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
+//
+// Solidity: function setRunMaxLength(_cnt uint256) returns()
+func (_FuxBatch *FuxBatchTransactor) SetRunMaxLength(opts *bind.TransactOpts, _cnt *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "setRunMaxLength", _cnt)
+}
+
+// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
+//
+// Solidity: function setRunMaxLength(_cnt uint256) returns()
+func (_FuxBatch *FuxBatchSession) SetRunMaxLength(_cnt *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SetRunMaxLength(&_FuxBatch.TransactOpts, _cnt)
+}
+
+// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
+//
+// Solidity: function setRunMaxLength(_cnt uint256) returns()
+func (_FuxBatch *FuxBatchTransactorSession) SetRunMaxLength(_cnt *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SetRunMaxLength(&_FuxBatch.TransactOpts, _cnt)
+}
+
+// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
+//
+// Solidity: function setTransferGas(_gas uint256) returns()
+func (_FuxBatch *FuxBatchTransactor) SetTransferGas(opts *bind.TransactOpts, _gas *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "setTransferGas", _gas)
+}
+
+// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
+//
+// Solidity: function setTransferGas(_gas uint256) returns()
+func (_FuxBatch *FuxBatchSession) SetTransferGas(_gas *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SetTransferGas(&_FuxBatch.TransactOpts, _gas)
+}
+
+// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
+//
+// Solidity: function setTransferGas(_gas uint256) returns()
+func (_FuxBatch *FuxBatchTransactorSession) SetTransferGas(_gas *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SetTransferGas(&_FuxBatch.TransactOpts, _gas)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
+//
+// Solidity: function transfer(_to address, _tokens uint256[]) returns()
+func (_FuxBatch *FuxBatchTransactor) Transfer(opts *bind.TransactOpts, _to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "transfer", _to, _tokens)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
+//
+// Solidity: function transfer(_to address, _tokens uint256[]) returns()
+func (_FuxBatch *FuxBatchSession) Transfer(_to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.Transfer(&_FuxBatch.TransactOpts, _to, _tokens)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
+//
+// Solidity: function transfer(_to address, _tokens uint256[]) returns()
+func (_FuxBatch *FuxBatchTransactorSession) Transfer(_to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.Transfer(&_FuxBatch.TransactOpts, _to, _tokens)
 }
