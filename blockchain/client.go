@@ -3,6 +3,7 @@ package blockchain
 import (
 	"context"
 	"math/big"
+	"sync"
 	"sync/atomic"
 
 	"gitlab.chainedfinance.com/chaincore/dr-contracts"
@@ -13,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"sync"
 )
 
 const (

@@ -1,13 +1,18 @@
 package fx
 
 import (
+	"database/sql"
 	"fmt"
 	"math/big"
 	"testing"
 	"time"
 
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -19,7 +24,44 @@ const (
 
 var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
+
+	db          *sql.DB
+	bConf       g.BlockChainConfig
+	keystore    *keychain.Store
+	clientCache *ClientCache
+	adminClient *blockchain.FxClient
 )
+
+func init() {
+	g.LoadConfig("../cf_dev.json")
+	conf := g.GetConfig()
+	bConf = conf.BlockchainConfig
+
+	cfKey := conf.BlockchainConfig.AdminKey
+	privKey, _ := crypto.HexToECDSA(cfKey)
+	address := crypto.PubkeyToAddress(privKey.PublicKey)
+	cfAccount := keychain.Account{Address: address, Key: cfKey}
+
+	dbConfig := conf.DbConfig
+	var err error
+	if db, err = g.OpenDB(dbConfig); err != nil {
+		panic(err)
+	}
+
+	ethUrl := conf.BlockchainConfig.RawUrl
+	keystore, err = keychain.NewStore(cfAccount, ethUrl, dbConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	clientCache = NewCache(bConf.RawUrl, keystore, 30)
+	acc := keystore.GetAdminAccount()
+	cli := keystore.GetAdminClient()
+	adminClient, err = blockchain.NewFxClient(cli, acc, bConf.ContractAddrs)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func TestFX(t *testing.T) {
 	defer keystore.Close()

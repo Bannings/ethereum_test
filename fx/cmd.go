@@ -2,9 +2,10 @@ package fx
 
 import (
 	"fmt"
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"math/big"
 	"strings"
+
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type TxType uint8
