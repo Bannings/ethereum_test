@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"math/big"
 	"sort"
+	"sync"
 	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
+	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
@@ -18,11 +20,15 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/getsentry/raven-go"
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 )
 
 var (
 	ErrTxExecuteFailed = errors.New("transaction execute failed")
+)
+
+var (
+	defaultExecutor *EthExecutor
+	executorOnce    sync.Once
 )
 
 const (
@@ -41,6 +47,28 @@ type EthExecutor struct {
 	clientCache   *ClientCache
 	adminClient   *blockchain.FxClient
 	opts          *options
+}
+
+func DefaultExecutor() *EthExecutor {
+	executorOnce.Do(func() {
+		conf := g.GetConfig()
+		bConf := conf.BlockchainConfig
+		db, err := g.OpenDB(conf.DbConfig)
+		if err != nil {
+			panic(err)
+		}
+		store := keychain.DefaultStore()
+		cache := DefaultCache()
+		adminClient, err := blockchain.NewFxClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+		if err != nil {
+			panic(err)
+		}
+		defaultExecutor, err = NewEthExecutor(store, bConf, db, cache, adminClient)
+		if err != nil {
+			panic(err)
+		}
+	})
+	return defaultExecutor
 }
 
 func NewEthExecutor(
@@ -314,18 +342,18 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 		log.Errorf("GET Account failed :%v", err)
 		return err
 	}
-	id := make([]*big.Int, len(p.cmd.Tx.Input))
-	for i, input := range p.cmd.Tx.Input {
-		id[i] = &input.Id
+
+	ids := make([]*big.Int, len(p.cmd.Tx.Input))
+	for i, v := range p.cmd.Tx.Input {
+		ids[i] = &v.Id
 	}
+	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", p.cmd.Tx.Input[0].Owner, toAccount, ids)
 
-	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", p.cmd.Tx.Input[0].Owner, toAccount, id)
 	var tx *ethTypes.Transaction
-
 	err = p.CallWithFxBatchTransactor(
 		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
-			tx, innerErr = session.Transfer(Acc.Address, id)
+			tx, innerErr = session.Transfer(Acc.Address, ids)
 			return tx, innerErr
 		},
 	)
@@ -519,16 +547,15 @@ func mergeToken(input []Token) map[string]uint64 {
 
 func HandleTransaction(supplierChain chan Transaction, resultChan chan ProcessResult) {
 	for transaction := range supplierChain {
-
 		if len(supplierChain) == 0 {
 			break
 		}
 		var ethTransaction *ethTypes.Transaction
 		result := &ProcessResult{Id: transaction.Id, Supplier: transaction.Input[0].Owner}
-		executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
+		executor := DefaultExecutor()
 		hash := make(map[string]string)
 		cmd := Command{Tx: transaction, txHashes: hash}
-		err = executor.Execute(cmd)
+		err := executor.Execute(cmd)
 		if err != nil {
 			log.Errorf("Execute Transaction error:%v", err)
 			result.err = err

@@ -12,10 +12,10 @@ CREATE TABLE `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `cmd_procedure`;
+DROP TABLE IF EXISTS `tx_procedure`;
 CREATE TABLE `cmd_procedure` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `command_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
   `start_nonce` bigint(20) DEFAULT NULL,
   `tx_hashes` JSON DEFAULT NULL,
   `state` enum('unprocess', 'processing', 'processed') NOT NULL DEFAULT 'unprocess',
@@ -23,4 +23,16 @@ CREATE TABLE `cmd_procedure` (
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`command_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `transactions`;
+CREATE TABLE `transactions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `deal_id` int(11) NOT NULL COMMENT '业务交易ID',
+  `input` JSON,
+  `output` JSON,
+  `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

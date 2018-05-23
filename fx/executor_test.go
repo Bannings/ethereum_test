@@ -1,15 +1,17 @@
 package fx
 
 import (
+	"database/sql"
 	"fmt"
 	"math/big"
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/crypto"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -21,6 +23,12 @@ const (
 
 var (
 	expireTime = time.Now().UnixNano()/1000000 + 365*24*3600*1000
+
+	db          *sql.DB
+	bConf       g.BlockChainConfig
+	keystore    *keychain.Store
+	clientCache *ClientCache
+	adminClient *blockchain.FxClient
 )
 
 func init() {
@@ -88,12 +96,12 @@ func TestFX(t *testing.T) {
 
 	txId := time.Now().UnixNano()
 	input := [2]big.Int{*tokenId2, *tokenId4}
-	_, err = pay(executor, input, uint64(txId))
+	err = pay(executor, input, uint64(txId))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = confirm(executor, *tokenId2, uint64(txId))
+	err = confirm(executor, *tokenId2, uint64(txId))
 	if err != nil {
 		t.Fatal(err)
 	}
