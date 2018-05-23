@@ -84,7 +84,7 @@ func (e *EthExecutor) handleError(err error, cmd Command, processor *CmdProcesso
 	}
 }
 
-func (e *EthExecutor) Execute(cmd Command) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) Execute(cmd Command) error {
 	log.Infof("execute command: %+v", cmd)
 
 	switch cmd.Tx.TxType {
@@ -93,83 +93,81 @@ func (e *EthExecutor) Execute(cmd Command) (*ethTypes.Transaction, error) {
 	case MintFX, Confirm:
 		return e.executeByPlatform(cmd)
 	default:
-		return nil, fmt.Errorf("unknow command: %+v", cmd)
+		return fmt.Errorf("unknow command: %+v", cmd)
 	}
 }
 
-func (e *EthExecutor) executeBySupplier(cmd Command) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) executeBySupplier(cmd Command) error {
 	companyID := cmd.Tx.Sponsor()
 	c, err1 := e.clientCache.GetOrCreate(companyID)
 	if err1 != nil {
 		log.Errorf("create personal client failed: %v", err1)
-		return nil, err1
+		return err1
 	}
 	p := &CmdProcessor{fxClient: c, cmd: cmd, db: e.db}
 
 	return e.process(cmd, p)
 }
 
-func (e *EthExecutor) process(cmd Command, p *CmdProcessor) (*ethTypes.Transaction, error) {
-	var tx *ethTypes.Transaction
+func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 	if e.opts.max == 0 {
-		tx, err := e.run(cmd, p)
+		err := e.run(cmd, p)
 		if err != nil {
 			e.handleError(err, cmd, p)
 		}
-		return tx, err
+		return err
 	}
 
 	var lastErr error
 	for attempt := uint(0); attempt < e.opts.max; attempt++ {
 		waitRetryBackoff(attempt, e.opts)
 
-		tx, lastErr = e.run(cmd, p)
+		lastErr = e.run(cmd, p)
 		if lastErr == nil {
-			return tx, nil
+			return nil
 		}
 
 		e.handleError(lastErr, cmd, p)
 		if !e.opts.retryIf(lastErr) {
-			return nil, lastErr
+			return lastErr
 		}
 
 		log.Warnf("executor retry attempt: %d, err: %v", attempt+1, lastErr)
 	}
 
-	return tx, lastErr
+	return lastErr
 }
 
-func (e *EthExecutor) run(cmd Command, p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	var err error
-	var tx *ethTypes.Transaction
 	switch cmd.Tx.TxType {
 	case SplitFX:
-		tx, err = e.splitFX(p)
+		err = e.splitFX(p)
 	case Discount:
-		tx, err = e.pay(p)
+		err = e.pay(p)
 	case Payment:
-		tx, err = e.pay(p)
+		err = e.pay(p)
 	case MintFX:
-		tx, err = e.mintFX(p)
+		err = e.mintFX(p)
 	case Confirm:
-		tx, err = e.confirm(p)
+		err = e.confirm(p)
 	default:
-		return nil, fmt.Errorf("err command: %v", cmd)
+		return fmt.Errorf("err command: %v", cmd)
 	}
 
 	if err == nil {
 		p.finishProcedure()
 	}
 
-	return tx, err
+	return err
 }
 
-func (e *EthExecutor) executeByPlatform(cmd Command) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) executeByPlatform(cmd Command) error {
 	p := &CmdProcessor{fxClient: e.adminClient, cmd: cmd, db: e.db}
 	return e.process(cmd, p)
 }
 
-func (e *EthExecutor) splitFX(p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	cmd := p.cmd
 	token := cmd.Tx.Input[0]
 	tokenId := token.Id
@@ -197,22 +195,22 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) (*ethTypes.Transaction, error) {
 	)
 	if err != nil {
 		log.Errorf("call FuxSplit.SplitFux contract failed: %v", err)
-		return nil, err
+		return err
 	}
 
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return nil, ErrTxExecuteFailed
+		return ErrTxExecuteFailed
 	}
 
-	return tx, nil
+	return nil
 }
 
 //This pay method with AddJob and RunJob
-func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) pay(p *CmdProcessor) error {
 	cmd := p.cmd
 	input := cmd.Tx.Input
 	m := mergeToken(cmd.Tx.Output)
@@ -229,7 +227,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		toAcc, err := e.keystore.GetAccount(to)
 		if err != nil {
 			log.Errorf("get account of %v failed: %v", to, err)
-			return nil, err
+			return err
 		}
 		log.Infof("create box: %v for %s", boxId, to)
 
@@ -242,7 +240,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		)
 		if err != nil {
 			log.Errorf("call FuxPayBoxFactory.CreatePayBox contract failed: %v", err)
-			return nil, err
+			return err
 		}
 
 		var boxAddr common.Address
@@ -260,7 +258,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 			)
 			if err1 != nil {
 				log.Errorf("create payBox(id: %v) failed: %v", boxId, err)
-				return nil, err
+				return err
 			}
 		} else {
 			boxAddr = r.ContractAddress
@@ -270,7 +268,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		n, err := e.boxing(p, amount, input, boxAddr, boxId)
 		if err != nil {
 			log.Errorf("transfer to box(id: %v) failed: %v", boxId, err)
-			return nil, err
+			return err
 		}
 
 		log.Infof("transfer box(%v) to %v", boxId, owner)
@@ -278,7 +276,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
 		if err != nil {
 			log.Errorf("Create new FuxPayBox contract failed: %v", err)
-			return nil, err
+			return err
 		}
 
 		err = p.CallWithBoxTransactor(
@@ -291,7 +289,7 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		)
 		if err != nil {
 			log.Errorf("call FuxPayBox.TransferOwnership contract failed: %v", err)
-			return nil, err
+			return err
 		}
 
 		input = input[n:]
@@ -299,31 +297,31 @@ func (e *EthExecutor) pay(p *CmdProcessor) (*ethTypes.Transaction, error) {
 
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return nil, ErrTxExecuteFailed
+		return ErrTxExecuteFailed
 	}
 
-	return tx, nil
+	return nil
 }
 
 //This pay method with batch transfer
-func (e *EthExecutor) payByTransfer(p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	toAccount := p.cmd.Tx.Output[0].Owner
 	Acc, err := e.keystore.GetAccount(toAccount)
+	if err != nil {
+		log.Errorf("GET Account failed :%v", err)
+		return err
+	}
 	id := make([]*big.Int, len(p.cmd.Tx.Input))
-	for i, _ := range p.cmd.Tx.Input {
-		id[i] = &p.cmd.Tx.Input[i].Id
+	for i, input := range p.cmd.Tx.Input {
+		id[i] = &input.Id
 	}
 
 	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", p.cmd.Tx.Input[0].Owner, toAccount, id)
 	var tx *ethTypes.Transaction
 
-	if err != nil {
-		log.Errorf("GET Account failed :%v", err)
-		return nil, err
-	}
 	err = p.CallWithFxBatchTransactor(
 		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
@@ -335,18 +333,18 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) (*ethTypes.Transaction, err
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
 		log.Errorf("transfer failed : %v", err)
-		return nil, err
+		return err
 	}
 
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return nil, ErrTxExecuteFailed
+		return ErrTxExecuteFailed
 	}
 	log.Infof("transfer success :%v ,receipt info:%v", tx, receipt)
-	return tx, nil
+	return nil
 }
 
 // Input tokens should be same with pay input tokens
-func (e *EthExecutor) confirm(p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	cmd := p.cmd
 	txId := cmd.Tx.TxId
 	boxId := generateBoxId(txId, 0)
@@ -360,11 +358,11 @@ func (e *EthExecutor) confirm(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		},
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	input := cmd.Tx.Input
@@ -372,7 +370,7 @@ func (e *EthExecutor) confirm(p *CmdProcessor) (*ethTypes.Transaction, error) {
 	toAcc, err := e.keystore.GetAccount(to)
 	if err != nil {
 		log.Errorf("get account of %v failed: %v", to, err)
-		return nil, err
+		return err
 	}
 
 	var tx *ethTypes.Transaction
@@ -387,7 +385,7 @@ func (e *EthExecutor) confirm(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		)
 		if err != nil {
 			log.Errorf("call FuxPayBox.Transfer contract failed: %v", err)
-			return nil, err
+			return err
 		}
 	}
 
@@ -401,21 +399,21 @@ func (e *EthExecutor) confirm(p *CmdProcessor) (*ethTypes.Transaction, error) {
 	)
 	if err != nil {
 		log.Errorf("call FuxPayBoxFactory.CloseBox contract failed: %v", err)
-		return nil, err
+		return err
 	}
 
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return nil, ErrTxExecuteFailed
+		return ErrTxExecuteFailed
 	}
 
-	return tx, nil
+	return nil
 }
 
-func (e *EthExecutor) mintFX(p *CmdProcessor) (*ethTypes.Transaction, error) {
+func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 	cmd := p.cmd
 	output := cmd.Tx.Output
 	var tx *ethTypes.Transaction
@@ -424,7 +422,7 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		acc, err := e.keystore.GetAccount(t.Owner)
 		if err != nil {
 			log.Errorf("get account of %v failed: %v", t.Owner, err)
-			return nil, err
+			return err
 		}
 
 		err = p.CallWithFxTokenTransactor(
@@ -443,10 +441,10 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) (*ethTypes.Transaction, error) {
 		)
 		if err != nil {
 			log.Errorf("call FuxToken.Mint contract failed: %v", err)
-			return nil, err
+			return err
 		}
 	}
-	return tx, nil
+	return nil
 
 }
 
@@ -530,7 +528,7 @@ func HandleTransaction(supplierChain chan Transaction, resultChan chan ProcessRe
 		executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
 		hash := make(map[string]string)
 		cmd := Command{Tx: transaction, txHashes: hash}
-		ethTransaction, err = executor.Execute(cmd)
+		err = executor.Execute(cmd)
 		if err != nil {
 			log.Errorf("Execute Transaction error:%v", err)
 			result.err = err

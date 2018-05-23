@@ -18,8 +18,7 @@ var (
 	adminClient *blockchain.FxClient
 )
 
-func init() {
-	g.LoadConfig("../cf_dev.json")
+func Init() {
 	conf := g.GetConfig()
 	bConf = conf.BlockchainConfig
 

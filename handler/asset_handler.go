@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"fmt"
-	"time"
 )
 
 var (
@@ -49,17 +48,9 @@ func FxMintHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tx := &fx.Transaction{TxType: txType}
 		DistributeTask(tx, companyId)
-		select {
-			case result := <-resultChan:
-				txHash := result.Tx.Hash().Hex()
-				resp := g.NewSuccResponse(map[string]string{"txHash": txHash})
-				render.JSON(w, r, resp)
-
-			case <- time.After(2 * time.Minute):
-				log.Errorf("TimeOut for Transaction:%v",tx)
-				render.Render(w, r, g.ErrBadRequest(errors.New("TimeOut")))
-				return
-		}
+		resp := g.NewSuccResponse("mint FX success")
+		render.JSON(w, r, resp)
+		return
 	}
 
 }
