@@ -174,11 +174,13 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	case Discount:
 		err = e.pay(p)
 	case Payment:
-		err = e.pay(p)
+		//err = e.pay(p)
+		err = e.payByTransfer(p)
 	case MintFX:
 		err = e.mintFX(p)
 	case Confirm:
-		err = e.confirm(p)
+		//err = e.confirm(p)
+		err = e.payByTransfer(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
 	}
@@ -207,7 +209,9 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	var amounts [2]*big.Int
 	var states [2]*big.Int
 	for i, t := range tokens {
-		newTokenIds[i] = &t.Id
+		id := t.Id
+		newTokenIds[i] = &id
+
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
 		states[i] = new(big.Int).SetInt64(int64(t.State))
 	}
@@ -344,8 +348,9 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	}
 
 	ids := make([]*big.Int, len(p.cmd.Tx.Input))
-	for i, v := range p.cmd.Tx.Input {
-		ids[i] = &v.Id
+	for i, t := range p.cmd.Tx.Input {
+		id := t.Id
+		ids[i] = &id
 	}
 	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", p.cmd.Tx.Input[0].Owner, toAccount, ids)
 
@@ -545,23 +550,18 @@ func mergeToken(input []Token) map[string]uint64 {
 	return m
 }
 
-func HandleTransaction(supplierChain chan Transaction, resultChan chan ProcessResult) {
-	for transaction := range supplierChain {
-		if len(supplierChain) == 0 {
-			break
-		}
-		var ethTransaction *ethTypes.Transaction
-		result := &ProcessResult{Id: transaction.Id, Supplier: transaction.Input[0].Owner}
+func HandleTransaction(supplierChain chan Transaction) {
+	if transaction, ok := <-supplierChain; ok {
 		executor := DefaultExecutor()
 		hash := make(map[string]string)
 		cmd := Command{Tx: transaction, txHashes: hash}
 		err := executor.Execute(cmd)
+		log.Infof("Complete Transaction，transaction id:%v .", transaction.TxId)
 		if err != nil {
-			log.Errorf("Execute Transaction error:%v", err)
-			result.err = err
-			resultChan <- *result
+			log.Errorf("Execute Transaction error，transaction id:%v , error message:%v", transaction.TxId, err)
 		}
-		result.Tx = ethTransaction
-		resultChan <- *result
+	}
+	if len(supplierChain) > 0 {
+		HandleTransaction(supplierChain)
 	}
 }

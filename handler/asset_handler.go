@@ -1,73 +1,98 @@
 package handler
 
 import (
-	"errors"
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"net/http"
 
-	"fmt"
+	"context"
+	"encoding/json"
+	"time"
 )
 
 var (
 	supplierMap map[string]chan fx.Transaction
-	resultChan  chan fx.ProcessResult
+	types       []string
 )
 
 func init() {
 	supplierMap = make(map[string]chan fx.Transaction)
-	resultChan = make(chan fx.ProcessResult, 1)
+	types = []string{"Payment", "Discount", "SplitFX", "MintFX", "Confirm"}
 }
 
-func FxMintHandler(w http.ResponseWriter, r *http.Request) {
+func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var m g.M
+	var trans fx.Transaction
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
 		render.Render(w, r, g.ErrBadRequest(err))
 		return
 	}
-	companyId := m["companyId"].(string)
-	if companyId == "" {
-		render.Render(w, r, g.ErrBadRequest(errors.New("no companyId")))
-		return
-	}
 
-	store := keychain.DefaultStore()
-	_, err := store.GetAccount(companyId)
+	tx, err := json.Marshal(m)
+	err = json.Unmarshal(tx, trans)
 	if err != nil {
-		log.Errorf("Query company failed: %s", err.Error())
+		render.Render(w, r, g.ErrBadRequest(err))
+		return
+	}
+	err = saveTransaction(&trans)
+	if err != nil {
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}
-	if txType, err := fx.ParseType(m["txType"].(string)); err != nil {
-		render.Render(w, r, g.ErrRender(err))
-		return
-	} else {
-		tx := &fx.Transaction{TxType: txType}
-		DistributeTask(tx, companyId)
-		resp := g.NewSuccResponse("mint FX success")
-		render.JSON(w, r, resp)
-		return
-	}
+	DistributeTask(&trans)
+	resp := g.NewAcceptResponse("Accept request success")
+	render.JSON(w, r, resp)
+	return
 
 }
 
-func DistributeTask(transaction *fx.Transaction, supplier string) {
-
-	if supplierChain, ok := supplierMap[supplier]; ok {
-		select {
-		case supplierChain <- *transaction:
-		default:
-			fmt.Println("task for %v is full !", supplier)
+func DistributeTask(transaction *fx.Transaction) {
+	var company string
+	if transaction.TxType == fx.MintFX {
+		company = "cf"
+	} else {
+		company = transaction.Input[0].Owner
+	}
+	if supplierChain, ok := supplierMap[company]; ok {
+		if len(supplierChain) > 0 {
+			supplierChain <- *transaction
+		} else {
+			supplierChain <- *transaction
+			go fx.HandleTransaction(supplierChain)
 		}
-
 	} else {
 		supplierChain := make(chan fx.Transaction, 5)
-		supplierMap[supplier] = supplierChain
+		supplierMap[company] = supplierChain
 		supplierChain <- *transaction
-		go fx.HandleTransaction(supplierChain, resultChan)
+		go fx.HandleTransaction(supplierChain)
 	}
+}
+
+func saveTransaction(transaction *fx.Transaction) error {
+	conf := g.GetConfig()
+	db, err := g.OpenDB(conf.DbConfig)
+	if err != nil {
+		return (err)
+	}
+	input, err := json.Marshal(&transaction.Input)
+	if err != nil {
+		return err
+	}
+
+	output, err := json.Marshal(&transaction.Output)
+	if err != nil {
+		return err
+	}
+	stmt, err := db.Prepare("INSERT INTO transactions(deal_id, input, output,state) VALUES(?, ?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	_, err = stmt.ExecContext(ctx, transaction.TxId, input, output, types[transaction.TxType])
+	return err
 }
