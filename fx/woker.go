@@ -25,6 +25,7 @@ func Run(done <-chan struct{}) {
 		case <-ticker.C:
 			var cmds []Command
 			// TODO: fetch cmd from db(transactions left join tx_procedure)
+			// TODO: group by supplier
 			for r := range storeToEth(done, gen(done, cmds...)) {
 				if r.err != nil {
 					log.Errorf("execute command failed: id: %v, err: %v", r.Id, r.err)
