@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type TxType uint8
