@@ -101,7 +101,7 @@ func (p *CmdProcessor) initCmdNonce() {
 }
 
 func (p *CmdProcessor) createProcedure() error {
-	stmt, err := p.db.Prepare("INSERT INTO tx_procedure(transaction_id, start_nonce, state) VALUES(?, ?, ?)")
+	stmt, err := p.db.Prepare("INSERT INTO cmd_procedure(transaction_id, start_nonce, state) VALUES(?, ?, ?)")
 	if err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (p *CmdProcessor) finishProcedure() error {
 		return err
 	}
 
-	stmt, err := p.db.Prepare("UPDATE tx_procedure SET state = ? WHERE command_id = ?")
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE command_id = ?")
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (p *CmdProcessor) finishProcedure() error {
 
 func (p *CmdProcessor) saveTxHash(txHash string) error {
 	query := fmt.Sprintf(
-		"UPDATE tx_procedure set tx_hashes = JSON_SET(COALESCE(tx_hashes, '{}'), '$.\"%v\"', '%s') WHERE transaction_id = %v",
+		"UPDATE cmd_procedure set tx_hashes = JSON_SET(COALESCE(tx_hashes, '{}'), '$.\"%v\"', '%s') WHERE transaction_id = %v",
 		p.cmd.currNonce,
 		txHash,
 		p.cmd.Tx.Id,
@@ -186,6 +186,7 @@ func (p *CmdProcessor) CallWithBoxFactoryTransactor(
 func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) (*ethTypes.Receipt, error) {
 	nonce := p.cmd.currNonce
 	if txHash, ok := p.cmd.txHashes[string(nonce)]; ok {
+		log.Infof("txhash:%v",txHash)
 		return waitMined(ctx, p.fxClient.EthClient(), txHash)
 	}
 
