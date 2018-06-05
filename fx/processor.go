@@ -93,7 +93,7 @@ func (p *CmdProcessor) initCmdNonce() {
 		p.cmd.currNonce = currNonce
 		log.Infof(
 			"init command procedure and write to db: command_id: %v, start_nonce: %v",
-			p.cmd.Tx.Id,
+			p.cmd.Tx.TxId,
 			p.cmd.startNonce,
 		)
 		p.createProcedure()
@@ -109,7 +109,7 @@ func (p *CmdProcessor) createProcedure() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, err = stmt.ExecContext(ctx, p.cmd.Tx.Id, p.cmd.startNonce, stateProcessing)
+	_, err = stmt.ExecContext(ctx, p.cmd.Tx.TxId, p.cmd.startNonce, stateProcessing)
 	return err
 }
 
@@ -119,7 +119,7 @@ func (p *CmdProcessor) finishProcedure() error {
 		return err
 	}
 
-	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE command_id = ?")
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE transaction_id = ?")
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (p *CmdProcessor) finishProcedure() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, err = stmt.ExecContext(ctx, string(b), stateProcessed, p.cmd.Tx.Id)
+	_, err = stmt.ExecContext(ctx, string(b), stateProcessed, p.cmd.Tx.TxId)
 	return err
 }
 
@@ -136,7 +136,7 @@ func (p *CmdProcessor) saveTxHash(txHash string) error {
 		"UPDATE cmd_procedure set tx_hashes = JSON_SET(COALESCE(tx_hashes, '{}'), '$.\"%v\"', '%s') WHERE transaction_id = %v",
 		p.cmd.currNonce,
 		txHash,
-		p.cmd.Tx.Id,
+		p.cmd.Tx.TxId,
 	)
 	log.Debugf(query)
 
@@ -186,7 +186,7 @@ func (p *CmdProcessor) CallWithBoxFactoryTransactor(
 func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) (*ethTypes.Receipt, error) {
 	nonce := p.cmd.currNonce
 	if txHash, ok := p.cmd.txHashes[string(nonce)]; ok {
-		log.Infof("txhash:%v",txHash)
+		log.Infof("txhash:%v", txHash)
 		return waitMined(ctx, p.fxClient.EthClient(), txHash)
 	}
 
