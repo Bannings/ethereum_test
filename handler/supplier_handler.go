@@ -34,6 +34,15 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 	log.Infof("companyId: %s", companyId)
 
 	store := keychain.DefaultStore()
+	result, err := store.IsAccountExist(companyId)
+	if err != nil {
+		render.Render(w, r, g.ErrBadRequest(err))
+		return
+	}
+	if result {
+		render.Render(w, r, g.ErrBadRequest(errors.New("Company already existed")))
+		return
+	}
 
 	passphrase := companyId + salt
 	acc, err := store.CreateAccount(passphrase)

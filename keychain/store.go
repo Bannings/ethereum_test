@@ -165,6 +165,28 @@ func (s *Store) GetAccount(companyID string) (Account, error) {
 	return Account{}, errors.New("account not exist")
 }
 
+func (s *Store) IsAccountExist(companyID string) (bool, error) {
+	var result bool
+	rows, err := s.db.Query("select isnull ((select 1 from fx_blockchain.accounts  where firm_id = ? limit 1))", companyID)
+	if err != nil {
+		log.Warnf("fail to query firm keystore account: %v", err)
+		return false, err
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		var count int
+		rows.Scan(&count)
+		if count == 0 {
+			result = true
+		} else {
+			result = false
+		}
+	}
+	return result, nil
+}
+
 func (s *Store) GetAdminAccount() Account {
 	return s.adminAccount
 }
