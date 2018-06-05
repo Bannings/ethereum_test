@@ -119,7 +119,7 @@ func (p *CmdProcessor) finishProcedure() error {
 		return err
 	}
 
-	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET state = ? WHERE transaction_id = ?")
+	stmt, err := p.db.Prepare("UPDATE cmd_procedure SET tx_hashes = ?,state = ? WHERE transaction_id = ?")
 	if err != nil {
 		return err
 	}
