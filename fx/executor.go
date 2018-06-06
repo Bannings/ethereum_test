@@ -363,15 +363,20 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 		},
 	)
 
+	if err != nil {
+		log.Errorf("call FuxBatch.Transfer contract failed: %v", err)
+		return err
+	}
+
 	receipt, err := p.WaitMined(context.Background(), tx)
 	if err != nil {
 		log.Errorf("transfer failed : %v", err)
 		return err
 	}
-
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
 		return ErrTxExecuteFailed
 	}
+
 	log.Infof("transfer success :%v ,receipt info:%v", tx, receipt)
 	return nil
 }
@@ -472,13 +477,21 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 				return tx, innerErr
 			},
 		)
+
 		if err != nil {
 			log.Errorf("call FuxToken.Mint contract failed: %v", err)
 			return err
 		}
+
+		receipt, err := p.WaitMined(context.Background(), tx)
+		if err != nil {
+			return err
+		}
+		if receipt.Status == ethTypes.ReceiptStatusFailed {
+			return ErrTxExecuteFailed
+		}
 	}
 	return nil
-
 }
 
 func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Token, boxAddr common.Address, boxId uint64) (int, error) {
