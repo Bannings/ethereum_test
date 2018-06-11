@@ -7,14 +7,16 @@ import (
 	"math/big"
 	"strings"
 
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
 )
 
 // FuxTokenABI is the input ABI used to generate the binding from.
-const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isFuxHub\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_HUB\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_GROUP\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInFuxGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_proxy\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_coin\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_otherInfo\",\"type\":\"string\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"fuxBalanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxCoin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxCoin\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxToken is an auto generated Go binding around an Ethereum contract.
 type FuxToken struct {
@@ -158,6 +160,32 @@ func (_FuxToken *FuxTokenTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _FuxToken.Contract.contract.Transact(opts, method, params...)
 }
 
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxToken *FuxTokenCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "ROLE_ADMIN")
+	return *ret0, err
+}
+
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxToken *FuxTokenSession) ROLEADMIN() (string, error) {
+	return _FuxToken.Contract.ROLEADMIN(&_FuxToken.CallOpts)
+}
+
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxToken *FuxTokenCallerSession) ROLEADMIN() (string, error) {
+	return _FuxToken.Contract.ROLEADMIN(&_FuxToken.CallOpts)
+}
+
 // ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
@@ -184,290 +212,160 @@ func (_FuxToken *FuxTokenCallerSession) ROLECLUSTER() (string, error) {
 	return _FuxToken.Contract.ROLECLUSTER(&_FuxToken.CallOpts)
 }
 
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
+// Erc721token is a free data retrieval call binding the contract method 0xe5ebccf4.
 //
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROLEFUXGROUP(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "ROLE_FUX_GROUP")
-	return *ret0, err
-}
-
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
-//
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROLEFUXGROUP() (string, error) {
-	return _FuxToken.Contract.ROLEFUXGROUP(&_FuxToken.CallOpts)
-}
-
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
-//
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROLEFUXGROUP() (string, error) {
-	return _FuxToken.Contract.ROLEFUXGROUP(&_FuxToken.CallOpts)
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROLEFUXHUB(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "ROLE_FUX_HUB")
-	return *ret0, err
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROLEFUXHUB() (string, error) {
-	return _FuxToken.Contract.ROLEFUXHUB(&_FuxToken.CallOpts)
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROLEFUXHUB() (string, error) {
-	return _FuxToken.Contract.ROLEFUXHUB(&_FuxToken.CallOpts)
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTECFRBAC(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "ROUTE_CFRBAC")
-	return *ret0, err
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTECFRBAC() (string, error) {
-	return _FuxToken.Contract.ROUTECFRBAC(&_FuxToken.CallOpts)
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTECFRBAC() (string, error) {
-	return _FuxToken.Contract.ROUTECFRBAC(&_FuxToken.CallOpts)
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenCaller) ROUTECONFIG(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "ROUTE_CONFIG")
-	return *ret0, err
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenSession) ROUTECONFIG() (string, error) {
-	return _FuxToken.Contract.ROUTECONFIG(&_FuxToken.CallOpts)
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxToken *FuxTokenCallerSession) ROUTECONFIG() (string, error) {
-	return _FuxToken.Contract.ROUTECONFIG(&_FuxToken.CallOpts)
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenCaller) IsFuxHub(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "_isFuxHub", _addr)
-	return *ret0, err
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenSession) IsFuxHub(_addr common.Address) (bool, error) {
-	return _FuxToken.Contract.IsFuxHub(&_FuxToken.CallOpts, _addr)
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenCallerSession) IsFuxHub(_addr common.Address) (bool, error) {
-	return _FuxToken.Contract.IsFuxHub(&_FuxToken.CallOpts, _addr)
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenCaller) IsInFuxGroup(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "_isInFuxGroup", _addr)
-	return *ret0, err
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenSession) IsInFuxGroup(_addr common.Address) (bool, error) {
-	return _FuxToken.Contract.IsInFuxGroup(&_FuxToken.CallOpts, _addr)
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxToken *FuxTokenCallerSession) IsInFuxGroup(_addr common.Address) (bool, error) {
-	return _FuxToken.Contract.IsInFuxGroup(&_FuxToken.CallOpts, _addr)
-}
-
-// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
-//
-// Solidity: function balanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenCaller) BalanceOf(opts *bind.CallOpts, _owner common.Address) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "balanceOf", _owner)
-	return *ret0, err
-}
-
-// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
-//
-// Solidity: function balanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenSession) BalanceOf(_owner common.Address) (*big.Int, error) {
-	return _FuxToken.Contract.BalanceOf(&_FuxToken.CallOpts, _owner)
-}
-
-// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
-//
-// Solidity: function balanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenCallerSession) BalanceOf(_owner common.Address) (*big.Int, error) {
-	return _FuxToken.Contract.BalanceOf(&_FuxToken.CallOpts, _owner)
-}
-
-// FuxBalanceOf is a free data retrieval call binding the contract method 0xd75ab616.
-//
-// Solidity: function fuxBalanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenCaller) FuxBalanceOf(opts *bind.CallOpts, _owner common.Address) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "fuxBalanceOf", _owner)
-	return *ret0, err
-}
-
-// FuxBalanceOf is a free data retrieval call binding the contract method 0xd75ab616.
-//
-// Solidity: function fuxBalanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenSession) FuxBalanceOf(_owner common.Address) (*big.Int, error) {
-	return _FuxToken.Contract.FuxBalanceOf(&_FuxToken.CallOpts, _owner)
-}
-
-// FuxBalanceOf is a free data retrieval call binding the contract method 0xd75ab616.
-//
-// Solidity: function fuxBalanceOf(_owner address) constant returns(uint256)
-func (_FuxToken *FuxTokenCallerSession) FuxBalanceOf(_owner common.Address) (*big.Int, error) {
-	return _FuxToken.Contract.FuxBalanceOf(&_FuxToken.CallOpts, _owner)
-}
-
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
-//
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxToken *FuxTokenCaller) GetRouterAddress(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function erc721token() constant returns(address)
+func (_FuxToken *FuxTokenCaller) Erc721token(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "getRouterAddress")
+	err := _FuxToken.contract.Call(opts, out, "erc721token")
 	return *ret0, err
 }
 
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+// Erc721token is a free data retrieval call binding the contract method 0xe5ebccf4.
 //
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxToken *FuxTokenSession) GetRouterAddress() (common.Address, error) {
-	return _FuxToken.Contract.GetRouterAddress(&_FuxToken.CallOpts)
+// Solidity: function erc721token() constant returns(address)
+func (_FuxToken *FuxTokenSession) Erc721token() (common.Address, error) {
+	return _FuxToken.Contract.Erc721token(&_FuxToken.CallOpts)
 }
 
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+// Erc721token is a free data retrieval call binding the contract method 0xe5ebccf4.
 //
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxToken *FuxTokenCallerSession) GetRouterAddress() (common.Address, error) {
-	return _FuxToken.Contract.GetRouterAddress(&_FuxToken.CallOpts)
+// Solidity: function erc721token() constant returns(address)
+func (_FuxToken *FuxTokenCallerSession) Erc721token() (common.Address, error) {
+	return _FuxToken.Contract.Erc721token(&_FuxToken.CallOpts)
 }
 
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
+// FuxCoin is a free data retrieval call binding the contract method 0x015c3e3d.
 //
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxToken *FuxTokenCaller) IsUsingRouter(opts *bind.CallOpts) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "isUsingRouter")
-	return *ret0, err
-}
-
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
-//
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxToken *FuxTokenSession) IsUsingRouter() (bool, error) {
-	return _FuxToken.Contract.IsUsingRouter(&_FuxToken.CallOpts)
-}
-
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
-//
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxToken *FuxTokenCallerSession) IsUsingRouter() (bool, error) {
-	return _FuxToken.Contract.IsUsingRouter(&_FuxToken.CallOpts)
-}
-
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
-//
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxToken *FuxTokenCaller) SysRouter(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function fuxCoin() constant returns(address)
+func (_FuxToken *FuxTokenCaller) FuxCoin(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _FuxToken.contract.Call(opts, out, "sysRouter")
+	err := _FuxToken.contract.Call(opts, out, "fuxCoin")
 	return *ret0, err
 }
 
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+// FuxCoin is a free data retrieval call binding the contract method 0x015c3e3d.
 //
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxToken *FuxTokenSession) SysRouter() (common.Address, error) {
-	return _FuxToken.Contract.SysRouter(&_FuxToken.CallOpts)
+// Solidity: function fuxCoin() constant returns(address)
+func (_FuxToken *FuxTokenSession) FuxCoin() (common.Address, error) {
+	return _FuxToken.Contract.FuxCoin(&_FuxToken.CallOpts)
 }
 
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+// FuxCoin is a free data retrieval call binding the contract method 0x015c3e3d.
 //
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxToken *FuxTokenCallerSession) SysRouter() (common.Address, error) {
-	return _FuxToken.Contract.SysRouter(&_FuxToken.CallOpts)
+// Solidity: function fuxCoin() constant returns(address)
+func (_FuxToken *FuxTokenCallerSession) FuxCoin() (common.Address, error) {
+	return _FuxToken.Contract.FuxCoin(&_FuxToken.CallOpts)
+}
+
+// FuxLocker is a free data retrieval call binding the contract method 0xfd06bc9a.
+//
+// Solidity: function fuxLocker() constant returns(address)
+func (_FuxToken *FuxTokenCaller) FuxLocker(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "fuxLocker")
+	return *ret0, err
+}
+
+// FuxLocker is a free data retrieval call binding the contract method 0xfd06bc9a.
+//
+// Solidity: function fuxLocker() constant returns(address)
+func (_FuxToken *FuxTokenSession) FuxLocker() (common.Address, error) {
+	return _FuxToken.Contract.FuxLocker(&_FuxToken.CallOpts)
+}
+
+// FuxLocker is a free data retrieval call binding the contract method 0xfd06bc9a.
+//
+// Solidity: function fuxLocker() constant returns(address)
+func (_FuxToken *FuxTokenCallerSession) FuxLocker() (common.Address, error) {
+	return _FuxToken.Contract.FuxLocker(&_FuxToken.CallOpts)
+}
+
+// FuxStorage is a free data retrieval call binding the contract method 0x3203e7a9.
+//
+// Solidity: function fuxStorage() constant returns(address)
+func (_FuxToken *FuxTokenCaller) FuxStorage(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "fuxStorage")
+	return *ret0, err
+}
+
+// FuxStorage is a free data retrieval call binding the contract method 0x3203e7a9.
+//
+// Solidity: function fuxStorage() constant returns(address)
+func (_FuxToken *FuxTokenSession) FuxStorage() (common.Address, error) {
+	return _FuxToken.Contract.FuxStorage(&_FuxToken.CallOpts)
+}
+
+// FuxStorage is a free data retrieval call binding the contract method 0x3203e7a9.
+//
+// Solidity: function fuxStorage() constant returns(address)
+func (_FuxToken *FuxTokenCallerSession) FuxStorage() (common.Address, error) {
+	return _FuxToken.Contract.FuxStorage(&_FuxToken.CallOpts)
+}
+
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
+//
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxToken *FuxTokenCaller) IsMigrated(opts *bind.CallOpts, contractName string, migrationId string) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "isMigrated", contractName, migrationId)
+	return *ret0, err
+}
+
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
+//
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxToken *FuxTokenSession) IsMigrated(contractName string, migrationId string) (bool, error) {
+	return _FuxToken.Contract.IsMigrated(&_FuxToken.CallOpts, contractName, migrationId)
+}
+
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
+//
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxToken *FuxTokenCallerSession) IsMigrated(contractName string, migrationId string) (bool, error) {
+	return _FuxToken.Contract.IsMigrated(&_FuxToken.CallOpts, contractName, migrationId)
+}
+
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
+//
+// Solidity: function rbac() constant returns(address)
+func (_FuxToken *FuxTokenCaller) Rbac(opts *bind.CallOpts) (common.Address, error) {
+	var (
+		ret0 = new(common.Address)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "rbac")
+	return *ret0, err
+}
+
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
+//
+// Solidity: function rbac() constant returns(address)
+func (_FuxToken *FuxTokenSession) Rbac() (common.Address, error) {
+	return _FuxToken.Contract.Rbac(&_FuxToken.CallOpts)
+}
+
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
+//
+// Solidity: function rbac() constant returns(address)
+func (_FuxToken *FuxTokenCallerSession) Rbac() (common.Address, error) {
+	return _FuxToken.Contract.Rbac(&_FuxToken.CallOpts)
 }
 
 // Burn is a paid mutator transaction binding the contract method 0x9dc29fac.
@@ -491,44 +389,188 @@ func (_FuxToken *FuxTokenTransactorSession) Burn(_owner common.Address, _tokenId
 	return _FuxToken.Contract.Burn(&_FuxToken.TransactOpts, _owner, _tokenId)
 }
 
-// Mint is a paid mutator transaction binding the contract method 0xcf21977c.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function mint(_to address, _tokenId uint256, _coin uint256, _expire uint256, _state uint256, _otherInfo string) returns()
-func (_FuxToken *FuxTokenTransactor) Mint(opts *bind.TransactOpts, _to common.Address, _tokenId *big.Int, _coin *big.Int, _expire *big.Int, _state *big.Int, _otherInfo string) (*types.Transaction, error) {
-	return _FuxToken.contract.Transact(opts, "mint", _to, _tokenId, _coin, _expire, _state, _otherInfo)
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxToken *FuxTokenTransactor) Initialize(opts *bind.TransactOpts, _rbac common.Address) (*types.Transaction, error) {
+	return _FuxToken.contract.Transact(opts, "initialize", _rbac)
 }
 
-// Mint is a paid mutator transaction binding the contract method 0xcf21977c.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function mint(_to address, _tokenId uint256, _coin uint256, _expire uint256, _state uint256, _otherInfo string) returns()
-func (_FuxToken *FuxTokenSession) Mint(_to common.Address, _tokenId *big.Int, _coin *big.Int, _expire *big.Int, _state *big.Int, _otherInfo string) (*types.Transaction, error) {
-	return _FuxToken.Contract.Mint(&_FuxToken.TransactOpts, _to, _tokenId, _coin, _expire, _state, _otherInfo)
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxToken *FuxTokenSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
+	return _FuxToken.Contract.Initialize(&_FuxToken.TransactOpts, _rbac)
 }
 
-// Mint is a paid mutator transaction binding the contract method 0xcf21977c.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function mint(_to address, _tokenId uint256, _coin uint256, _expire uint256, _state uint256, _otherInfo string) returns()
-func (_FuxToken *FuxTokenTransactorSession) Mint(_to common.Address, _tokenId *big.Int, _coin *big.Int, _expire *big.Int, _state *big.Int, _otherInfo string) (*types.Transaction, error) {
-	return _FuxToken.Contract.Mint(&_FuxToken.TransactOpts, _to, _tokenId, _coin, _expire, _state, _otherInfo)
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxToken *FuxTokenTransactorSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
+	return _FuxToken.Contract.Initialize(&_FuxToken.TransactOpts, _rbac)
 }
 
-// Transfer is a paid mutator transaction binding the contract method 0xbeabacc8.
+// Mint is a paid mutator transaction binding the contract method 0xf92883a2.
 //
-// Solidity: function transfer(_from address, _to address, _tokenId uint256) returns()
-func (_FuxToken *FuxTokenTransactor) Transfer(opts *bind.TransactOpts, _from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
-	return _FuxToken.contract.Transact(opts, "transfer", _from, _to, _tokenId)
+// Solidity: function mint(_to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256) returns()
+func (_FuxToken *FuxTokenTransactor) Mint(opts *bind.TransactOpts, _to common.Address, _tokenId *big.Int, _value *big.Int, _state *big.Int, _expire *big.Int) (*types.Transaction, error) {
+	return _FuxToken.contract.Transact(opts, "mint", _to, _tokenId, _value, _state, _expire)
 }
 
-// Transfer is a paid mutator transaction binding the contract method 0xbeabacc8.
+// Mint is a paid mutator transaction binding the contract method 0xf92883a2.
 //
-// Solidity: function transfer(_from address, _to address, _tokenId uint256) returns()
-func (_FuxToken *FuxTokenSession) Transfer(_from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
-	return _FuxToken.Contract.Transfer(&_FuxToken.TransactOpts, _from, _to, _tokenId)
+// Solidity: function mint(_to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256) returns()
+func (_FuxToken *FuxTokenSession) Mint(_to common.Address, _tokenId *big.Int, _value *big.Int, _state *big.Int, _expire *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.Mint(&_FuxToken.TransactOpts, _to, _tokenId, _value, _state, _expire)
 }
 
-// Transfer is a paid mutator transaction binding the contract method 0xbeabacc8.
+// Mint is a paid mutator transaction binding the contract method 0xf92883a2.
 //
-// Solidity: function transfer(_from address, _to address, _tokenId uint256) returns()
-func (_FuxToken *FuxTokenTransactorSession) Transfer(_from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
-	return _FuxToken.Contract.Transfer(&_FuxToken.TransactOpts, _from, _to, _tokenId)
+// Solidity: function mint(_to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256) returns()
+func (_FuxToken *FuxTokenTransactorSession) Mint(_to common.Address, _tokenId *big.Int, _value *big.Int, _state *big.Int, _expire *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.Mint(&_FuxToken.TransactOpts, _to, _tokenId, _value, _state, _expire)
+}
+
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x42842e0e.
+//
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenTransactor) SafeTransferFrom(opts *bind.TransactOpts, _from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.contract.Transact(opts, "safeTransferFrom", _from, _to, _tokenId)
+}
+
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x42842e0e.
+//
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenSession) SafeTransferFrom(_from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.SafeTransferFrom(&_FuxToken.TransactOpts, _from, _to, _tokenId)
+}
+
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x42842e0e.
+//
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenTransactorSession) SafeTransferFrom(_from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.SafeTransferFrom(&_FuxToken.TransactOpts, _from, _to, _tokenId)
+}
+
+// FuxTokenMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the FuxToken contract.
+type FuxTokenMigratedIterator struct {
+	Event *FuxTokenMigrated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxTokenMigratedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxTokenMigrated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxTokenMigrated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxTokenMigratedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxTokenMigratedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxTokenMigrated represents a Migrated event raised by the FuxToken contract.
+type FuxTokenMigrated struct {
+	ContractName string
+	MigrationId  string
+	Raw          types.Log // Blockchain specific contextual infos
+}
+
+// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
+//
+// Solidity: event Migrated(contractName string, migrationId string)
+func (_FuxToken *FuxTokenFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxTokenMigratedIterator, error) {
+
+	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Migrated")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxTokenMigratedIterator{contract: _FuxToken.contract, event: "Migrated", logs: logs, sub: sub}, nil
+}
+
+// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
+//
+// Solidity: event Migrated(contractName string, migrationId string)
+func (_FuxToken *FuxTokenFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxTokenMigrated) (event.Subscription, error) {
+
+	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Migrated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxTokenMigrated)
+				if err := _FuxToken.contract.UnpackLog(event, "Migrated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }
