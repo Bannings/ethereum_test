@@ -2,10 +2,9 @@ package fx
 
 import (
 	"fmt"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"math/big"
 	"strings"
-
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type TxType uint8
@@ -101,4 +100,11 @@ type Command struct {
 	startNonce uint64
 	currNonce  uint64
 	txHashes   map[string]string // key: string(nonce)
+}
+
+type ProcessResult struct {
+	Id       uint
+	Tx       *ethTypes.Transaction
+	Supplier string
+	err      error
 }

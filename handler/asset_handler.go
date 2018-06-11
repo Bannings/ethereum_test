@@ -42,7 +42,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}
-	DistributeTask(&trans)
+	//DistributeTask(&trans)
 	resp := g.NewAcceptResponse("Accept request success")
 	render.JSON(w, r, resp)
 	return
@@ -95,4 +95,5 @@ func saveTransaction(transaction *fx.Transaction) error {
 	defer cancel()
 	_, err = stmt.ExecContext(ctx, transaction.TxId, input, output, types[transaction.TxType])
 	return err
+
 }

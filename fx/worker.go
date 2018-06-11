@@ -6,31 +6,29 @@ import (
 	"github.com/eddyzhou/log"
 )
 
-// run
-// ```
-// done := make(chan struct{})
-// defer close(done)
-// go run(done)
-// ```
-// in main.go
-func Run(done <-chan struct{}) {
-	ticker := time.NewTicker(300 * time.Second)
+func ExcuteTransaction(done <-chan struct{}) {
+	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-done:
-			log.Println("Done!")
+			log.Infof("Process for data to blockchain is done! time:%v", time.Now())
 			return
 		case <-ticker.C:
-			var cmds []Command
-			// TODO: fetch cmd from db(transactions left join tx_procedure)
-			// TODO: group by supplier
-			for r := range storeToEth(done, gen(done, cmds...)) {
-				if r.err != nil {
-					log.Errorf("execute command failed: id: %v, err: %v", r.Id, r.err)
-				}
+			unfinsherdCmds := getUnfinshedCmd()
+			supplierMap := sectionalizeCmd(unfinsherdCmds)
+			for _, cmds := range supplierMap {
+				go run(done, cmds)
 			}
+		}
+	}
+}
+
+func run(done <-chan struct{}, cmds []Command) {
+	for r := range storeToEth(done, gen(done, cmds...)) {
+		if r.err != nil {
+			log.Errorf("execute transaction failed: id: %v, err: %v", r.Id, r.err)
 		}
 	}
 }
@@ -64,4 +62,42 @@ func storeToEth(done <-chan struct{}, in <-chan Command) <-chan ProcessResult {
 		}
 	}()
 	return out
+}
+
+func getUnfinshedCmd() []Command {
+	e := DefaultExecutor()
+	p := &CmdProcessor{db: e.db}
+	cmds, err := p.getCmd()
+	if err != nil {
+		log.Errorf("Get unfinshed cmds fail:%v", err)
+		return nil
+	}
+	return cmds
+}
+
+func sectionalizeCmd(cmds []Command) map[string][]Command {
+	supplierMap := make(map[string][]Command)
+
+	for _, cmd := range cmds {
+
+		if cmd.Tx.TxType == MintFX {
+			if _, ok := supplierMap["cf"]; ok {
+				temp := supplierMap["cf"]
+				temp = append(temp, cmd)
+				supplierMap["cf"] = temp
+			} else {
+				supplierMap["cf"] = []Command{}
+				supplierMap["cf"] = append(supplierMap["cf"], cmd)
+			}
+		} else {
+			if _, ok := supplierMap[cmd.Tx.Input[0].Owner]; ok {
+				supplierMap[cmd.Tx.Input[0].Owner] = append(supplierMap[cmd.Tx.Input[0].Owner], cmd)
+			} else {
+				temp := []Command{cmd}
+				supplierMap[cmd.Tx.Input[0].Owner] = temp
+			}
+		}
+	}
+
+	return supplierMap
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gitlab.chainedfinance.com/chaincore/r2/fx"
 )
 
 const (
@@ -130,12 +131,18 @@ func main() {
 		r.Use(mw.OnlyCF)
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
+
+		r.Post("/asset", handler.AssetHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT)
+
+	done := make(chan struct{})
+	defer close(done)
+	go fx.ExcuteTransaction(done)
 
 	log.Infof("listening on: %v", *port)
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *port), Handler: r}

@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
+	"strconv"
 )
 
 const (
@@ -40,7 +41,7 @@ func (p *CmdProcessor) CallWithFxTokenTransactor(
 		tx, err := p.fxClient.CallWithFxTokenTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
-			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
 			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
@@ -58,7 +59,7 @@ func (p *CmdProcessor) CallWithFxSplitTransactor(
 		tx, err := p.fxClient.CallWithFxSplitTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
-			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
 			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
@@ -76,7 +77,7 @@ func (p *CmdProcessor) CallWithFxBatchTransactor(
 		tx, err := p.fxClient.CallWithFxBatchTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
-			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
+			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
 			p.saveTxHash(txHash)
 			p.cmd.currNonce += 1
 		}
@@ -144,6 +145,32 @@ func (p *CmdProcessor) saveTxHash(txHash string) error {
 	defer cancel()
 	_, err := p.db.ExecContext(ctx, query)
 	return err
+}
+
+func (p *CmdProcessor) getCmd() ([]Command, error) {
+	var cmds []Command
+	rows, err := p.db.Query("select * from( select deal_id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on deal_id=transaction_id order by t1.created_at) as t3 where process_state is null")
+	if err != nil {
+		log.Error("fail to query unfinished transactions: %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var inputStr, outputStr, state, processState string
+		var input, output []Token
+		var deal_id uint64
+
+		rows.Scan(&deal_id, &inputStr, &outputStr, &state, &processState)
+		json.Unmarshal([]byte(inputStr), &input)
+		json.Unmarshal([]byte(outputStr), &output)
+		txType, _ := ParseType(state)
+		tx := &Transaction{Input: input, Output: output, TxId: deal_id, TxType: txType}
+		cmd := &Command{Tx: *tx, txHashes: make(map[string]string)}
+		cmds = append(cmds, *cmd)
+	}
+	return cmds, nil
 }
 
 func (p *CmdProcessor) CallWithBoxTransactor(
