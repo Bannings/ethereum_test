@@ -221,7 +221,7 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	err := p.CallWithFxSplitTransactor(
 		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
-			tx, innerErr = session.SplitFux(&tokenId, newTokenIds, amounts, states)
+			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
 		},
 	)
@@ -470,9 +470,8 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 					acc.Address,
 					&t.Id,
 					new(big.Int).SetUint64(t.Amount),
-					new(big.Int).SetInt64(t.ExpireTime),
 					new(big.Int).SetUint64(uint64(t.State)),
-					"",
+					new(big.Int).SetInt64(t.ExpireTime),
 				)
 				return tx, innerErr
 			},

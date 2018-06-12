@@ -7,7 +7,7 @@ import (
 )
 
 func ExcuteTransaction(done <-chan struct{}) {
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(300 * time.Second)
 	defer ticker.Stop()
 
 	for {
