@@ -340,8 +340,10 @@ func (e *EthExecutor) pay(p *CmdProcessor) error {
 
 //This pay method with batch transfer
 func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
+	fromAccount := p.cmd.Tx.Input[0].Owner
 	toAccount := p.cmd.Tx.Output[0].Owner
-	Acc, err := e.keystore.GetAccount(toAccount)
+	toAcc, err := e.keystore.GetAccount(toAccount)
+	fromAcc, err := e.keystore.GetAccount(fromAccount)
 	if err != nil {
 		log.Errorf("GET Account failed :%v", err)
 		return err
@@ -351,33 +353,32 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	for i, t := range p.cmd.Tx.Input {
 		id := t.Id
 		ids[i] = &id
-	}
-	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", p.cmd.Tx.Input[0].Owner, toAccount, ids)
+		var tx *ethTypes.Transaction
+		err = p.CallWithFxTokenTransactor(
+			func(session *contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error) {
+				var innerErr error
+				tx, innerErr = session.SafeTransferFrom(fromAcc.Address, toAcc.Address, &id)
+				return tx, innerErr
+			},
+		)
 
-	var tx *ethTypes.Transaction
-	err = p.CallWithFxBatchTransactor(
-		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
-			var innerErr error
-			tx, innerErr = session.Transfer(Acc.Address, ids)
-			return tx, innerErr
-		},
-	)
+		if err != nil {
+			log.Errorf("call FuxBatch.Transfer contract failed: %v", err)
+			return err
+		}
 
-	if err != nil {
-		log.Errorf("call FuxBatch.Transfer contract failed: %v", err)
-		return err
+		receipt, err := p.WaitMined(context.Background(), tx)
+		if err != nil {
+			log.Errorf("transfer failed : %v", err)
+			return err
+		}
+		if receipt.Status == ethTypes.ReceiptStatusFailed {
+			return ErrTxExecuteFailed
+		}
+		log.Infof("transfer success :%v ,receipt info:%v", tx, receipt.TxHash)
 	}
+	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAccount, ids)
 
-	receipt, err := p.WaitMined(context.Background(), tx)
-	if err != nil {
-		log.Errorf("transfer failed : %v", err)
-		return err
-	}
-	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return ErrTxExecuteFailed
-	}
-
-	log.Infof("transfer success :%v ,receipt info:%v", tx, receipt)
 	return nil
 }
 
