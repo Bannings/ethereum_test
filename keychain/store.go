@@ -167,9 +167,31 @@ func (s *Store) GetAccount(companyID string) (Account, error) {
 
 func (s *Store) IsAccountExist(companyID string) (bool, error) {
 	var result bool
-	rows, err := s.db.Query("select isnull ((select 1 from fx_blockchain.accounts  where firm_id = ? limit 1))", companyID)
+	rows, err := s.db.Query("select isnull ((select 1 from accounts  where firm_id = ? limit 1))", companyID)
 	if err != nil {
-		log.Warnf("fail to query firm keystore account: %v", err)
+		log.Warnf("fail to query firm company: %v", err)
+		return false, err
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		var count int
+		rows.Scan(&count)
+		if count == 0 {
+			result = true
+		} else {
+			result = false
+		}
+	}
+	return result, nil
+}
+
+func (s *Store) IsTransactionExist(TxId uint64) (bool, error) {
+	var result bool
+	rows, err := s.db.Query("select isnull ((select 1 from transactions where deal_id = ? limit 1))", TxId)
+	if err != nil {
+		log.Warnf("fail to query transaction id : %v", err)
 		return false, err
 	}
 

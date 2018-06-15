@@ -5,10 +5,12 @@ import (
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"net/http"
 
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -32,9 +34,19 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx, err := json.Marshal(m)
-	err = json.Unmarshal(tx, trans)
 	if err != nil {
 		render.Render(w, r, g.ErrBadRequest(err))
+		return
+	}
+	err = json.Unmarshal(tx, &trans)
+	if err != nil {
+		render.Render(w, r, g.ErrBadRequest(err))
+		return
+	}
+	store := keychain.DefaultStore()
+	exist, err := store.IsTransactionExist(trans.TxId)
+	if exist {
+		render.Render(w, r, g.ErrBadRequest(errors.New("Transaction id already exist")))
 		return
 	}
 	err = saveTransaction(&trans)
