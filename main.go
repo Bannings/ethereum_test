@@ -127,7 +127,7 @@ func main() {
 	})
 
 	r.Route("/api/fx", func(r chi.Router) {
-		r.Use(mw.Auth())
+		//r.Use(mw.Auth())
 		r.Use(mw.OnlyCF)
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
@@ -142,7 +142,7 @@ func main() {
 
 	done := make(chan struct{})
 	defer close(done)
-	go fx.ExcuteTransaction(done)
+	//go fx.ExcuteTransaction(done)
 
 	log.Infof("listening on: %v", *port)
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *port), Handler: r}
