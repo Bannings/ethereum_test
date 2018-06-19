@@ -1,18 +1,16 @@
 package handler
 
 import (
-	"errors"
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"net/http"
 
 	"context"
 	"encoding/json"
-	"fmt"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
-	"math/big"
+	"errors"
 	"time"
 )
 
@@ -28,7 +26,7 @@ func init() {
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var m g.M
-	var trans Transaction
+	var trans fx.Transaction
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
 		render.Render(w, r, g.ErrBadRequest(err))
@@ -36,7 +34,6 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tx, err := json.Marshal(m)
-	fmt.Println(string(tx))
 	if err != nil {
 		render.Render(w, r, g.ErrBadRequest(err))
 		return
@@ -45,25 +42,6 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		render.Render(w, r, g.ErrBadRequest(err))
 		return
-	}
-	_, err = fx.ParseType(trans.TxType)
-	if err != nil {
-		render.Render(w, r, g.ErrBadRequest(errors.New("Invalid TxType")))
-		return
-	}
-	for _, token := range trans.Input {
-		_, err = fx.ParseState(token.State)
-		if err != nil {
-			render.Render(w, r, g.ErrBadRequest(errors.New("Invalid input token state")))
-			return
-		}
-	}
-	for _, token := range trans.Output {
-		_, err = fx.ParseState(token.State)
-		if err != nil {
-			render.Render(w, r, g.ErrBadRequest(errors.New("Invalid output token state")))
-			return
-		}
 	}
 	store := keychain.DefaultStore()
 	exist, err := store.IsTransactionExist(trans.TxId)
@@ -76,7 +54,8 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}
-	resp := g.NewSuccResponse("Accept request success")
+	//DistributeTask(&trans)
+	resp := g.NewAcceptResponse("Accept request success")
 	render.JSON(w, r, resp)
 	return
 
@@ -104,7 +83,7 @@ func DistributeTask(transaction *fx.Transaction) {
 	}
 }
 
-func saveTransaction(transaction *Transaction) error {
+func saveTransaction(transaction *fx.Transaction) error {
 	conf := g.GetConfig()
 	db, err := g.OpenDB(conf.DbConfig)
 	if err != nil {
@@ -126,23 +105,7 @@ func saveTransaction(transaction *Transaction) error {
 	defer stmt.Close()
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, err = stmt.ExecContext(ctx, transaction.TxId, input, output, transaction.TxType)
+	_, err = stmt.ExecContext(ctx, transaction.TxId, input, output, types[transaction.TxType])
 	return err
 
-}
-
-type Transaction struct {
-	Id     uint    `json:"id"`
-	Input  []Token `json:"input"`
-	Output []Token `json:"output"`
-	TxId   uint64  `json:"tx_id"`
-	TxType string  `json:"tx_type"`
-}
-
-type Token struct {
-	Id         big.Int `json:"id"`
-	Amount     uint64  `json:"amount"`
-	Owner      string  `json:"owner"` //company ID
-	State      string  `json:"state"`
-	ExpireTime int64   `json:"expire_time"`
 }

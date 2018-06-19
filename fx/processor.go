@@ -102,13 +102,8 @@ func (p *CmdProcessor) initCmdNonce() {
 }
 
 func (p *CmdProcessor) createProcedure() error {
-	conn, err := p.db.Begin()
-	if err != nil {
-		return err
-	}
 	stmt, err := p.db.Prepare("INSERT INTO cmd_procedure(transaction_id, start_nonce, state) VALUES(?, ?, ?)")
 	if err != nil {
-		conn.Rollback()
 		return err
 	}
 	defer stmt.Close()
@@ -116,33 +111,11 @@ func (p *CmdProcessor) createProcedure() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	_, err = stmt.ExecContext(ctx, p.cmd.Tx.TxId, p.cmd.startNonce, stateProcessing)
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-
-	stmt, err = p.db.Prepare("UPDATE transactions SET status = ? WHERE deal_id = ?")
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-	_, err = stmt.ExecContext(ctx, "processing", p.cmd.Tx.TxId)
-
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-	conn.Commit()
-	return nil
+	return err
 }
 
 func (p *CmdProcessor) finishProcedure() error {
 	b, err := json.Marshal(p.cmd.txHashes)
-	if err != nil {
-		return err
-	}
-
-	conn, err := p.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -156,21 +129,7 @@ func (p *CmdProcessor) finishProcedure() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	_, err = stmt.ExecContext(ctx, string(b), stateProcessed, p.cmd.Tx.TxId)
-
-	stmt, err = p.db.Prepare("UPDATE transactions SET status = ? WHERE deal_id = ?")
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-	_, err = stmt.ExecContext(ctx, "successed", p.cmd.Tx.TxId)
-
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-
-	conn.Commit()
-	return nil
+	return err
 }
 
 func (p *CmdProcessor) saveTxHash(txHash string) error {
@@ -188,36 +147,9 @@ func (p *CmdProcessor) saveTxHash(txHash string) error {
 	return err
 }
 
-func (p *CmdProcessor) updateStatus() error {
-	conn, err := p.db.Begin()
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	stmt, err := p.db.Prepare("UPDATE transactions SET status = ? WHERE deal_id = ?")
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-	_, err = stmt.ExecContext(ctx, "failed", p.cmd.Tx.TxId)
-
-	if err != nil {
-		conn.Rollback()
-		return err
-	}
-
-	conn.Commit()
-	return nil
-
-}
-
 func (p *CmdProcessor) getCmd() ([]Command, error) {
 	var cmds []Command
-	//rows, err := p.db.Query("select * from( select deal_id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on deal_id=transaction_id order by t1.created_at) as t3 where process_state is null")
-	rows, err := p.db.Query("select deal_id,input,output,state from transactions where status='unprocessed' or status='failed' order by created_at")
+	rows, err := p.db.Query("select * from( select deal_id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on deal_id=transaction_id order by t1.created_at) as t3 where process_state is null")
 	if err != nil {
 		log.Error("fail to query unfinished transactions: %v", err)
 		return nil, err
@@ -226,11 +158,11 @@ func (p *CmdProcessor) getCmd() ([]Command, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var inputStr, outputStr, state string
+		var inputStr, outputStr, state, processState string
 		var input, output []Token
 		var deal_id uint64
 
-		rows.Scan(&deal_id, &inputStr, &outputStr, &state)
+		rows.Scan(&deal_id, &inputStr, &outputStr, &state, &processState)
 		json.Unmarshal([]byte(inputStr), &input)
 		json.Unmarshal([]byte(outputStr), &output)
 		txType, _ := ParseType(state)
