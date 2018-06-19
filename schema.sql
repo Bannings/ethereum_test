@@ -22,7 +22,6 @@ CREATE TABLE `cmd_procedure` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY (`command_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -33,6 +32,7 @@ CREATE TABLE `transactions` (
   `input` JSON,
   `output` JSON,
   `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
+  `status` enum('unprocessed','successed','processing','failed') NOT NULL DEFAULT 'unprocessed',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
