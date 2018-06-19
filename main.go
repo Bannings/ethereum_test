@@ -127,8 +127,6 @@ func main() {
 	})
 
 	r.Route("/api/fx", func(r chi.Router) {
-		r.Use(mw.Auth())
-		r.Use(mw.OnlyCF)
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 
