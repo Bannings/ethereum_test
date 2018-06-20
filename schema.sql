@@ -21,7 +21,7 @@ CREATE TABLE `cmd_procedure` (
   `state` enum('unprocess', 'processing', 'processed') NOT NULL DEFAULT 'unprocess',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
