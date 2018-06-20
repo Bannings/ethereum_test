@@ -1,4 +1,5 @@
--- create database fx_blockchain
+create database fx_blockchain;
+use fx_blockchain;
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
