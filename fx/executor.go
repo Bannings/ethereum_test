@@ -5,15 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"math/big"
-	"sort"
-	"sync"
-	"time"
-
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"math/big"
+	"sync"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/common"
@@ -172,7 +169,7 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	case SplitFX:
 		err = e.splitFX(p)
 	case Discount:
-		err = e.pay(p)
+		err = e.payByTransfer(p)
 	case Payment:
 		//err = e.pay(p)
 		err = e.payByTransfer(p)
@@ -228,103 +225,6 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	if err != nil {
 		log.Errorf("call FuxSplit.SplitFux contract failed: %v", err)
 		return err
-	}
-
-	receipt, err := p.WaitMined(context.Background(), tx)
-	if err != nil {
-		return err
-	}
-	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return ErrTxExecuteFailed
-	}
-
-	return nil
-}
-
-//This pay method with AddJob and RunJob
-func (e *EthExecutor) pay(p *CmdProcessor) error {
-	cmd := p.cmd
-	input := cmd.Tx.Input
-	m := mergeToken(cmd.Tx.Output)
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var tx *ethTypes.Transaction
-	for idx, owner := range keys {
-		boxId := generateBoxId(cmd.Tx.TxId, idx)
-		to := owner
-		toAcc, err := e.keystore.GetAccount(to)
-		if err != nil {
-			log.Errorf("get account of %v failed: %v", to, err)
-			return err
-		}
-		log.Infof("create box: %v for %s", boxId, to)
-
-		err = p.CallWithBoxFactoryTransactor(
-			func(session *contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error) {
-				var innerErr error
-				tx, innerErr = session.CreatePayBox(new(big.Int).SetUint64(boxId), toAcc.Address)
-				return tx, innerErr
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxPayBoxFactory.CreatePayBox contract failed: %v", err)
-			return err
-		}
-
-		var boxAddr common.Address
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
-		r, err := p.WaitMined(ctx, tx)
-		cancel()
-		if err != nil {
-			// Compatible with Ganache backend
-			err1 := p.fxClient.CallWithBoxFactoryCaller(
-				func(session *contract_gen.FuxPayBoxFactoryCallerSession) error {
-					addr, innerErr := session.GetPayBoxAddress(new(big.Int).SetUint64(boxId))
-					boxAddr = addr
-					return innerErr
-				},
-			)
-			if err1 != nil {
-				log.Errorf("create payBox(id: %v) failed: %v", boxId, err)
-				return err
-			}
-		} else {
-			boxAddr = r.ContractAddress
-		}
-
-		amount := m[owner]
-		n, err := e.boxing(p, amount, input, boxAddr, boxId)
-		if err != nil {
-			log.Errorf("transfer to box(id: %v) failed: %v", boxId, err)
-			return err
-		}
-
-		log.Infof("transfer box(%v) to %v", boxId, owner)
-		acc := e.keystore.GetAdminAccount()
-		box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
-		if err != nil {
-			log.Errorf("Create new FuxPayBox contract failed: %v", err)
-			return err
-		}
-
-		err = p.CallWithBoxTransactor(
-			box,
-			func(session *contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error) {
-				var innerErr error
-				tx, innerErr = session.TransferOwnership(acc.Address)
-				return tx, innerErr
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxPayBox.TransferOwnership contract failed: %v", err)
-			return err
-		}
-
-		input = input[n:]
 	}
 
 	receipt, err := p.WaitMined(context.Background(), tx)
@@ -492,58 +392,6 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 		}
 	}
 	return nil
-}
-
-func (e *EthExecutor) boxing(p *CmdProcessor, targetAmount uint64, tokens []Token, boxAddr common.Address, boxId uint64) (int, error) {
-	companyID := p.cmd.Tx.Sponsor()
-	fromAcc, err := e.keystore.GetAccount(companyID)
-	if err != nil {
-		log.Errorf("get account of %v failed: %v", companyID, err)
-		return 0, err
-	}
-
-	var actualAmount uint64
-	var consumedNum int
-	tokenIds := make([]*big.Int, len(tokens))
-	for idx, t := range tokens {
-		if actualAmount >= targetAmount {
-			break
-		}
-
-		actualAmount += t.Amount
-		consumedNum += 1
-		tokenIds[idx] = &t.Id
-	}
-
-	tokenIds = tokenIds[:consumedNum]
-	jobId := new(big.Int).SetUint64(boxId)
-	err = p.CallWithFxBatchTransactor(
-		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
-			return session.AddJob(jobId, fromAcc.Address, boxAddr, tokenIds)
-		},
-	)
-	if err != nil {
-		log.Errorf("call FuxBatch.AddJob contract failed: %v", err)
-		return 0, err
-	}
-
-	n := consumedNum / batchSize
-	if consumedNum%batchSize > 0 {
-		n += 1
-	}
-	for i := 0; i < n; i++ {
-		err = p.CallWithFxBatchTransactor(
-			func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
-				return session.RunJob(jobId)
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxBatch.RunJob contract failed: %v", err)
-			return 0, err
-		}
-	}
-
-	return consumedNum, nil
 }
 
 func generateBoxId(txId uint64, index int) uint64 {
