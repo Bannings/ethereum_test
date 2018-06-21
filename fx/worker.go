@@ -3,8 +3,19 @@ package fx
 import (
 	"time"
 
+	"database/sql"
+	"encoding/json"
 	"github.com/eddyzhou/log"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 )
+
+var (
+	defaultDBConnection *dbConnection
+)
+
+type dbConnection struct {
+	db *sql.DB
+}
 
 func ExcuteTransaction(done <-chan struct{}) {
 	ticker := time.NewTicker(300 * time.Second)
@@ -19,7 +30,7 @@ func ExcuteTransaction(done <-chan struct{}) {
 			unfinsherdCmds := getUnfinshedCmd()
 			supplierMap := sectionalizeCmd(unfinsherdCmds)
 			for _, cmds := range supplierMap {
-				go run(done, cmds)
+				run(done, cmds)
 			}
 		}
 	}
@@ -65,9 +76,7 @@ func storeToEth(done <-chan struct{}, in <-chan Command) <-chan ProcessResult {
 }
 
 func getUnfinshedCmd() []Command {
-	e := DefaultExecutor()
-	p := &CmdProcessor{db: e.db}
-	cmds, err := p.getCmd()
+	cmds, err := getCmd()
 	if err != nil {
 		log.Errorf("Get unfinshed cmds fail:%v", err)
 		return nil
@@ -100,4 +109,41 @@ func sectionalizeCmd(cmds []Command) map[string][]Command {
 	}
 
 	return supplierMap
+}
+
+func getCmd() ([]Command, error) {
+	var cmds []Command
+	rows, err := DefaultDBConnection().db.Query("select * from( select t1.id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on t1.id=transaction_id order by t1.created_at) as t3 where process_state is null;")
+	//rows, err := p.db.Query("select deal_id,input,output,state from transactions where status='unprocessed' or status='failed' order by created_at")
+	if err != nil {
+		log.Error("fail to query unfinished transactions: %v", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var inputStr, outputStr, state, process_state string
+		var input, output []Token
+		var id uint
+
+		rows.Scan(&id, &inputStr, &outputStr, &state, &process_state)
+		json.Unmarshal([]byte(inputStr), &input)
+		json.Unmarshal([]byte(outputStr), &output)
+		txType, _ := ParseType(state)
+		tx := &Transaction{Id: id, Input: input, Output: output, TxType: txType}
+		cmd := &Command{Tx: *tx, txHashes: make(map[string]string)}
+		cmds = append(cmds, *cmd)
+	}
+	return cmds, nil
+}
+
+func DefaultDBConnection() *dbConnection {
+	conf := g.GetConfig()
+	db, err := g.OpenDB(conf.DbConfig)
+	if err != nil {
+		panic(err)
+	}
+	defaultDBConnection := &dbConnection{db: db}
+	return defaultDBConnection
 }

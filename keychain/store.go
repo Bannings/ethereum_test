@@ -77,12 +77,12 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 
 	keyHex := hex.EncodeToString(crypto.FromECDSA(key))
 	log.Debugf("key: %s", keyHex)
-	addr, err := s.adminClient.PersonalImportRawKey(keyHex, passphrase)
-	if err != nil {
-		log.Errorf("personal_importRawKey %s failed: %v", keyHex, err)
-		return Account{}, err
-	}
-	log.Debugf("--- addr: %s", addr)
+	//addr, err := s.adminClient.PersonalImportRawKey(keyHex, passphrase)
+	//if err != nil {
+	//	log.Errorf("personal_importRawKey %s failed: %v", keyHex, err)
+	//	return Account{}, err
+	//}
+	//log.Debugf("--- addr: %s", addr)
 
 	//if _, err := s.client.PersonalUnlockAccount(s.adminAccount.Address.Hex(), s.adminAccount.Passphrase, 30); err != nil {
 	//	log.Errorf("Unlock admin account failed: %v", err)
@@ -187,7 +187,7 @@ func (s *Store) IsAccountExist(companyID string) (bool, error) {
 	return result, nil
 }
 
-func (s *Store) IsTransactionExist(TxId uint64) (bool, error) {
+func (s *Store) IsTransactionExist(TxId string) (bool, error) {
 	var result bool
 	rows, err := s.db.Query("select isnull ((select 1 from transactions where deal_id = ? limit 1))", TxId)
 	if err != nil {

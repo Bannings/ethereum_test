@@ -171,12 +171,10 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	case Discount:
 		err = e.payByTransfer(p)
 	case Payment:
-		//err = e.pay(p)
-		err = e.payByTransfer(p)
+		err = e.payTransaction(p)
 	case MintFX:
-		err = e.mintFX(p)
+		err = e.mintTransaction(p)
 	case Confirm:
-		//err = e.confirm(p)
 		err = e.payByTransfer(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
@@ -238,6 +236,41 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	return nil
 }
 
+func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
+	cmd := p.cmd
+	input := cmd.Tx.Input
+	output := cmd.Tx.Output
+	owner := input[0].Owner
+	var transferToken []Token
+
+	for n, inputToken := range input {
+		var splitToken []Token
+		for _, outputToken := range output {
+			if inputToken.Id.String() == outputToken.ParentId.String() {
+				splitToken = append(splitToken, outputToken)
+			}
+			if outputToken.Owner != owner && n == 0 {
+				transferToken = append(transferToken, outputToken)
+			}
+		}
+		if len(splitToken) == 1 {
+			splitToken = append(splitToken, Token{Amount: 0, Id: *big.NewInt(0)})
+		}
+		err := e.split(inputToken, splitToken, p)
+		if err != nil {
+			log.Errorf("split fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
+			return err
+		}
+	}
+
+	err := e.batchTransfer(input[0], transferToken, p)
+	if err != nil {
+		log.Errorf("transfer fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
+		return err
+	}
+	return nil
+}
+
 //This pay method with batch transfer
 func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	fromAccount := p.cmd.Tx.Input[0].Owner
@@ -282,11 +315,120 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	return nil
 }
 
+func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor) error {
+	//fromAccount := p.cmd.Tx.Input[0].Owner
+	//toAccount := p.cmd.Tx.Output[0].Owner
+	fromAccount := input.Owner
+	toAccount := output[0].Owner
+	toAcc, err := e.keystore.GetAccount(toAccount)
+	fromAcc, err := e.keystore.GetAccount(fromAccount)
+	if err != nil {
+		log.Errorf("GET Account failed :%v", err)
+		return err
+	}
+	ids := make([]*big.Int, len(output))
+	for i, t := range output {
+		id := t.Id
+		ids[i] = &id
+	}
+	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAccount, ids)
+	var tx *ethTypes.Transaction
+	err = p.CallWithFxBatchTransactor(
+		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+			var innerErr error
+			tx, innerErr = session.SafeTransferFrom(fromAcc.Address, toAcc.Address, ids)
+			return tx, innerErr
+		},
+	)
+
+	if err != nil {
+		log.Errorf("call FuxBatch.Transfer contract failed: %v", err)
+		return err
+	}
+
+	receipt, err := p.WaitMined(context.Background(), tx)
+	if err != nil {
+		log.Errorf("transfer failed : %v", err)
+		return err
+	}
+	if receipt.Status == ethTypes.ReceiptStatusFailed {
+		return ErrTxExecuteFailed
+	}
+	log.Infof("transfer success :%v ,receipt info:%v", tx, receipt.TxHash)
+
+	return nil
+}
+
+func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
+	err := e.mintFX(p)
+	if err != nil {
+		log.Errorf("mint fx failed: %v, txid:%v", err, p.cmd.Tx.TxId)
+		return err
+	}
+	cmd := p.cmd
+	input := cmd.Tx.Input
+	output := cmd.Tx.Output
+	for _, t := range input {
+		var splitToken []Token
+		for _, st := range output {
+			if t.Id.String() == st.ParentId.String() {
+				splitToken = append(splitToken, st)
+			}
+		}
+		err = e.split(t, splitToken, p)
+		if err != nil {
+
+		}
+	}
+
+	return nil
+}
+
+func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error {
+	tokenId := input.Id
+	var tokens [2]Token
+	copy(tokens[:], output[:2])
+	var newTokenIds [2]*big.Int
+	var amounts [2]*big.Int
+	var states [2]*big.Int
+	for i, t := range tokens {
+		id := t.Id
+		newTokenIds[i] = &id
+
+		amounts[i] = new(big.Int).SetUint64(t.Amount)
+		states[i] = new(big.Int).SetInt64(int64(t.State))
+	}
+	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
+	var tx *ethTypes.Transaction
+	err := p.CallWithFxSplitTransactor(
+		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
+			var innerErr error
+			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
+			return tx, innerErr
+		},
+	)
+	if err != nil {
+		log.Errorf("call FuxSplit.SplitFux contract failed: %v", err)
+		return err
+	}
+
+	receipt, err := p.WaitMined(context.Background(), tx)
+	if err != nil {
+		return err
+	}
+	if receipt.Status == ethTypes.ReceiptStatusFailed {
+		return ErrTxExecuteFailed
+	}
+
+	return nil
+}
+
 // Input tokens should be same with pay input tokens
 func (e *EthExecutor) confirm(p *CmdProcessor) error {
 	cmd := p.cmd
-	txId := cmd.Tx.TxId
-	boxId := generateBoxId(txId, 0)
+	//txId := cmd.Tx.TxId
+	txId := 0
+	boxId := generateBoxId(uint64(txId), 0)
 
 	var boxAddr common.Address
 	err := p.fxClient.CallWithBoxFactoryCaller(
@@ -354,9 +496,9 @@ func (e *EthExecutor) confirm(p *CmdProcessor) error {
 
 func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 	cmd := p.cmd
-	output := cmd.Tx.Output
+	input := cmd.Tx.Input
 	var tx *ethTypes.Transaction
-	for _, t := range output {
+	for _, t := range input {
 		log.Infof("mint fx: id: %v, owner: %v, amount: %v, state: %v", t.Id.String(), t.Owner, t.Amount, t.State)
 		acc, err := e.keystore.GetAccount(t.Owner)
 		if err != nil {
@@ -371,7 +513,7 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 					acc.Address,
 					&t.Id,
 					new(big.Int).SetUint64(t.Amount),
-					new(big.Int).SetUint64(uint64(t.State)),
+					new(big.Int).SetUint64(uint64(Normal)),
 					new(big.Int).SetInt64(t.ExpireTime),
 				)
 				return tx, innerErr
