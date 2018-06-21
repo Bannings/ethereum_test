@@ -2,6 +2,8 @@ image: golang:latest
 
 variables:
   REPO_NAME: gitlab.chainedfinance.com/chaincore/r2
+  BIN_NAME: r2
+  ARTIFACTS_DIR: artifacts
 
 before_script:
   - mkdir -p $GOPATH/src/$REPO_NAME
@@ -23,7 +25,7 @@ compile:
     stage: build
     script:
       #- go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/{{ repo }}
-      - go build
+      - go build -o $CI_PROJECT_DIR/$ARTIFACTS_DIR/$BIN_NAME
     artifacts:
       paths:
-        - r2
+        - $ARTIFACTS_DIR
