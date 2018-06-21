@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
@@ -19,6 +20,7 @@ import (
 var (
 	supplierMap map[string]chan fx.Transaction
 	types       []string
+	db          *sql.DB
 )
 
 func init() {
@@ -31,49 +33,60 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var trans Transaction
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		render.Render(w, r, g.ErrBadRequest(err))
+		resp := g.NewBadResponse("400", err.Error(), err)
+		render.JSON(w, r, resp)
 		return
 	}
 
 	tx, err := json.Marshal(m)
 	fmt.Println(string(tx))
 	if err != nil {
-		render.Render(w, r, g.ErrBadRequest(err))
+		resp := g.NewBadResponse("400", err.Error(), err)
+		render.JSON(w, r, resp)
 		return
 	}
 	err = json.Unmarshal(tx, &trans)
 	if err != nil {
-		render.Render(w, r, g.ErrBadRequest(err))
+		log.Errorf("Unmarshal request failed: %s", err.Error())
+		resp := g.NewBadResponse("400", err.Error(), err)
+		render.JSON(w, r, resp)
 		return
 	}
 	_, err = fx.ParseType(trans.TxType)
 	if err != nil {
-		render.Render(w, r, g.ErrBadRequest(errors.New("Invalid TxType")))
+		resp := g.NewBadResponse("400", err.Error(), err)
+		render.JSON(w, r, resp)
 		return
 	}
 	for _, token := range trans.Input {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			render.Render(w, r, g.ErrBadRequest(errors.New("Invalid input token state")))
+			resp := g.NewBadResponse("400", err.Error(), err)
+			render.JSON(w, r, resp)
 			return
 		}
 	}
 	for _, token := range trans.Output {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			render.Render(w, r, g.ErrBadRequest(errors.New("Invalid output token state")))
+			resp := g.NewBadResponse("400", err.Error(), err)
+			render.JSON(w, r, resp)
 			return
 		}
 	}
 	store := keychain.DefaultStore()
 	exist, err := store.IsTransactionExist(trans.TxId)
+	//exist, err := IsTransactionExist(trans.TxId)
 	if exist {
-		render.Render(w, r, g.ErrBadRequest(errors.New("Transaction id already exist")))
+		resp := g.NewBadResponse("400", "Transaction id already exist", errors.New("Transaction id already exist"))
+		render.JSON(w, r, resp)
 		return
 	}
 	err = saveTransaction(&trans)
 	if err != nil {
-		render.Render(w, r, g.ErrRender(err))
+		log.Errorf("%v", err)
+		resp := g.NewBadResponse("500", err.Error(), err)
+		render.JSON(w, r, resp)
 		return
 	}
 	resp := g.NewSuccResponse("Accept request success")
@@ -106,7 +119,9 @@ func DistributeTask(transaction *fx.Transaction) {
 
 func saveTransaction(transaction *Transaction) error {
 	conf := g.GetConfig()
+
 	db, err := g.OpenDB(conf.DbConfig)
+	defer db.Close()
 	if err != nil {
 		return (err)
 	}
@@ -135,12 +150,13 @@ type Transaction struct {
 	Id     uint    `json:"id"`
 	Input  []Token `json:"input"`
 	Output []Token `json:"output"`
-	TxId   uint64  `json:"tx_id"`
+	TxId   string  `json:"tx_id"`
 	TxType string  `json:"tx_type"`
 }
 
 type Token struct {
 	Id         big.Int `json:"id"`
+	ParentId   big.Int `json:parentId`
 	Amount     uint64  `json:"amount"`
 	Owner      string  `json:"owner"` //company ID
 	State      string  `json:"state"`

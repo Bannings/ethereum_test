@@ -77,6 +77,7 @@ func ParseState(state string) (State, error) {
 
 type Token struct {
 	Id         big.Int `json:"id"`
+	ParentId   big.Int `json:parentId`
 	Amount     uint64  `json:"amount"`
 	Owner      string  `json:"owner"` //company ID
 	State      State   `json:"state"`
@@ -87,7 +88,7 @@ type Transaction struct {
 	Id     uint    `json:"id"`
 	Input  []Token `json:"input"`
 	Output []Token `json:"output"`
-	TxId   uint64  `json:"tx_id"`
+	TxId   string  `json:"tx_id"`
 	TxType TxType  `json:"tx_type"`
 }
 

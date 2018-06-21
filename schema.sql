@@ -29,7 +29,7 @@ CREATE TABLE `cmd_procedure` (
 DROP TABLE IF EXISTS `transactions`;
 CREATE TABLE `transactions` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `deal_id` int(11) NOT NULL COMMENT '业务交易ID',
+  `deal_id` varchar(32) NOT NULL COMMENT '业务交易ID',
   `input` JSON,
   `output` JSON,
   `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
