@@ -1,4 +1,5 @@
--- create database fx_blockchain
+create database fx_blockchain;
+use fx_blockchain;
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -12,15 +13,26 @@ CREATE TABLE `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `cmd_procedure`;
+DROP TABLE IF EXISTS `tx_procedure`;
 CREATE TABLE `cmd_procedure` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `command_id` int(11) NOT NULL,
+  `transaction_id` int(11) NOT NULL,
   `start_nonce` bigint(20) DEFAULT NULL,
-  `receipts` JSON DEFAULT NULL,
+  `tx_hashes` JSON DEFAULT NULL,
   `state` enum('unprocess', 'processing', 'processed') NOT NULL DEFAULT 'unprocess',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY (`command_id`)
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `transactions`;
+CREATE TABLE `transactions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `deal_id` varchar(32) NOT NULL COMMENT '业务交易ID',
+  `input` JSON,
+  `output` JSON,
+  `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

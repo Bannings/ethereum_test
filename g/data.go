@@ -12,10 +12,30 @@ type SuccResponse struct {
 	Data       interface{} `json:"retData,omitempty"`
 }
 
-func NewSuccResponse(data interface{}) SuccResponse {
+func NewSuccResponse(data interface{}, otherInfo ...string) SuccResponse {
+	var statusText string
+	for _, info := range otherInfo {
+		statusText = info
+	}
+	if statusText != "" {
+		return SuccResponse{
+			AppCode:    "0001",
+			StatusText: statusText,
+			Data:       data,
+		}
+	}
+
 	return SuccResponse{
 		AppCode:    "0000",
 		StatusText: "success",
+		Data:       data,
+	}
+}
+
+func NewBadResponse(appcode string, StatusText string, data interface{}) SuccResponse {
+	return SuccResponse{
+		AppCode:    appcode,
+		StatusText: StatusText,
 		Data:       data,
 	}
 }

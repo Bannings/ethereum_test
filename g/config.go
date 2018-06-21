@@ -36,8 +36,9 @@ type BlockChainConfig struct {
 
 type ContractAddrs struct {
 	FxTokenAddr      string `json:"fxTokenAddr"`
-	FxPayBoxAddr     string `json:"fxPayBoxAddr"`
 	FxBoxFactoryAddr string `json:"fxBoxFactoryAddr"`
+	FxSplitAddr      string `json:"fxSplitAddr"`
+	FxBatchAddr      string `json:"fxBatchAddr"`
 
 	NodeAddr  string `json:"nodeAddr"`
 	StoreAddr string `json:"storeAddr"`

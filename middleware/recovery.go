@@ -19,30 +19,13 @@ const (
 )
 
 type Recoverer struct {
-	h            http.Handler
-	monitor      *Monitor
-	sentryClient *raven.Client
+	h       http.Handler
+	monitor *Monitor
 }
 
-func NewRecoverer(m *Monitor, sentryDSN string) (*Recoverer, error) {
-	client, err := raven.New(sentryDSN)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
+func Recovery(m *Monitor) func(http.Handler) http.Handler {
 	r := &Recoverer{
-		monitor:      m,
-		sentryClient: client,
-	}
-
-	return r, nil
-}
-
-func Recovery(m *Monitor, sentryDSN string) func(http.Handler) http.Handler {
-	r, err := NewRecoverer(m, sentryDSN)
-	if err != nil {
-		panic(err)
+		monitor: m,
 	}
 
 	fn := func(h http.Handler) http.Handler {
@@ -86,9 +69,9 @@ func (rec *Recoverer) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 				rec.monitor.errCounter.WithLabelValues(r.Method, r.URL.Path).Inc()
 				switch rval := err.(type) {
 				case error:
-					rec.sentryClient.CaptureError(rval, nil)
+					raven.CaptureError(rval, nil)
 				default:
-					rec.sentryClient.CaptureError(errors.New(fmt.Sprint(rval)), nil)
+					raven.CaptureError(errors.New(fmt.Sprint(rval)), nil)
 				}
 			}()
 		}

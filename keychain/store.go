@@ -19,17 +19,43 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+var (
+	defaultStore *Store
+	once         sync.Once
+)
+
+func DefaultStore() *Store {
+	once.Do(func() {
+		conf := g.GetConfig()
+		bConf := conf.BlockchainConfig
+		acc, err := GetAccount(bConf.AdminKey, bConf.AdminPassphrase)
+		if err != nil {
+			panic(err)
+		}
+		store, err := NewStore(acc, bConf.RawUrl, conf.DbConfig)
+		if err != nil {
+			panic(err)
+		}
+		defaultStore = store
+	})
+	return defaultStore
+}
+
+// Eth1 returns 1 ethereum value (10^18 wei)
+func Eth1() *big.Int {
+	return big.NewInt(1000000000000000000)
+}
+
 type Store struct {
 	adminAccount Account
-
-	client *Client
-	db     *sql.DB
+	adminClient  *AccountClient
+	db           *sql.DB
 
 	mux sync.Mutex
 }
 
 func NewStore(adminAccount Account, rawUrl string, dbConfig g.DbConfig) (*Store, error) {
-	c, err := newClient(adminAccount, rawUrl, 5*time.Second)
+	c, err := NewAccountClient(adminAccount, rawUrl, 5*time.Second)
 	if err != nil {
 		log.Errorf("new client failed: %v", err)
 		return nil, err
@@ -40,7 +66,7 @@ func NewStore(adminAccount Account, rawUrl string, dbConfig g.DbConfig) (*Store,
 		return nil, err
 	}
 
-	return &Store{adminAccount: adminAccount, client: c, db: db}, nil
+	return &Store{adminAccount: adminAccount, adminClient: c, db: db}, nil
 }
 
 func (s *Store) CreateAccount(passphrase string) (Account, error) {
@@ -50,11 +76,13 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 	}
 
 	keyHex := hex.EncodeToString(crypto.FromECDSA(key))
-	addr, err := s.client.PersonalImportRawKey(keyHex, passphrase)
-	if err != nil {
-		return Account{}, err
-	}
-	log.Debugf("--- addr: %s", addr)
+	log.Debugf("key: %s", keyHex)
+	//addr, err := s.adminClient.PersonalImportRawKey(keyHex, passphrase)
+	//if err != nil {
+	//	log.Errorf("personal_importRawKey %s failed: %v", keyHex, err)
+	//	return Account{}, err
+	//}
+	//log.Debugf("--- addr: %s", addr)
 
 	//if _, err := s.client.PersonalUnlockAccount(s.adminAccount.Address.Hex(), s.adminAccount.Passphrase, 30); err != nil {
 	//	log.Errorf("Unlock admin account failed: %v", err)
@@ -64,8 +92,8 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 	address := crypto.PubkeyToAddress(key.PublicKey)
 
 	v := new(big.Int)
-	v = v.Mul(Eth1(), big.NewInt(1000))
-	if err := s.transferEther(address, v); err != nil {
+	v = v.Mul(Eth1(), big.NewInt(10))
+	if err := s.TransferEther(address, v); err != nil {
 		log.Errorf("transfer Ether failed: %v", err)
 		return Account{}, err
 	}
@@ -73,7 +101,7 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 	return Account{address, keyHex, passphrase}, nil
 }
 
-func (s *Store) transferEther(to common.Address, amount *big.Int) error {
+func (s *Store) TransferEther(to common.Address, amount *big.Int) error {
 	key, err := crypto.HexToECDSA(s.adminAccount.Key)
 	if err != nil {
 		return err
@@ -81,7 +109,8 @@ func (s *Store) transferEther(to common.Address, amount *big.Int) error {
 
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	nonce := s.client.nonce
+	nonce := s.adminClient.Nonce()
+	log.Debugf("nonce: %v", nonce)
 	tx := types.NewTransaction(nonce, to, amount, 100000, new(big.Int), nil)
 	signTx, err := types.SignTx(tx, types.HomesteadSigner{}, key)
 	//signTx, err := types.SignTx(tx, types.NewEIP155Signer(chainId), s.adminPrivKey)
@@ -89,16 +118,18 @@ func (s *Store) transferEther(to common.Address, amount *big.Int) error {
 		return err
 	}
 
-	if err := s.client.SendTransaction(signTx); err != nil {
+	if err := s.adminClient.SendTransaction(signTx); err != nil {
 		return err
 	}
 
-	atomic.AddUint64(&s.client.nonce, 1)
+	s.adminClient.IncrNonce()
 	go func() {
-		if _, err := bind.WaitMined(context.Background(), s.client.ethClient, tx); err != nil {
-			atomic.StoreUint64(&s.client.nonce, nonce)
+		if _, err := bind.WaitMined(context.Background(), s.adminClient.EthClient, tx); err != nil {
+			log.Errorf("tx execute failed: %v", err)
+			atomic.StoreUint64(s.adminClient.nonce, nonce)
 		}
 	}()
+	log.Debugf("now nonce: %v", s.adminClient.Nonce())
 
 	return nil
 }
@@ -134,12 +165,60 @@ func (s *Store) GetAccount(companyID string) (Account, error) {
 	return Account{}, errors.New("account not exist")
 }
 
+func (s *Store) IsAccountExist(companyID string) (bool, error) {
+	var result bool
+	rows, err := s.db.Query("select isnull ((select 1 from accounts  where firm_id = ? limit 1))", companyID)
+	if err != nil {
+		log.Warnf("fail to query firm company: %v", err)
+		return false, err
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		var count int
+		rows.Scan(&count)
+		if count == 0 {
+			result = true
+		} else {
+			result = false
+		}
+	}
+	return result, nil
+}
+
+func (s *Store) IsTransactionExist(TxId string) (bool, error) {
+	var result bool
+	rows, err := s.db.Query("select isnull ((select 1 from transactions where deal_id = ? limit 1))", TxId)
+	if err != nil {
+		log.Warnf("fail to query transaction id : %v", err)
+		return false, err
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		var count int
+		rows.Scan(&count)
+		if count == 0 {
+			result = true
+		} else {
+			result = false
+		}
+	}
+	return result, nil
+}
+
 func (s *Store) GetAdminAccount() Account {
 	return s.adminAccount
 }
 
+func (s *Store) GetAdminClient() *AccountClient {
+	return s.adminClient
+}
+
 func (s *Store) Close() error {
 	err := s.db.Close()
-	s.client.Close()
+	s.adminClient.Close()
 	return err
 }

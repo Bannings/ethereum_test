@@ -33,18 +33,29 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof("companyId: %s", companyId)
 
-	ctx := r.Context()
-	store := ctx.Value(StoreKey).(keychain.Store)
+	store := keychain.DefaultStore()
+	account, err := store.GetAccount(companyId)
+	//account, err := GetAccount(companyId)
+	if err != nil && err.Error() != "account not exist" {
+		render.Render(w, r, g.ErrRender(err))
+		return
+	}
+	if err == nil {
+		render.JSON(w, r, g.NewSuccResponse(account, "Company already exist"))
+		return
+	}
 
 	passphrase := companyId + salt
 	acc, err := store.CreateAccount(passphrase)
+	//acc, err := CreateAccount(passphrase)
 	if err != nil {
 		log.Errorf("Create account failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}
-
-	if err := store.StoreAccount(companyId, acc); err != nil {
+	err = store.StoreAccount(companyId, acc)
+	//err = StoreAccount(companyId, acc)
+	if err != nil {
 		log.Errorf("Store account failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
 		return

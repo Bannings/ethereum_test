@@ -2,10 +2,9 @@ package fx
 
 import (
 	"fmt"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"math/big"
 	"strings"
-
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type TxType uint8
@@ -77,19 +76,20 @@ func ParseState(state string) (State, error) {
 // ----------------
 
 type Token struct {
-	ID         big.Int
-	Amount     uint64
-	Owner      string // companyID
-	State      State
-	ExpireTime int64
+	Id         big.Int `json:"id"`
+	ParentId   big.Int `json:parentId`
+	Amount     uint64  `json:"amount"`
+	Owner      string  `json:"owner"` //company ID
+	State      State   `json:"state"`
+	ExpireTime int64   `json:"expire_time"`
 }
 
 type Transaction struct {
-	Id     uint
-	Input  []Token
-	Output []Token
-	TxId   uint64
-	TxType TxType
+	Id     uint    `json:"id"`
+	Input  []Token `json:"input"`
+	Output []Token `json:"output"`
+	TxId   string  `json:"tx_id"`
+	TxType TxType  `json:"tx_type"`
 }
 
 func (t *Transaction) Sponsor() string {
@@ -100,5 +100,12 @@ type Command struct {
 	Tx         Transaction
 	startNonce uint64
 	currNonce  uint64
-	receipts   map[string]*ethTypes.Receipt // key: string(nonce)
+	txHashes   map[string]string // key: string(nonce)
+}
+
+type ProcessResult struct {
+	Id       uint
+	Tx       *ethTypes.Transaction
+	Supplier string
+	err      error
 }

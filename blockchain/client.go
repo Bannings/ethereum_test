@@ -3,6 +3,7 @@ package blockchain
 import (
 	"context"
 	"math/big"
+	"sync"
 	"sync/atomic"
 
 	"gitlab.chainedfinance.com/chaincore/dr-contracts"
@@ -19,27 +20,43 @@ const (
 	gasLimit uint64 = 4712357
 )
 
-var DefaultClient Client
+var (
+	defaultClient *EthStoreClient
+	once          sync.Once
+)
 
-type Client interface {
-	StoreCallerSession(ctx context.Context) *contracts.ArStoreCallerSession
-	StoreTransactorSession(ctx context.Context) *contracts.ArStoreTransactorSession
-	NodesCallerSession(ctx context.Context) *contracts.CfNodesCallerSession
-	NodesTransactorSession(ctx context.Context) *contracts.CfNodesTransactorSession
+func DefaultClient() *EthStoreClient {
+	once.Do(func() {
+		conf := g.GetConfig().BlockchainConfig
+		c, err := NewEthStoreClient(conf)
+		if err != nil {
+			panic(err)
+		}
+		defaultClient = c
+	})
+
+	return defaultClient
 }
 
-type EthClient struct {
+type StoreClient interface {
+	StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession
+	StoreTransactorSession(ctx context.Context) *dr_contracts.ARStoreTransactorSession
+	NodesCallerSession(ctx context.Context) *dr_contracts.CFNodesCallerSession
+	NodesTransactorSession(ctx context.Context) *dr_contracts.CFNodesTransactorSession
+}
+
+type EthStoreClient struct {
 	ec    *ethclient.Client
 	auth  *bind.TransactOpts
 	nonce uint64
 
-	store *contracts.ArStore
-	nodes *contracts.CfNodes
+	store *dr_contracts.ARStore
+	nodes *dr_contracts.CFNodes
 }
 
-func (c *EthClient) StoreTransactorSession(ctx context.Context) *contracts.ArStoreTransactorSession {
-	s := &contracts.ArStoreTransactorSession{
-		Contract: &c.store.ArStoreTransactor,
+func (c *EthStoreClient) StoreTransactorSession(ctx context.Context) *dr_contracts.ARStoreTransactorSession {
+	s := &dr_contracts.ARStoreTransactorSession{
+		Contract: &c.store.ARStoreTransactor,
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
@@ -53,9 +70,9 @@ func (c *EthClient) StoreTransactorSession(ctx context.Context) *contracts.ArSto
 	return s
 }
 
-func (c *EthClient) StoreCallerSession(ctx context.Context) *contracts.ArStoreCallerSession {
-	return &contracts.ArStoreCallerSession{
-		Contract: &c.store.ArStoreCaller,
+func (c *EthStoreClient) StoreCallerSession(ctx context.Context) *dr_contracts.ARStoreCallerSession {
+	return &dr_contracts.ARStoreCallerSession{
+		Contract: &c.store.ARStoreCaller,
 		CallOpts: bind.CallOpts{
 			Pending: true,
 			From:    c.auth.From,
@@ -64,9 +81,9 @@ func (c *EthClient) StoreCallerSession(ctx context.Context) *contracts.ArStoreCa
 	}
 }
 
-func (c *EthClient) NodesCallerSession(ctx context.Context) *contracts.CfNodesCallerSession {
-	return &contracts.CfNodesCallerSession{
-		Contract: &c.nodes.CfNodesCaller,
+func (c *EthStoreClient) NodesCallerSession(ctx context.Context) *dr_contracts.CFNodesCallerSession {
+	return &dr_contracts.CFNodesCallerSession{
+		Contract: &c.nodes.CFNodesCaller,
 		CallOpts: bind.CallOpts{
 			Pending: true,
 			From:    c.auth.From,
@@ -75,9 +92,9 @@ func (c *EthClient) NodesCallerSession(ctx context.Context) *contracts.CfNodesCa
 	}
 }
 
-func (c *EthClient) NodesTransactorSession(ctx context.Context) *contracts.CfNodesTransactorSession {
-	s := &contracts.CfNodesTransactorSession{
-		Contract: &c.nodes.CfNodesTransactor,
+func (c *EthStoreClient) NodesTransactorSession(ctx context.Context) *dr_contracts.CFNodesTransactorSession {
+	s := &dr_contracts.CFNodesTransactorSession{
+		Contract: &c.nodes.CFNodesTransactor,
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
@@ -91,7 +108,7 @@ func (c *EthClient) NodesTransactorSession(ctx context.Context) *contracts.CfNod
 	return s
 }
 
-func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
+func NewEthStoreClient(conf g.BlockChainConfig) (*EthStoreClient, error) {
 	privKey, err := crypto.HexToECDSA(conf.Key)
 	if err != nil {
 		log.Errorf("Failed to convert private key: %v", err)
@@ -106,13 +123,13 @@ func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
 
 	auth := bind.NewKeyedTransactor(privKey)
 
-	store, err := contracts.NewArStore(common.HexToAddress(conf.ContractAddrs.StoreAddr), conn)
+	store, err := dr_contracts.NewARStore(common.HexToAddress(conf.ContractAddrs.StoreAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a ArStore contract: %v", err)
 		return nil, err
 	}
 
-	nodes, err := contracts.NewCfNodes(common.HexToAddress(conf.ContractAddrs.NodeAddr), conn)
+	nodes, err := dr_contracts.NewCFNodes(common.HexToAddress(conf.ContractAddrs.NodeAddr), conn)
 	if err != nil {
 		log.Errorf("Failed to instantiate a CfNodes contract: %v", err)
 		return nil, err
@@ -124,7 +141,7 @@ func NewEthClient(conf g.BlockChainConfig) (*EthClient, error) {
 	}
 	log.Debugf("nonce: %v", nonce)
 
-	c := &EthClient{
+	c := &EthStoreClient{
 		ec:    conn,
 		auth:  auth,
 		nonce: nonce,

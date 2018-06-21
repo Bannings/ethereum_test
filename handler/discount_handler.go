@@ -26,7 +26,7 @@ func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	discountId := m["discountId"].(string)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasDiscount(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -41,7 +41,7 @@ func CreateDiscountHandler(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).DiscountByAR(discountId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).DiscountByAR(discountId, s)
 	if err != nil {
 		log.Errorf("Add discount data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -63,7 +63,7 @@ func QueryDiscountHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasDiscount(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -76,7 +76,7 @@ func QueryDiscountHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryDiscountTx(discountId)
+	v, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryDiscountTx(discountId)
 	if err != nil {
 		log.Errorf("Query discount from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -114,7 +114,7 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckDiscountId(discountId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasDiscount(discountId)
 	if err != nil {
 		log.Errorf("Check discountId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -127,7 +127,7 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, d, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryDiscountTx(discountId)
+	d, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryDiscountTx(discountId)
 	if err != nil {
 		log.Errorf("Query discount from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -151,7 +151,7 @@ func UpdateDiscountHander(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateDiscountInfoOfAR(discountId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).UpdateDiscountInfoOfAR(discountId, s)
 	if err != nil {
 		log.Errorf("update discount data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))

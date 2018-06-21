@@ -48,7 +48,7 @@ func AddNodeHandler(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.NodesTransactorSession(ctx).AddNode(nodeName.(string), pubPem, s)
+	tx, err := blockchain.DefaultClient().NodesTransactorSession(ctx).AddNode(nodeName.(string), pubPem, s)
 	if err != nil {
 		log.Errorf("Add Node to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -77,7 +77,7 @@ func DeleteNodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.NodesTransactorSession(ctx).DeleteNode(nodeName.(string))
+	tx, err := blockchain.DefaultClient().NodesTransactorSession(ctx).DeleteNode(nodeName.(string))
 	if err != nil {
 		log.Errorf("Delete Node from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -98,7 +98,7 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	pub, v, err := blockchain.DefaultClient.NodesCallerSession(ctx).GetNodeKey(node)
+	pub, err := blockchain.DefaultClient().NodesCallerSession(ctx).GetNodeKey(node)
 	log.Infof("publicKey: %v", pub)
 	if err != nil {
 		log.Errorf("Query node from block chain failed: %s", err.Error())
@@ -106,14 +106,7 @@ func QueryNodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var m g.M
-	if err := json.Unmarshal([]byte(v), &m); err != nil {
-		log.Errorf("Unmarshal node data failed: %s", err.Error())
-		render.Render(w, r, g.ErrRender(err))
-		return
-	}
-	m["nodeName"] = node
-	m["publicKey"] = pub
+	m := map[string]string{"nodeName": node, "publicKey": pub}
 	log.Infof("ar: %+v", m)
 
 	render.JSON(w, r, g.NewSuccResponse(m))

@@ -2,7 +2,7 @@ package keychain
 
 import (
 	"context"
-	"math/big"
+	"sync/atomic"
 	"time"
 
 	"github.com/eddyzhou/log"
@@ -12,20 +12,15 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// Eth1 returns 1 ethereum value (10^18 wei)
-func Eth1() *big.Int {
-	return big.NewInt(1000000000000000000)
-}
-
-type Client struct {
+type AccountClient struct {
 	account   Account
 	rpcClient *rpc.Client
-	ethClient *ethclient.Client
-	timeout   time.Duration
-	nonce     uint64
+	EthClient *ethclient.Client
+	Timeout   time.Duration
+	nonce     *uint64
 }
 
-func newClient(account Account, rawUrl string, timeout time.Duration) (*Client, error) {
+func NewAccountClient(account Account, rawUrl string, timeout time.Duration) (*AccountClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	c, err := rpc.DialContext(ctx, rawUrl)
@@ -44,21 +39,26 @@ func newClient(account Account, rawUrl string, timeout time.Duration) (*Client, 
 		return nil, err
 	}
 
-	return &Client{account, c, ethClient, timeout, nonce}, nil
+	return &AccountClient{account, c, ethClient, timeout, &nonce}, nil
 }
 
-func (c *Client) PersonalImportRawKey(keyHex, passphrase string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+func (c *AccountClient) PersonalImportRawKey(keyHex, passphrase string) (string, error) {
+	key := keyHex
+	if keyHex[0:2] != "0x" && keyHex[0:2] != "0X" {
+		key = "0x" + keyHex
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 	var addr string
-	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", keyHex, passphrase); err != nil {
+	if err := c.rpcClient.CallContext(ctx, &addr, "personal_importRawKey", key, passphrase); err != nil {
 		return "", err
 	}
 	return addr, nil
 }
 
-func (c *Client) PersonalUnlockAccount(address string, passphrase string, duration int) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+func (c *AccountClient) PersonalUnlockAccount(address string, passphrase string, duration int) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 	var succ bool
 	if err := c.rpcClient.CallContext(ctx, &succ, "personal_unlockAccount", address, passphrase, duration); err != nil {
@@ -67,18 +67,36 @@ func (c *Client) PersonalUnlockAccount(address string, passphrase string, durati
 	return succ, nil
 }
 
-func (c *Client) SendTransaction(tx *types.Transaction) error {
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+func (c *AccountClient) SendTransaction(tx *types.Transaction) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
-	return c.ethClient.SendTransaction(ctx, tx)
+	return c.EthClient.SendTransaction(ctx, tx)
 }
 
-func (c *Client) PendingNonceAt(account common.Address) (uint64, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+func (c *AccountClient) PendingNonceAt(account common.Address) (uint64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
-	return c.ethClient.PendingNonceAt(ctx, account)
+	return c.EthClient.PendingNonceAt(ctx, account)
 }
 
-func (c *Client) Close() {
+func (c *AccountClient) Nonce() uint64 {
+	return *c.nonce
+}
+
+func (c *AccountClient) IncrNonce() {
+	atomic.AddUint64(c.nonce, 1)
+}
+
+func (c *AccountClient) RefreshNonce() error {
+	nonce, err := c.PendingNonceAt(c.account.Address)
+	if err != nil {
+		return err
+	}
+
+	atomic.StoreUint64(c.nonce, nonce)
+	return nil
+}
+
+func (c *AccountClient) Close() {
 	c.rpcClient.Close()
 }

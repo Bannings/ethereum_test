@@ -26,7 +26,7 @@ func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
 	payId := m["payId"].(string)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasPayment(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -42,7 +42,7 @@ func CreateArPayHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debug(s)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).PayByAR(payId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).PayByAR(payId, s)
 	if err != nil {
 		log.Errorf("Add arPay data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -64,7 +64,7 @@ func QueryArPayHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasPayment(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -77,7 +77,7 @@ func QueryArPayHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryPaymentTx(payId)
+	v, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryPaymentTx(payId)
 	if err != nil {
 		log.Errorf("Query arPay from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -115,7 +115,7 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckPayId(payId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasPayment(payId)
 	if err != nil {
 		log.Errorf("Check payId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -128,7 +128,7 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, p, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryPaymentTx(payId)
+	p, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryPaymentTx(payId)
 	if err != nil {
 		log.Errorf("Query arPay from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -152,7 +152,7 @@ func UpdateArPayHander(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdatePaymentInfoOfAR(payId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).UpdatePaymentInfoOfAR(payId, s)
 	if err != nil {
 		log.Errorf("update arPay data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))

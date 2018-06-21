@@ -3,7 +3,7 @@ package blockchain
 import (
 	"context"
 	"math/big"
-	"sync/atomic"
+	"time"
 
 	"gitlab.chainedfinance.com/chaincore/contract-gen"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
@@ -12,146 +12,212 @@ import (
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/rpc"
 )
 
 type FxClient struct {
-	rpcClient *rpc.Client
-	EthClient *ethclient.Client
-	Auth      *bind.TransactOpts
-	nonce     uint64
+	cli  *keychain.AccountClient
+	auth *bind.TransactOpts
 
 	fxToken      *contract_gen.FuxToken
-	fxPayBox     *contract_gen.FuxPayBox
 	fxBoxFactory *contract_gen.FuxPayBoxFactory
+	fxSplit      *contract_gen.FuxSplit
+	fxBatch      *contract_gen.FuxBatch
 }
 
-func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
+func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
 	key, err := acccount.GetKey()
 	if err != nil {
 		return nil, err
 	}
-
-	cli, err := rpc.Dial(rawUrl)
-	if err != nil {
-		log.Errorf("Fail to connect to the Ethereum client: %v", err)
-		return nil, err
-	}
-	conn := ethclient.NewClient(cli)
-
 	auth := bind.NewKeyedTransactor(key)
-	nonce, err := conn.PendingNonceAt(context.Background(), auth.From)
-	if err != nil {
-		return nil, err
-	}
-	log.Debugf("nonce: %v", nonce)
 
-	fxToken, err := contract_gen.NewFuxToken(common.HexToAddress(contractAddrs.FxTokenAddr), conn)
+	fxToken, err := contract_gen.NewFuxToken(common.HexToAddress(contractAddrs.FxTokenAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxToken contract: %v", err)
 		return nil, err
 	}
 
-	fxPayBox, err := contract_gen.NewFuxPayBox(common.HexToAddress(contractAddrs.FxPayBoxAddr), conn)
-	if err != nil {
-		log.Errorf("Failed to instantiate a fxPayBox contract: %v", err)
-		return nil, err
-	}
-
-	fxBoxFactory, err := contract_gen.NewFuxPayBoxFactory(common.HexToAddress(contractAddrs.FxBoxFactoryAddr), conn)
+	fxBoxFactory, err := contract_gen.NewFuxPayBoxFactory(common.HexToAddress(contractAddrs.FxBoxFactoryAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxBoxFactory contract: %v", err)
 		return nil, err
 	}
 
+	fxSplit, err := contract_gen.NewFuxSplit(common.HexToAddress(contractAddrs.FxSplitAddr), cli.EthClient)
+	if err != nil {
+		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		return nil, err
+	}
+
+	fxBatch, err := contract_gen.NewFuxBatch(common.HexToAddress(contractAddrs.FxBatchAddr), cli.EthClient)
+	if err != nil {
+		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		return nil, err
+	}
+
 	c := &FxClient{
-		rpcClient:    cli,
-		EthClient:    conn,
-		Auth:         auth,
-		nonce:        nonce,
+		cli:          cli,
+		auth:         auth,
 		fxToken:      fxToken,
-		fxPayBox:     fxPayBox,
 		fxBoxFactory: fxBoxFactory,
+		fxSplit:      fxSplit,
+		fxBatch:      fxBatch,
 	}
 
 	return c, nil
 }
 
-func (c *FxClient) CallWithFxTransactor(
-	ctx context.Context,
-	fn func(*contract_gen.FuxTokenTransactorSession) error) error {
+func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
+	cli, err := keychain.NewAccountClient(acccount, rawUrl, 5*time.Second)
+	if err != nil {
+		log.Errorf("new client failed: %v", err)
+		return nil, err
+	}
+
+	c, err := NewFxClient(cli, acccount, contractAddrs)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (c *FxClient) CallWithFxTokenTransactor(
+	fn func(*contract_gen.FuxTokenTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
 	s := &contract_gen.FuxTokenTransactorSession{
 		Contract: &c.fxToken.FuxTokenTransactor,
 		TransactOpts: bind.TransactOpts{
-			From:     c.Auth.From,
-			Signer:   c.Auth.Signer,
-			Nonce:    big.NewInt(int64(c.nonce)),
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
-	atomic.AddUint64(&c.nonce, 1)
-	return nil
+	c.cli.IncrNonce()
+	return tx, nil
+}
+
+func (c *FxClient) CallWithFxSplitTransactor(
+	fn func(*contract_gen.FuxSplitTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
+	s := &contract_gen.FuxSplitTransactorSession{
+		Contract: &c.fxSplit.FuxSplitTransactor,
+		TransactOpts: bind.TransactOpts{
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
+			GasLimit: gasLimit,
+			Context:  ctx,
+		},
+	}
+
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
+	}
+
+	c.cli.IncrNonce()
+	return tx, nil
+}
+
+func (c *FxClient) CallWithFxBatchTransactor(
+	fn func(*contract_gen.FuxBatchTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
+	s := &contract_gen.FuxBatchTransactorSession{
+		Contract: &c.fxBatch.FuxBatchTransactor,
+		TransactOpts: bind.TransactOpts{
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
+			GasLimit: gasLimit,
+			Context:  ctx,
+		},
+	}
+
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
+	}
+
+	c.cli.IncrNonce()
+	return tx, nil
 }
 
 func (c *FxClient) CallWithBoxTransactor(
-	ctx context.Context,
-	fn func(*contract_gen.FuxPayBoxTransactorSession) error) error {
+	box *contract_gen.FuxPayBox,
+	fn func(*contract_gen.FuxPayBoxTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
 	s := &contract_gen.FuxPayBoxTransactorSession{
-		Contract: &c.fxPayBox.FuxPayBoxTransactor,
+		Contract: &box.FuxPayBoxTransactor,
 		TransactOpts: bind.TransactOpts{
-			From:     c.Auth.From,
-			Signer:   c.Auth.Signer,
-			Nonce:    big.NewInt(int64(c.nonce)),
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
-	atomic.AddUint64(&c.nonce, 1)
-	return nil
+	c.cli.IncrNonce()
+	return tx, nil
 }
 
 func (c *FxClient) CallWithBoxFactoryTransactor(
-	ctx context.Context,
-	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) error) error {
+	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
 	s := &contract_gen.FuxPayBoxFactoryTransactorSession{
 		Contract: &c.fxBoxFactory.FuxPayBoxFactoryTransactor,
 		TransactOpts: bind.TransactOpts{
-			From:     c.Auth.From,
-			Signer:   c.Auth.Signer,
-			Nonce:    big.NewInt(int64(c.nonce)),
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
 			GasLimit: gasLimit,
 			Context:  ctx,
 		},
 	}
 
-	if err := fn(s); err != nil {
-		return err
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
 	}
 
-	atomic.AddUint64(&c.nonce, 1)
-	return nil
+	c.cli.IncrNonce()
+	return tx, nil
 }
 
-func (c *FxClient) CallWithBoxFactoryCaller(
-	ctx context.Context,
-	fn func(*contract_gen.FuxPayBoxFactoryCallerSession) error) error {
+func (c *FxClient) CallWithBoxFactoryCaller(fn func(*contract_gen.FuxPayBoxFactoryCallerSession) error) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
 	s := &contract_gen.FuxPayBoxFactoryCallerSession{
 		Contract: &c.fxBoxFactory.FuxPayBoxFactoryCaller,
 		CallOpts: bind.CallOpts{
 			Pending: true,
-			From:    c.Auth.From,
+			From:    c.auth.From,
 			Context: ctx,
 		},
 	}
@@ -159,14 +225,12 @@ func (c *FxClient) CallWithBoxFactoryCaller(
 	return fn(s)
 }
 
-func (c *FxClient) CallWithFxCaller(
-	ctx context.Context,
-	fn func(*contract_gen.FuxTokenCallerSession) error) error {
+func (c *FxClient) CallWithFxTokenCaller(ctx context.Context, fn func(*contract_gen.FuxTokenCallerSession) error) error {
 	s := &contract_gen.FuxTokenCallerSession{
 		Contract: &c.fxToken.FuxTokenCaller,
 		CallOpts: bind.CallOpts{
 			Pending: true,
-			From:    c.Auth.From,
+			From:    c.auth.From,
 			Context: ctx,
 		},
 	}
@@ -174,10 +238,18 @@ func (c *FxClient) CallWithFxCaller(
 	return fn(s)
 }
 
-func (c *FxClient) GetNonce() uint64 {
-	return c.nonce
+func (c *FxClient) Nonce() uint64 {
+	return c.cli.Nonce()
+}
+
+func (c *FxClient) RefreshNonce() error {
+	return c.cli.RefreshNonce()
+}
+
+func (c *FxClient) EthClient() *ethclient.Client {
+	return c.cli.EthClient
 }
 
 func (c *FxClient) Close() {
-	c.rpcClient.Close()
+	c.cli.Close()
 }

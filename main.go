@@ -11,13 +11,12 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/handler"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	mw "gitlab.chainedfinance.com/chaincore/r2/middleware"
 
 	"github.com/eddyzhou/log"
+	"github.com/getsentry/raven-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -33,8 +32,6 @@ var (
 	logFile  = flag.String("logfile", "", "log file path")
 	port     = flag.Int("port", 10088, "listen port")
 )
-
-var keystore *keychain.Store
 
 func init() {
 	flag.Usage = usage
@@ -55,25 +52,13 @@ func init() {
 		log.Std = log.New(os.Stderr, "", log.Ldefault, lvl)
 	}
 
+	if err := raven.SetDSN(sentryDSN); err != nil {
+		log.Fatal(err)
+	}
+
 	configFile := args[0]
-	conf, err := g.LoadConfig(configFile)
-	if err != nil {
+	if _, err := g.LoadConfig(configFile); err != nil {
 		log.Fatal(err)
-	}
-
-	blockchainConf := conf.BlockchainConfig
-	blockchain.DefaultClient, err = blockchain.NewEthClient(blockchainConf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if adminAccount, err := keychain.GetAccount(blockchainConf.AdminKey, blockchainConf.AdminPassphrase); err == nil {
-		keystore, err = keychain.NewStore(adminAccount, blockchainConf.RawUrl, conf.DbConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fx.Init(blockchainConf.RawUrl, keystore)
 	}
 
 	pid2file()
@@ -98,7 +83,7 @@ func main() {
 	m := mw.NewMonitor("r2", *port)
 
 	r := chi.NewRouter()
-	r.Use(mw.Recovery(m, sentryDSN))
+	r.Use(mw.Recovery(m))
 	r.Use(mw.Monitoring(m))
 	r.Use(mw.Logging(log.Std))
 
@@ -142,17 +127,20 @@ func main() {
 	})
 
 	r.Route("/api/fx", func(r chi.Router) {
-		r.Use(middleware.WithValue(handler.StoreKey, keystore))
-		r.Use(mw.Auth())
-		r.Use(mw.OnlyCF)
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
+
+		r.Post("/asset", handler.AssetHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT)
+
+	done := make(chan struct{})
+	defer close(done)
+	go fx.ExcuteTransaction(done)
 
 	log.Infof("listening on: %v", *port)
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *port), Handler: r}
@@ -170,7 +158,5 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 
-	keystore.Close()
-	fx.Close()
 	log.Println("Server gracefully stopped")
 }

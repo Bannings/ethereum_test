@@ -26,7 +26,7 @@ func AddCompanyHandler(w http.ResponseWriter, r *http.Request) {
 	companyId := m["companyId"].(string)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasCompany(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -42,7 +42,7 @@ func AddCompanyHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).AddCompany(companyId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).AddCompany(companyId, s)
 	if err != nil {
 		log.Errorf("Add company data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -63,7 +63,7 @@ func QueryCompanyHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasCompany(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -76,7 +76,7 @@ func QueryCompanyHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, v, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryCompanyInfo(companyId)
+	v, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryCompanyInfo(companyId)
 	if err != nil {
 		log.Errorf("Query company from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -114,7 +114,7 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := blockchain.DefaultClient.StoreCallerSession(ctx).CheckCompanyId(companyId)
+	existed, err := blockchain.DefaultClient().StoreCallerSession(ctx).HasCompany(companyId)
 	if err != nil {
 		log.Errorf("Check companyId failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -127,7 +127,7 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	_, c, err := blockchain.DefaultClient.StoreCallerSession(ctx).QueryCompanyInfo(companyId)
+	c, err := blockchain.DefaultClient().StoreCallerSession(ctx).QueryCompanyInfo(companyId)
 	if err != nil {
 		log.Errorf("Query company from block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
@@ -151,7 +151,7 @@ func UpdateCompanyHander(w http.ResponseWriter, r *http.Request) {
 	s := string(b)
 	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	tx, err := blockchain.DefaultClient.StoreTransactorSession(ctx).UpdateCompanyInfo(companyId, s)
+	tx, err := blockchain.DefaultClient().StoreTransactorSession(ctx).UpdateCompanyInfo(companyId, s)
 	if err != nil {
 		log.Errorf("update company data to block chain failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
