@@ -1,7 +1,7 @@
 image: golang:latest
 
 variables:
-  REPO_NAME: 193.112.247.211/chaincore/r2
+  REPO_NAME: gitlab.chainedfinance.com/chaincore/r2
 
 before_script:
   - mkdir -p $GOPATH/src/$REPO_NAME
