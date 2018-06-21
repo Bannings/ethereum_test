@@ -1,10 +1,10 @@
 image: golang:latest
 
 variables:
-  REPO_NAME: gitlab.com/{{ group }}/{{ repo }}
+  REPO_NAME: 193.112.247.211/chaincore/r2
 
 before_script:
-  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - mkdir -p $GOPATH/src/$REPO_NAME
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
 
@@ -26,4 +26,4 @@ compile:
       - go build
     artifacts:
       paths:
-        - {{ repo }}
+        - r2
