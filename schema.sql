@@ -33,7 +33,6 @@ CREATE TABLE `transactions` (
   `input` JSON,
   `output` JSON,
   `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
-  `status` enum('unprocessed','successed','processing','failed') NOT NULL DEFAULT 'unprocessed',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
