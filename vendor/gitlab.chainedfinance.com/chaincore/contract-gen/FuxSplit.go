@@ -16,7 +16,7 @@ import (
 )
 
 // FuxSplitABI is the input ABI used to generate the binding from.
-const FuxSplitABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ARCHIVE_FLAG\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_kidIds\",\"type\":\"uint256[2]\"},{\"name\":\"_kidValues\",\"type\":\"uint256[2]\"},{\"name\":\"_kidStates\",\"type\":\"uint256[2]\"}],\"name\":\"split\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const FuxSplitABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ARCHIVE_FLAG\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_kidIds\",\"type\":\"uint256[2]\"},{\"indexed\":false,\"name\":\"_kidValues\",\"type\":\"uint256[2]\"},{\"indexed\":false,\"name\":\"_kidStates\",\"type\":\"uint256[2]\"}],\"name\":\"SplitToken\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_kidIds\",\"type\":\"uint256[2]\"},{\"name\":\"_kidValues\",\"type\":\"uint256[2]\"},{\"name\":\"_kidStates\",\"type\":\"uint256[2]\"}],\"name\":\"split\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxSplit is an auto generated Go binding around an Ethereum contract.
 type FuxSplit struct {
@@ -513,6 +513,133 @@ func (_FuxSplit *FuxSplitFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan
 				// New log arrived, parse the event and forward to the user
 				event := new(FuxSplitMigrated)
 				if err := _FuxSplit.contract.UnpackLog(event, "Migrated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// FuxSplitSplitTokenIterator is returned from FilterSplitToken and is used to iterate over the raw logs and unpacked data for SplitToken events raised by the FuxSplit contract.
+type FuxSplitSplitTokenIterator struct {
+	Event *FuxSplitSplitToken // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxSplitSplitTokenIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxSplitSplitToken)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxSplitSplitToken)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxSplitSplitTokenIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxSplitSplitTokenIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxSplitSplitToken represents a SplitToken event raised by the FuxSplit contract.
+type FuxSplitSplitToken struct {
+	Caller    common.Address
+	TokenId   *big.Int
+	Owner     common.Address
+	KidIds    [2]*big.Int
+	KidValues [2]*big.Int
+	KidStates [2]*big.Int
+	Raw       types.Log // Blockchain specific contextual infos
+}
+
+// FilterSplitToken is a free log retrieval operation binding the contract event 0x267a65f439bfb39128d989ebb745250d8b7d0ccc4841369588f3bce5f3ff9316.
+//
+// Solidity: event SplitToken(_caller address, _tokenId uint256, _owner address, _kidIds uint256[2], _kidValues uint256[2], _kidStates uint256[2])
+func (_FuxSplit *FuxSplitFilterer) FilterSplitToken(opts *bind.FilterOpts) (*FuxSplitSplitTokenIterator, error) {
+
+	logs, sub, err := _FuxSplit.contract.FilterLogs(opts, "SplitToken")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxSplitSplitTokenIterator{contract: _FuxSplit.contract, event: "SplitToken", logs: logs, sub: sub}, nil
+}
+
+// WatchSplitToken is a free log subscription operation binding the contract event 0x267a65f439bfb39128d989ebb745250d8b7d0ccc4841369588f3bce5f3ff9316.
+//
+// Solidity: event SplitToken(_caller address, _tokenId uint256, _owner address, _kidIds uint256[2], _kidValues uint256[2], _kidStates uint256[2])
+func (_FuxSplit *FuxSplitFilterer) WatchSplitToken(opts *bind.WatchOpts, sink chan<- *FuxSplitSplitToken) (event.Subscription, error) {
+
+	logs, sub, err := _FuxSplit.contract.WatchLogs(opts, "SplitToken")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxSplitSplitToken)
+				if err := _FuxSplit.contract.UnpackLog(event, "SplitToken", log); err != nil {
 					return err
 				}
 				event.Raw = log

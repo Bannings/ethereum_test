@@ -16,7 +16,7 @@ import (
 )
 
 // FuxTokenABI is the input ABI used to generate the binding from.
-const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxCoin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxCoin\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxCoin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxCoin\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_caller\",\"type\":\"address\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFromInCluster\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxToken is an auto generated Go binding around an Ethereum contract.
 type FuxToken struct {
@@ -452,6 +452,151 @@ func (_FuxToken *FuxTokenTransactorSession) SafeTransferFrom(_from common.Addres
 	return _FuxToken.Contract.SafeTransferFrom(&_FuxToken.TransactOpts, _from, _to, _tokenId)
 }
 
+// SafeTransferFromInCluster is a paid mutator transaction binding the contract method 0xe9ce758c.
+//
+// Solidity: function safeTransferFromInCluster(_caller address, _from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenTransactor) SafeTransferFromInCluster(opts *bind.TransactOpts, _caller common.Address, _from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.contract.Transact(opts, "safeTransferFromInCluster", _caller, _from, _to, _tokenId)
+}
+
+// SafeTransferFromInCluster is a paid mutator transaction binding the contract method 0xe9ce758c.
+//
+// Solidity: function safeTransferFromInCluster(_caller address, _from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenSession) SafeTransferFromInCluster(_caller common.Address, _from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.SafeTransferFromInCluster(&_FuxToken.TransactOpts, _caller, _from, _to, _tokenId)
+}
+
+// SafeTransferFromInCluster is a paid mutator transaction binding the contract method 0xe9ce758c.
+//
+// Solidity: function safeTransferFromInCluster(_caller address, _from address, _to address, _tokenId uint256) returns()
+func (_FuxToken *FuxTokenTransactorSession) SafeTransferFromInCluster(_caller common.Address, _from common.Address, _to common.Address, _tokenId *big.Int) (*types.Transaction, error) {
+	return _FuxToken.Contract.SafeTransferFromInCluster(&_FuxToken.TransactOpts, _caller, _from, _to, _tokenId)
+}
+
+// FuxTokenBurnedIterator is returned from FilterBurned and is used to iterate over the raw logs and unpacked data for Burned events raised by the FuxToken contract.
+type FuxTokenBurnedIterator struct {
+	Event *FuxTokenBurned // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxTokenBurnedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxTokenBurned)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxTokenBurned)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxTokenBurnedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxTokenBurnedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxTokenBurned represents a Burned event raised by the FuxToken contract.
+type FuxTokenBurned struct {
+	Caller  common.Address
+	Owner   common.Address
+	TokenId *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterBurned is a free log retrieval operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
+//
+// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
+func (_FuxToken *FuxTokenFilterer) FilterBurned(opts *bind.FilterOpts) (*FuxTokenBurnedIterator, error) {
+
+	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Burned")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxTokenBurnedIterator{contract: _FuxToken.contract, event: "Burned", logs: logs, sub: sub}, nil
+}
+
+// WatchBurned is a free log subscription operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
+//
+// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
+func (_FuxToken *FuxTokenFilterer) WatchBurned(opts *bind.WatchOpts, sink chan<- *FuxTokenBurned) (event.Subscription, error) {
+
+	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Burned")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxTokenBurned)
+				if err := _FuxToken.contract.UnpackLog(event, "Burned", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
 // FuxTokenMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the FuxToken contract.
 type FuxTokenMigratedIterator struct {
 	Event *FuxTokenMigrated // Event containing the contract specifics and raw log
@@ -555,6 +700,258 @@ func (_FuxToken *FuxTokenFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan
 				// New log arrived, parse the event and forward to the user
 				event := new(FuxTokenMigrated)
 				if err := _FuxToken.contract.UnpackLog(event, "Migrated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// FuxTokenMintedIterator is returned from FilterMinted and is used to iterate over the raw logs and unpacked data for Minted events raised by the FuxToken contract.
+type FuxTokenMintedIterator struct {
+	Event *FuxTokenMinted // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxTokenMintedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxTokenMinted)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxTokenMinted)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxTokenMintedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxTokenMintedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxTokenMinted represents a Minted event raised by the FuxToken contract.
+type FuxTokenMinted struct {
+	Caller  common.Address
+	To      common.Address
+	TokenId *big.Int
+	Value   *big.Int
+	State   *big.Int
+	Expire  *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterMinted is a free log retrieval operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
+//
+// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
+func (_FuxToken *FuxTokenFilterer) FilterMinted(opts *bind.FilterOpts) (*FuxTokenMintedIterator, error) {
+
+	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Minted")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxTokenMintedIterator{contract: _FuxToken.contract, event: "Minted", logs: logs, sub: sub}, nil
+}
+
+// WatchMinted is a free log subscription operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
+//
+// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
+func (_FuxToken *FuxTokenFilterer) WatchMinted(opts *bind.WatchOpts, sink chan<- *FuxTokenMinted) (event.Subscription, error) {
+
+	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Minted")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxTokenMinted)
+				if err := _FuxToken.contract.UnpackLog(event, "Minted", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// FuxTokenTransferIterator is returned from FilterTransfer and is used to iterate over the raw logs and unpacked data for Transfer events raised by the FuxToken contract.
+type FuxTokenTransferIterator struct {
+	Event *FuxTokenTransfer // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxTokenTransferIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxTokenTransfer)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxTokenTransfer)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxTokenTransferIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxTokenTransferIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxTokenTransfer represents a Transfer event raised by the FuxToken contract.
+type FuxTokenTransfer struct {
+	Caller  common.Address
+	From    common.Address
+	To      common.Address
+	TokenId *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterTransfer is a free log retrieval operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
+//
+// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
+func (_FuxToken *FuxTokenFilterer) FilterTransfer(opts *bind.FilterOpts) (*FuxTokenTransferIterator, error) {
+
+	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Transfer")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxTokenTransferIterator{contract: _FuxToken.contract, event: "Transfer", logs: logs, sub: sub}, nil
+}
+
+// WatchTransfer is a free log subscription operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
+//
+// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
+func (_FuxToken *FuxTokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *FuxTokenTransfer) (event.Subscription, error) {
+
+	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Transfer")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxTokenTransfer)
+				if err := _FuxToken.contract.UnpackLog(event, "Transfer", log); err != nil {
 					return err
 				}
 				event.Raw = log
