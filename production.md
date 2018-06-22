@@ -6,6 +6,7 @@
 >http://10.8.1.20:10088/api/fx/supplier/
 >
 >http://10.8.1.20:10088/api/fx/asset
+>
 ## 提交方式：post
 
 
