@@ -3,8 +3,9 @@
 10.8.1.20：10088
 
 ## 接口列表 ：
-http://10.8.1.20:10088/api/fx/supplier/register
-http://10.8.1.20:10088/api/fx/asset
+>http://10.8.1.20:10088/api/fx/supplier/
+>
+>http://10.8.1.20:10088/api/fx/asset
 ## 提交方式：post
 
 
