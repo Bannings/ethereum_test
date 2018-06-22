@@ -7,14 +7,16 @@ import (
 	"math/big"
 	"strings"
 
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/event"
 )
 
 // FuxBatchABI is the input ABI used to generate the binding from.
-const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"isUsingRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"cursorGas\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"sysRouter\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CONFIG\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isFuxHub\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROUTE_CFRBAC\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getRouterAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_HUB\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_FUX_GROUP\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"runMaxCount\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"_isInFuxGroup\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"transferGas\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_router\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"name\":\"_len\",\"type\":\"uint256\"}],\"name\":\"setMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_cnt\",\"type\":\"uint256\"}],\"name\":\"setRunMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_gas\",\"type\":\"uint256\"}],\"name\":\"setTransferGas\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokens\",\"type\":\"uint256[]\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokens\",\"type\":\"uint256[]\"}],\"name\":\"addJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"runJob\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_id\",\"type\":\"uint256\"}],\"name\":\"isCompile\",\"outputs\":[{\"name\":\"compile\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_fuxToken\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_length\",\"type\":\"uint256\"}],\"name\":\"updateMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenIds\",\"type\":\"uint256[]\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxBatch is an auto generated Go binding around an Ethereum contract.
 type FuxBatch struct {
@@ -158,6 +160,32 @@ func (_FuxBatch *FuxBatchTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _FuxBatch.Contract.contract.Transact(opts, method, params...)
 }
 
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxBatch *FuxBatchCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+	var (
+		ret0 = new(string)
+	)
+	out := ret0
+	err := _FuxBatch.contract.Call(opts, out, "ROLE_ADMIN")
+	return *ret0, err
+}
+
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxBatch *FuxBatchSession) ROLEADMIN() (string, error) {
+	return _FuxBatch.Contract.ROLEADMIN(&_FuxBatch.CallOpts)
+}
+
+// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+//
+// Solidity: function ROLE_ADMIN() constant returns(string)
+func (_FuxBatch *FuxBatchCallerSession) ROLEADMIN() (string, error) {
+	return _FuxBatch.Contract.ROLEADMIN(&_FuxBatch.CallOpts)
+}
+
 // ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
@@ -184,264 +212,56 @@ func (_FuxBatch *FuxBatchCallerSession) ROLECLUSTER() (string, error) {
 	return _FuxBatch.Contract.ROLECLUSTER(&_FuxBatch.CallOpts)
 }
 
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
+// FuxToken is a free data retrieval call binding the contract method 0xd91f5a6a.
 //
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxBatch *FuxBatchCaller) ROLEFUXGROUP(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "ROLE_FUX_GROUP")
-	return *ret0, err
-}
-
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
-//
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxBatch *FuxBatchSession) ROLEFUXGROUP() (string, error) {
-	return _FuxBatch.Contract.ROLEFUXGROUP(&_FuxBatch.CallOpts)
-}
-
-// ROLEFUXGROUP is a free data retrieval call binding the contract method 0xd89e6c4f.
-//
-// Solidity: function ROLE_FUX_GROUP() constant returns(string)
-func (_FuxBatch *FuxBatchCallerSession) ROLEFUXGROUP() (string, error) {
-	return _FuxBatch.Contract.ROLEFUXGROUP(&_FuxBatch.CallOpts)
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxBatch *FuxBatchCaller) ROLEFUXHUB(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "ROLE_FUX_HUB")
-	return *ret0, err
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxBatch *FuxBatchSession) ROLEFUXHUB() (string, error) {
-	return _FuxBatch.Contract.ROLEFUXHUB(&_FuxBatch.CallOpts)
-}
-
-// ROLEFUXHUB is a free data retrieval call binding the contract method 0xd6b419fb.
-//
-// Solidity: function ROLE_FUX_HUB() constant returns(string)
-func (_FuxBatch *FuxBatchCallerSession) ROLEFUXHUB() (string, error) {
-	return _FuxBatch.Contract.ROLEFUXHUB(&_FuxBatch.CallOpts)
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxBatch *FuxBatchCaller) ROUTECFRBAC(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "ROUTE_CFRBAC")
-	return *ret0, err
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxBatch *FuxBatchSession) ROUTECFRBAC() (string, error) {
-	return _FuxBatch.Contract.ROUTECFRBAC(&_FuxBatch.CallOpts)
-}
-
-// ROUTECFRBAC is a free data retrieval call binding the contract method 0xc427d38d.
-//
-// Solidity: function ROUTE_CFRBAC() constant returns(string)
-func (_FuxBatch *FuxBatchCallerSession) ROUTECFRBAC() (string, error) {
-	return _FuxBatch.Contract.ROUTECFRBAC(&_FuxBatch.CallOpts)
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxBatch *FuxBatchCaller) ROUTECONFIG(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "ROUTE_CONFIG")
-	return *ret0, err
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxBatch *FuxBatchSession) ROUTECONFIG() (string, error) {
-	return _FuxBatch.Contract.ROUTECONFIG(&_FuxBatch.CallOpts)
-}
-
-// ROUTECONFIG is a free data retrieval call binding the contract method 0x6ed56bce.
-//
-// Solidity: function ROUTE_CONFIG() constant returns(string)
-func (_FuxBatch *FuxBatchCallerSession) ROUTECONFIG() (string, error) {
-	return _FuxBatch.Contract.ROUTECONFIG(&_FuxBatch.CallOpts)
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchCaller) IsFuxHub(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "_isFuxHub", _addr)
-	return *ret0, err
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchSession) IsFuxHub(_addr common.Address) (bool, error) {
-	return _FuxBatch.Contract.IsFuxHub(&_FuxBatch.CallOpts, _addr)
-}
-
-// IsFuxHub is a free data retrieval call binding the contract method 0xade61724.
-//
-// Solidity: function _isFuxHub(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchCallerSession) IsFuxHub(_addr common.Address) (bool, error) {
-	return _FuxBatch.Contract.IsFuxHub(&_FuxBatch.CallOpts, _addr)
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchCaller) IsInFuxGroup(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "_isInFuxGroup", _addr)
-	return *ret0, err
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchSession) IsInFuxGroup(_addr common.Address) (bool, error) {
-	return _FuxBatch.Contract.IsInFuxGroup(&_FuxBatch.CallOpts, _addr)
-}
-
-// IsInFuxGroup is a free data retrieval call binding the contract method 0xf0b15e82.
-//
-// Solidity: function _isInFuxGroup(_addr address) constant returns(bool)
-func (_FuxBatch *FuxBatchCallerSession) IsInFuxGroup(_addr common.Address) (bool, error) {
-	return _FuxBatch.Contract.IsInFuxGroup(&_FuxBatch.CallOpts, _addr)
-}
-
-// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
-//
-// Solidity: function cursorGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchCaller) CursorGas(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "cursorGas")
-	return *ret0, err
-}
-
-// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
-//
-// Solidity: function cursorGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchSession) CursorGas() (*big.Int, error) {
-	return _FuxBatch.Contract.CursorGas(&_FuxBatch.CallOpts)
-}
-
-// CursorGas is a free data retrieval call binding the contract method 0x2133bfc6.
-//
-// Solidity: function cursorGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchCallerSession) CursorGas() (*big.Int, error) {
-	return _FuxBatch.Contract.CursorGas(&_FuxBatch.CallOpts)
-}
-
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
-//
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxBatch *FuxBatchCaller) GetRouterAddress(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function fuxToken() constant returns(address)
+func (_FuxBatch *FuxBatchCaller) FuxToken(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "getRouterAddress")
+	err := _FuxBatch.contract.Call(opts, out, "fuxToken")
 	return *ret0, err
 }
 
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+// FuxToken is a free data retrieval call binding the contract method 0xd91f5a6a.
 //
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxBatch *FuxBatchSession) GetRouterAddress() (common.Address, error) {
-	return _FuxBatch.Contract.GetRouterAddress(&_FuxBatch.CallOpts)
+// Solidity: function fuxToken() constant returns(address)
+func (_FuxBatch *FuxBatchSession) FuxToken() (common.Address, error) {
+	return _FuxBatch.Contract.FuxToken(&_FuxBatch.CallOpts)
 }
 
-// GetRouterAddress is a free data retrieval call binding the contract method 0xd54f7d5e.
+// FuxToken is a free data retrieval call binding the contract method 0xd91f5a6a.
 //
-// Solidity: function getRouterAddress() constant returns(address)
-func (_FuxBatch *FuxBatchCallerSession) GetRouterAddress() (common.Address, error) {
-	return _FuxBatch.Contract.GetRouterAddress(&_FuxBatch.CallOpts)
+// Solidity: function fuxToken() constant returns(address)
+func (_FuxBatch *FuxBatchCallerSession) FuxToken() (common.Address, error) {
+	return _FuxBatch.Contract.FuxToken(&_FuxBatch.CallOpts)
 }
 
-// IsCompile is a free data retrieval call binding the contract method 0xa3c332ab.
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
 //
-// Solidity: function isCompile(_id uint256) constant returns(compile bool)
-func (_FuxBatch *FuxBatchCaller) IsCompile(opts *bind.CallOpts, _id *big.Int) (bool, error) {
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxBatch *FuxBatchCaller) IsMigrated(opts *bind.CallOpts, contractName string, migrationId string) (bool, error) {
 	var (
 		ret0 = new(bool)
 	)
 	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "isCompile", _id)
+	err := _FuxBatch.contract.Call(opts, out, "isMigrated", contractName, migrationId)
 	return *ret0, err
 }
 
-// IsCompile is a free data retrieval call binding the contract method 0xa3c332ab.
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
 //
-// Solidity: function isCompile(_id uint256) constant returns(compile bool)
-func (_FuxBatch *FuxBatchSession) IsCompile(_id *big.Int) (bool, error) {
-	return _FuxBatch.Contract.IsCompile(&_FuxBatch.CallOpts, _id)
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxBatch *FuxBatchSession) IsMigrated(contractName string, migrationId string) (bool, error) {
+	return _FuxBatch.Contract.IsMigrated(&_FuxBatch.CallOpts, contractName, migrationId)
 }
 
-// IsCompile is a free data retrieval call binding the contract method 0xa3c332ab.
+// IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
 //
-// Solidity: function isCompile(_id uint256) constant returns(compile bool)
-func (_FuxBatch *FuxBatchCallerSession) IsCompile(_id *big.Int) (bool, error) {
-	return _FuxBatch.Contract.IsCompile(&_FuxBatch.CallOpts, _id)
-}
-
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
-//
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxBatch *FuxBatchCaller) IsUsingRouter(opts *bind.CallOpts) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "isUsingRouter")
-	return *ret0, err
-}
-
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
-//
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxBatch *FuxBatchSession) IsUsingRouter() (bool, error) {
-	return _FuxBatch.Contract.IsUsingRouter(&_FuxBatch.CallOpts)
-}
-
-// IsUsingRouter is a free data retrieval call binding the contract method 0x0d20aa48.
-//
-// Solidity: function isUsingRouter() constant returns(bool)
-func (_FuxBatch *FuxBatchCallerSession) IsUsingRouter() (bool, error) {
-	return _FuxBatch.Contract.IsUsingRouter(&_FuxBatch.CallOpts)
+// Solidity: function isMigrated(contractName string, migrationId string) constant returns(bool)
+func (_FuxBatch *FuxBatchCallerSession) IsMigrated(contractName string, migrationId string) (bool, error) {
+	return _FuxBatch.Contract.IsMigrated(&_FuxBatch.CallOpts, contractName, migrationId)
 }
 
 // MaxLength is a free data retrieval call binding the contract method 0xd06a89a4.
@@ -470,206 +290,214 @@ func (_FuxBatch *FuxBatchCallerSession) MaxLength() (*big.Int, error) {
 	return _FuxBatch.Contract.MaxLength(&_FuxBatch.CallOpts)
 }
 
-// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
 //
-// Solidity: function runMaxCount() constant returns(uint256)
-func (_FuxBatch *FuxBatchCaller) RunMaxCount(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "runMaxCount")
-	return *ret0, err
-}
-
-// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
-//
-// Solidity: function runMaxCount() constant returns(uint256)
-func (_FuxBatch *FuxBatchSession) RunMaxCount() (*big.Int, error) {
-	return _FuxBatch.Contract.RunMaxCount(&_FuxBatch.CallOpts)
-}
-
-// RunMaxCount is a free data retrieval call binding the contract method 0xe2bf84f8.
-//
-// Solidity: function runMaxCount() constant returns(uint256)
-func (_FuxBatch *FuxBatchCallerSession) RunMaxCount() (*big.Int, error) {
-	return _FuxBatch.Contract.RunMaxCount(&_FuxBatch.CallOpts)
-}
-
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
-//
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxBatch *FuxBatchCaller) SysRouter(opts *bind.CallOpts) (common.Address, error) {
+// Solidity: function rbac() constant returns(address)
+func (_FuxBatch *FuxBatchCaller) Rbac(opts *bind.CallOpts) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
 	)
 	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "sysRouter")
+	err := _FuxBatch.contract.Call(opts, out, "rbac")
 	return *ret0, err
 }
 
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
 //
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxBatch *FuxBatchSession) SysRouter() (common.Address, error) {
-	return _FuxBatch.Contract.SysRouter(&_FuxBatch.CallOpts)
+// Solidity: function rbac() constant returns(address)
+func (_FuxBatch *FuxBatchSession) Rbac() (common.Address, error) {
+	return _FuxBatch.Contract.Rbac(&_FuxBatch.CallOpts)
 }
 
-// SysRouter is a free data retrieval call binding the contract method 0x66b9852b.
+// Rbac is a free data retrieval call binding the contract method 0xa8ecc7f1.
 //
-// Solidity: function sysRouter() constant returns(address)
-func (_FuxBatch *FuxBatchCallerSession) SysRouter() (common.Address, error) {
-	return _FuxBatch.Contract.SysRouter(&_FuxBatch.CallOpts)
+// Solidity: function rbac() constant returns(address)
+func (_FuxBatch *FuxBatchCallerSession) Rbac() (common.Address, error) {
+	return _FuxBatch.Contract.Rbac(&_FuxBatch.CallOpts)
 }
 
-// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function transferGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchCaller) TransferGas(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _FuxBatch.contract.Call(opts, out, "transferGas")
-	return *ret0, err
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxBatch *FuxBatchTransactor) Initialize(opts *bind.TransactOpts, _rbac common.Address) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "initialize", _rbac)
 }
 
-// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function transferGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchSession) TransferGas() (*big.Int, error) {
-	return _FuxBatch.Contract.TransferGas(&_FuxBatch.CallOpts)
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxBatch *FuxBatchSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
+	return _FuxBatch.Contract.Initialize(&_FuxBatch.TransactOpts, _rbac)
 }
 
-// TransferGas is a free data retrieval call binding the contract method 0xfa03f797.
+// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
 //
-// Solidity: function transferGas() constant returns(uint256)
-func (_FuxBatch *FuxBatchCallerSession) TransferGas() (*big.Int, error) {
-	return _FuxBatch.Contract.TransferGas(&_FuxBatch.CallOpts)
+// Solidity: function initialize(_rbac address) returns()
+func (_FuxBatch *FuxBatchTransactorSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
+	return _FuxBatch.Contract.Initialize(&_FuxBatch.TransactOpts, _rbac)
 }
 
-// AddJob is a paid mutator transaction binding the contract method 0xabf836fc.
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x24cf6f0f.
 //
-// Solidity: function addJob(_id uint256, _from address, _to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactor) AddJob(opts *bind.TransactOpts, _id *big.Int, _from common.Address, _to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "addJob", _id, _from, _to, _tokens)
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenIds uint256[]) returns()
+func (_FuxBatch *FuxBatchTransactor) SafeTransferFrom(opts *bind.TransactOpts, _from common.Address, _to common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "safeTransferFrom", _from, _to, _tokenIds)
 }
 
-// AddJob is a paid mutator transaction binding the contract method 0xabf836fc.
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x24cf6f0f.
 //
-// Solidity: function addJob(_id uint256, _from address, _to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchSession) AddJob(_id *big.Int, _from common.Address, _to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.AddJob(&_FuxBatch.TransactOpts, _id, _from, _to, _tokens)
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenIds uint256[]) returns()
+func (_FuxBatch *FuxBatchSession) SafeTransferFrom(_from common.Address, _to common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SafeTransferFrom(&_FuxBatch.TransactOpts, _from, _to, _tokenIds)
 }
 
-// AddJob is a paid mutator transaction binding the contract method 0xabf836fc.
+// SafeTransferFrom is a paid mutator transaction binding the contract method 0x24cf6f0f.
 //
-// Solidity: function addJob(_id uint256, _from address, _to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactorSession) AddJob(_id *big.Int, _from common.Address, _to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.AddJob(&_FuxBatch.TransactOpts, _id, _from, _to, _tokens)
+// Solidity: function safeTransferFrom(_from address, _to address, _tokenIds uint256[]) returns()
+func (_FuxBatch *FuxBatchTransactorSession) SafeTransferFrom(_from common.Address, _to common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.SafeTransferFrom(&_FuxBatch.TransactOpts, _from, _to, _tokenIds)
 }
 
-// RunJob is a paid mutator transaction binding the contract method 0x9a1e4822.
+// UpdateMaxLength is a paid mutator transaction binding the contract method 0x23969d51.
 //
-// Solidity: function runJob(_id uint256) returns()
-func (_FuxBatch *FuxBatchTransactor) RunJob(opts *bind.TransactOpts, _id *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "runJob", _id)
+// Solidity: function updateMaxLength(_length uint256) returns()
+func (_FuxBatch *FuxBatchTransactor) UpdateMaxLength(opts *bind.TransactOpts, _length *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.contract.Transact(opts, "updateMaxLength", _length)
 }
 
-// RunJob is a paid mutator transaction binding the contract method 0x9a1e4822.
+// UpdateMaxLength is a paid mutator transaction binding the contract method 0x23969d51.
 //
-// Solidity: function runJob(_id uint256) returns()
-func (_FuxBatch *FuxBatchSession) RunJob(_id *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.RunJob(&_FuxBatch.TransactOpts, _id)
+// Solidity: function updateMaxLength(_length uint256) returns()
+func (_FuxBatch *FuxBatchSession) UpdateMaxLength(_length *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.UpdateMaxLength(&_FuxBatch.TransactOpts, _length)
 }
 
-// RunJob is a paid mutator transaction binding the contract method 0x9a1e4822.
+// UpdateMaxLength is a paid mutator transaction binding the contract method 0x23969d51.
 //
-// Solidity: function runJob(_id uint256) returns()
-func (_FuxBatch *FuxBatchTransactorSession) RunJob(_id *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.RunJob(&_FuxBatch.TransactOpts, _id)
+// Solidity: function updateMaxLength(_length uint256) returns()
+func (_FuxBatch *FuxBatchTransactorSession) UpdateMaxLength(_length *big.Int) (*types.Transaction, error) {
+	return _FuxBatch.Contract.UpdateMaxLength(&_FuxBatch.TransactOpts, _length)
 }
 
-// SetMaxLength is a paid mutator transaction binding the contract method 0xdc2f7867.
-//
-// Solidity: function setMaxLength(_len uint256) returns()
-func (_FuxBatch *FuxBatchTransactor) SetMaxLength(opts *bind.TransactOpts, _len *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "setMaxLength", _len)
+// FuxBatchMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the FuxBatch contract.
+type FuxBatchMigratedIterator struct {
+	Event *FuxBatchMigrated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
 }
 
-// SetMaxLength is a paid mutator transaction binding the contract method 0xdc2f7867.
-//
-// Solidity: function setMaxLength(_len uint256) returns()
-func (_FuxBatch *FuxBatchSession) SetMaxLength(_len *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetMaxLength(&_FuxBatch.TransactOpts, _len)
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxBatchMigratedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxBatchMigrated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxBatchMigrated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
 }
 
-// SetMaxLength is a paid mutator transaction binding the contract method 0xdc2f7867.
-//
-// Solidity: function setMaxLength(_len uint256) returns()
-func (_FuxBatch *FuxBatchTransactorSession) SetMaxLength(_len *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetMaxLength(&_FuxBatch.TransactOpts, _len)
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxBatchMigratedIterator) Error() error {
+	return it.fail
 }
 
-// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
-//
-// Solidity: function setRunMaxLength(_cnt uint256) returns()
-func (_FuxBatch *FuxBatchTransactor) SetRunMaxLength(opts *bind.TransactOpts, _cnt *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "setRunMaxLength", _cnt)
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxBatchMigratedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
 }
 
-// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
-//
-// Solidity: function setRunMaxLength(_cnt uint256) returns()
-func (_FuxBatch *FuxBatchSession) SetRunMaxLength(_cnt *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetRunMaxLength(&_FuxBatch.TransactOpts, _cnt)
+// FuxBatchMigrated represents a Migrated event raised by the FuxBatch contract.
+type FuxBatchMigrated struct {
+	ContractName string
+	MigrationId  string
+	Raw          types.Log // Blockchain specific contextual infos
 }
 
-// SetRunMaxLength is a paid mutator transaction binding the contract method 0x5d2ddd15.
+// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: function setRunMaxLength(_cnt uint256) returns()
-func (_FuxBatch *FuxBatchTransactorSession) SetRunMaxLength(_cnt *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetRunMaxLength(&_FuxBatch.TransactOpts, _cnt)
+// Solidity: event Migrated(contractName string, migrationId string)
+func (_FuxBatch *FuxBatchFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxBatchMigratedIterator, error) {
+
+	logs, sub, err := _FuxBatch.contract.FilterLogs(opts, "Migrated")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxBatchMigratedIterator{contract: _FuxBatch.contract, event: "Migrated", logs: logs, sub: sub}, nil
 }
 
-// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
+// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: function setTransferGas(_gas uint256) returns()
-func (_FuxBatch *FuxBatchTransactor) SetTransferGas(opts *bind.TransactOpts, _gas *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "setTransferGas", _gas)
-}
+// Solidity: event Migrated(contractName string, migrationId string)
+func (_FuxBatch *FuxBatchFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxBatchMigrated) (event.Subscription, error) {
 
-// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
-//
-// Solidity: function setTransferGas(_gas uint256) returns()
-func (_FuxBatch *FuxBatchSession) SetTransferGas(_gas *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetTransferGas(&_FuxBatch.TransactOpts, _gas)
-}
+	logs, sub, err := _FuxBatch.contract.WatchLogs(opts, "Migrated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxBatchMigrated)
+				if err := _FuxBatch.contract.UnpackLog(event, "Migrated", log); err != nil {
+					return err
+				}
+				event.Raw = log
 
-// SetTransferGas is a paid mutator transaction binding the contract method 0xc7e066ba.
-//
-// Solidity: function setTransferGas(_gas uint256) returns()
-func (_FuxBatch *FuxBatchTransactorSession) SetTransferGas(_gas *big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SetTransferGas(&_FuxBatch.TransactOpts, _gas)
-}
-
-// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
-//
-// Solidity: function transfer(_to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactor) Transfer(opts *bind.TransactOpts, _to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "transfer", _to, _tokens)
-}
-
-// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
-//
-// Solidity: function transfer(_to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchSession) Transfer(_to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.Transfer(&_FuxBatch.TransactOpts, _to, _tokens)
-}
-
-// Transfer is a paid mutator transaction binding the contract method 0x2b4e4e96.
-//
-// Solidity: function transfer(_to address, _tokens uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactorSession) Transfer(_to common.Address, _tokens []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.Transfer(&_FuxBatch.TransactOpts, _to, _tokens)
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
 }
