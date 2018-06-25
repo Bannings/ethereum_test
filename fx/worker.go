@@ -11,13 +11,9 @@ import (
 )
 
 var (
-	defaultDBConnection *dbConnection
+	defaultDBConnection *sql.DB
 	once                sync.Once
 )
-
-type dbConnection struct {
-	db *sql.DB
-}
 
 func ExcuteTransaction(done <-chan struct{}) {
 	ticker := time.NewTicker(300 * time.Second)
@@ -115,7 +111,7 @@ func sectionalizeCmd(cmds []Command) map[string][]Command {
 
 func getCmd() ([]Command, error) {
 	var cmds []Command
-	rows, err := DefaultDBConnection().db.Query("select * from( select t1.id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on t1.id=transaction_id order by t1.created_at) as t3 where process_state is null;")
+	rows, err := DefaultDBConnection().Query("select * from( select t1.id,input,output,t1.state,t2.state process_state from transactions t1 left join cmd_procedure t2 on t1.id=transaction_id order by t1.created_at) as t3 where process_state is null;")
 	//rows, err := p.db.Query("select deal_id,input,output,state from transactions where status='unprocessed' or status='failed' order by created_at")
 	if err != nil {
 		log.Error("fail to query unfinished transactions: %v", err)
@@ -140,14 +136,14 @@ func getCmd() ([]Command, error) {
 	return cmds, nil
 }
 
-func DefaultDBConnection() *dbConnection {
+func DefaultDBConnection() *sql.DB {
 	once.Do(func() {
 		conf := g.GetConfig()
 		db, err := g.OpenDB(conf.DbConfig)
 		if err != nil {
 			panic(err)
 		}
-		defaultDBConnection = &dbConnection{db: db}
+		defaultDBConnection = db
 	})
 
 	return defaultDBConnection

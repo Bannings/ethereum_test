@@ -33,7 +33,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var trans Transaction
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		resp := g.NewBadResponse("400", err.Error(), err)
+		resp := g.NewBadResponse("400", err)
 		render.JSON(w, r, resp)
 		return
 	}
@@ -41,27 +41,27 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := json.Marshal(m)
 	fmt.Println(string(tx))
 	if err != nil {
-		resp := g.NewBadResponse("400", err.Error(), err)
+		resp := g.NewBadResponse("400", err)
 		render.JSON(w, r, resp)
 		return
 	}
 	err = json.Unmarshal(tx, &trans)
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		resp := g.NewBadResponse("400", err.Error(), err)
+		resp := g.NewBadResponse("400", err)
 		render.JSON(w, r, resp)
 		return
 	}
 	_, err = fx.ParseType(trans.TxType)
 	if err != nil {
-		resp := g.NewBadResponse("400", err.Error(), err)
+		resp := g.NewBadResponse("400", err)
 		render.JSON(w, r, resp)
 		return
 	}
 	for _, token := range trans.Input {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			resp := g.NewBadResponse("400", err.Error(), err)
+			resp := g.NewBadResponse("400", err)
 			render.JSON(w, r, resp)
 			return
 		}
@@ -69,7 +69,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	for _, token := range trans.Output {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			resp := g.NewBadResponse("400", err.Error(), err)
+			resp := g.NewBadResponse("400", err)
 			render.JSON(w, r, resp)
 			return
 		}
@@ -78,14 +78,14 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	exist, err := store.IsTransactionExist(trans.TxId)
 	//exist, err := IsTransactionExist(trans.TxId)
 	if exist {
-		resp := g.NewBadResponse("400", "Transaction id already exist", errors.New("Transaction id already exist"))
+		resp := g.NewBadResponse("400", errors.New("Transaction id already exist"))
 		render.JSON(w, r, resp)
 		return
 	}
 	err = saveTransaction(&trans)
 	if err != nil {
 		log.Errorf("%v", err)
-		resp := g.NewBadResponse("500", err.Error(), err)
+		resp := g.NewBadResponse("500", err)
 		render.JSON(w, r, resp)
 		return
 	}
@@ -118,13 +118,6 @@ func DistributeTask(transaction *fx.Transaction) {
 }
 
 func saveTransaction(transaction *Transaction) error {
-	conf := g.GetConfig()
-
-	db, err := g.OpenDB(conf.DbConfig)
-	defer db.Close()
-	if err != nil {
-		return (err)
-	}
 	input, err := json.Marshal(&transaction.Input)
 	if err != nil {
 		return err
@@ -134,7 +127,8 @@ func saveTransaction(transaction *Transaction) error {
 	if err != nil {
 		return err
 	}
-	stmt, err := db.Prepare("INSERT INTO transactions(deal_id, input, output,state) VALUES(?, ?, ?, ?)")
+
+	stmt, err := fx.DefaultDBConnection().Prepare("INSERT INTO transactions(deal_id, input, output,state) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
