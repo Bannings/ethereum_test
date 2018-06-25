@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
@@ -19,13 +18,15 @@ import (
 
 var (
 	supplierMap map[string]chan fx.Transaction
-	types       []string
+	tradeTypes  []string
+	fxState     []string
 	db          *sql.DB
 )
 
 func init() {
 	supplierMap = make(map[string]chan fx.Transaction)
-	types = []string{"Payment", "Discount", "SplitFX", "MintFX", "Confirm"}
+	tradeTypes = []string{"Payment", "Discount", "SplitFX", "MintFX", "Confirm"}
+	fxState = []string{"Frozen", "Normal", "Historic"}
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +34,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var trans Transaction
 	if err := render.Bind(r, &m); err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		resp := g.NewBadResponse("400", err)
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
@@ -41,27 +42,27 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	tx, err := json.Marshal(m)
 	fmt.Println(string(tx))
 	if err != nil {
-		resp := g.NewBadResponse("400", err)
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
 	err = json.Unmarshal(tx, &trans)
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
-		resp := g.NewBadResponse("400", err)
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
 	_, err = fx.ParseType(trans.TxType)
 	if err != nil {
-		resp := g.NewBadResponse("400", err)
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
 	for _, token := range trans.Input {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			resp := g.NewBadResponse("400", err)
+			resp := g.NewBadResponse("400", err.Error())
 			render.JSON(w, r, resp)
 			return
 		}
@@ -69,7 +70,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	for _, token := range trans.Output {
 		_, err = fx.ParseState(token.State)
 		if err != nil {
-			resp := g.NewBadResponse("400", err)
+			resp := g.NewBadResponse("400", err.Error())
 			render.JSON(w, r, resp)
 			return
 		}
@@ -78,14 +79,14 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	exist, err := store.IsTransactionExist(trans.TxId)
 	//exist, err := IsTransactionExist(trans.TxId)
 	if exist {
-		resp := g.NewBadResponse("400", errors.New("Transaction id already exist"))
+		resp := g.NewBadResponse("400", "Transaction id already exist")
 		render.JSON(w, r, resp)
 		return
 	}
 	err = saveTransaction(&trans)
 	if err != nil {
 		log.Errorf("%v", err)
-		resp := g.NewBadResponse("500", err)
+		resp := g.NewBadResponse("500", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
