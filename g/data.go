@@ -32,11 +32,10 @@ func NewSuccResponse(data interface{}, otherInfo ...string) SuccResponse {
 	}
 }
 
-func NewBadResponse(appcode string, StatusText string, data interface{}) SuccResponse {
+func NewBadResponse(appcode string, data interface{}) SuccResponse {
 	return SuccResponse{
-		AppCode:    appcode,
-		StatusText: StatusText,
-		Data:       data,
+		AppCode: appcode,
+		Data:    data,
 	}
 }
 
