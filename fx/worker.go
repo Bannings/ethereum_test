@@ -7,10 +7,12 @@ import (
 	"encoding/json"
 	"github.com/eddyzhou/log"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"sync"
 )
 
 var (
 	defaultDBConnection *dbConnection
+	once                sync.Once
 )
 
 type dbConnection struct {
@@ -139,11 +141,14 @@ func getCmd() ([]Command, error) {
 }
 
 func DefaultDBConnection() *dbConnection {
-	conf := g.GetConfig()
-	db, err := g.OpenDB(conf.DbConfig)
-	if err != nil {
-		panic(err)
-	}
-	defaultDBConnection := &dbConnection{db: db}
+	once.Do(func() {
+		conf := g.GetConfig()
+		db, err := g.OpenDB(conf.DbConfig)
+		if err != nil {
+			panic(err)
+		}
+		defaultDBConnection = &dbConnection{db: db}
+	})
+
 	return defaultDBConnection
 }
