@@ -24,6 +24,9 @@ type FxClient struct {
 	fxBoxFactory *contract_gen.FuxPayBoxFactory
 	fxSplit      *contract_gen.FuxSplit
 	fxBatch      *contract_gen.FuxBatch
+	erc27Token   *contract_gen.ERC27Token
+	fxLocker     *contract_gen.FuxLocker
+	fxStorage    *contract_gen.FuxStorage
 }
 
 func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
@@ -56,7 +59,21 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
 	}
-
+	erc27Token, err := contract_gen.NewERC27Token(common.HexToAddress(contractAddrs.ERC27Token), cli.EthClient)
+	if err != nil {
+		log.Errorf("Failed to instantiate a erc27Token contract: %v", err)
+		return nil, err
+	}
+	fxLocker, err := contract_gen.NewFuxLocker(common.HexToAddress(contractAddrs.FXLocker), cli.EthClient)
+	if err != nil {
+		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		return nil, err
+	}
+	fxStorage, err := contract_gen.NewFuxStorage(common.HexToAddress(contractAddrs.FXStorage), cli.EthClient)
+	if err != nil {
+		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		return nil, err
+	}
 	c := &FxClient{
 		cli:          cli,
 		auth:         auth,
@@ -64,6 +81,9 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		fxBoxFactory: fxBoxFactory,
 		fxSplit:      fxSplit,
 		fxBatch:      fxBatch,
+		erc27Token:   erc27Token,
+		fxLocker:     fxLocker,
+		fxStorage:    fxStorage,
 	}
 
 	return c, nil
@@ -236,6 +256,42 @@ func (c *FxClient) CallWithFxTokenCaller(ctx context.Context, fn func(*contract_
 	}
 
 	return fn(s)
+}
+
+func (c *FxClient) CallWithERC27TokenCaller(ctx context.Context) *contract_gen.ERC27TokenCallerSession {
+	session := &contract_gen.ERC27TokenCallerSession{
+		Contract: &c.erc27Token.ERC27TokenCaller,
+		CallOpts: bind.CallOpts{
+			Pending: true,
+			From:    c.auth.From,
+			Context: ctx,
+		},
+	}
+	return session
+}
+
+func (c *FxClient) CallWithFXLockerCaller(ctx context.Context) *contract_gen.FuxLockerCallerSession {
+	session := &contract_gen.FuxLockerCallerSession{
+		Contract: &c.fxLocker.FuxLockerCaller,
+		CallOpts: bind.CallOpts{
+			Pending: true,
+			From:    c.auth.From,
+			Context: ctx,
+		},
+	}
+	return session
+}
+
+func (c *FxClient) CallWithFXStorageCaller(ctx context.Context) *contract_gen.FuxStorageCallerSession {
+	session := &contract_gen.FuxStorageCallerSession{
+		Contract: &c.fxStorage.FuxStorageCaller,
+		CallOpts: bind.CallOpts{
+			Pending: true,
+			From:    c.auth.From,
+			Context: ctx,
+		},
+	}
+	return session
 }
 
 func (c *FxClient) Nonce() uint64 {

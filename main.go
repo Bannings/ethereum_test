@@ -129,8 +129,8 @@ func main() {
 	r.Route("/api/fx", func(r chi.Router) {
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
-
 		r.Post("/asset", handler.AssetHandler)
+		r.Get("/query", handler.QueryFXHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
