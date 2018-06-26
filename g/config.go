@@ -39,9 +39,9 @@ type ContractAddrs struct {
 	FxBoxFactoryAddr string `json:"fxBoxFactoryAddr"`
 	FxSplitAddr      string `json:"fxSplitAddr"`
 	FxBatchAddr      string `json:"fxBatchAddr"`
-	ERC27Token       string `json:"erc27TokenAddr"`
-	FXLocker         string `json:"fxLockerAddr"`
-	FXStorage        string `json:"fxStorageAddr"`
+	ERC27TokenAddr   string `json:"erc27TokenAddr"`
+	FXLockerAddr     string `json:"fxLockerAddr"`
+	FXStorageAddr    string `json:"fxStorageAddr"`
 
 	NodeAddr  string `json:"nodeAddr"`
 	StoreAddr string `json:"storeAddr"`

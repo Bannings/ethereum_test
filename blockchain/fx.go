@@ -59,17 +59,17 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
 	}
-	erc27Token, err := contract_gen.NewERC27Token(common.HexToAddress(contractAddrs.ERC27Token), cli.EthClient)
+	erc27Token, err := contract_gen.NewERC27Token(common.HexToAddress(contractAddrs.ERC27TokenAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a erc27Token contract: %v", err)
 		return nil, err
 	}
-	fxLocker, err := contract_gen.NewFuxLocker(common.HexToAddress(contractAddrs.FXLocker), cli.EthClient)
+	fxLocker, err := contract_gen.NewFuxLocker(common.HexToAddress(contractAddrs.FXLockerAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
 	}
-	fxStorage, err := contract_gen.NewFuxStorage(common.HexToAddress(contractAddrs.FXStorage), cli.EthClient)
+	fxStorage, err := contract_gen.NewFuxStorage(common.HexToAddress(contractAddrs.FXStorageAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
