@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	sentryDSN = "http://91f3f829417f4780970565b9916345be:033365bfe6484634b3539b8e0bb22019@sentry.chainedfinance.com/3"
+	sentryDSN = "http://f283fee151d848b8a21074d95a509472:3a35e8635ebb4351847ee7ba557eec39@193.112.186.211/2"
 )
 
 var (
