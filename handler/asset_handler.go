@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"io/ioutil"
 	"math/big"
 	"time"
 )
@@ -30,23 +31,10 @@ func init() {
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
-	var m g.M
 	var trans Transaction
-	if err := render.Bind(r, &m); err != nil {
-		log.Errorf("Unmarshal request failed: %s", err.Error())
-		resp := g.NewBadResponse("400", err.Error())
-		render.JSON(w, r, resp)
-		return
-	}
-
-	tx, err := json.Marshal(m)
-	fmt.Println(string(tx))
-	if err != nil {
-		resp := g.NewBadResponse("400", err.Error())
-		render.JSON(w, r, resp)
-		return
-	}
-	err = json.Unmarshal(tx, &trans)
+	body, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(body))
+	err := json.Unmarshal(body, &trans)
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
 		resp := g.NewBadResponse("400", err.Error())
@@ -77,7 +65,6 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	store := keychain.DefaultStore()
 	exist, err := store.IsTransactionExist(trans.TxId)
-	//exist, err := IsTransactionExist(trans.TxId)
 	if exist {
 		resp := g.NewBadResponse("400", "Transaction id already exist")
 		render.JSON(w, r, resp)
