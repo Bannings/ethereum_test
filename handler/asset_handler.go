@@ -138,7 +138,7 @@ type Transaction struct {
 
 type Token struct {
 	Id         big.Int `json:"id"`
-	ParentId   big.Int `json:parentId`
+	ParentId   big.Int `json:"parentId"`
 	Amount     uint64  `json:"amount"`
 	Owner      string  `json:"owner"` //company ID
 	State      string  `json:"state"`

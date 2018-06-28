@@ -246,7 +246,7 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 	for n, inputToken := range input {
 		var splitToken []Token
 		for _, outputToken := range output {
-			if inputToken.Id.String() == outputToken.ParentId.String() {
+			if inputToken.Id.Uint64() == outputToken.ParentId.Uint64() {
 				splitToken = append(splitToken, outputToken)
 			}
 			if outputToken.Owner != owner && n == 0 {
@@ -371,7 +371,7 @@ func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 	for _, t := range input {
 		var splitToken []Token
 		for _, st := range output {
-			if t.Id.String() == st.ParentId.String() {
+			if t.Id.Uint64() == st.ParentId.Uint64() {
 				splitToken = append(splitToken, st)
 			}
 		}
