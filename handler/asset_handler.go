@@ -14,6 +14,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"io/ioutil"
 	"math/big"
+	"strings"
 	"time"
 )
 
@@ -67,6 +68,13 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	exist, err := store.IsTransactionExist(trans.TxId)
 	if exist {
 		resp := g.NewBadResponse("400", "Transaction id already exist")
+		render.JSON(w, r, resp)
+		return
+	}
+	result, companyId := verifyTransaction(&trans)
+	if !result {
+		errText := "company id" + *companyId + " not exist"
+		resp := g.NewBadResponse("400", errText)
 		render.JSON(w, r, resp)
 		return
 	}
@@ -126,6 +134,25 @@ func saveTransaction(transaction *Transaction) error {
 	_, err = stmt.ExecContext(ctx, transaction.TxId, input, output, transaction.TxType)
 	return err
 
+}
+
+func verifyTransaction(trans *Transaction) (bool, *string) {
+	for _, token := range trans.Input {
+		_, err := keychain.DefaultStore().GetAccount(token.Owner)
+		if err != nil {
+			return false, &token.Owner
+		}
+	}
+	if strings.ToLower(trans.TxType) == "mintfx" {
+		return true, nil
+	}
+	for _, token := range trans.Output {
+		_, err := keychain.DefaultStore().GetAccount(token.Owner)
+		if err != nil {
+			return false, &token.Owner
+		}
+	}
+	return true, nil
 }
 
 type Transaction struct {
