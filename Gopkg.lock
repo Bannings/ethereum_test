@@ -216,12 +216,6 @@
   version = "0.0.5"
 
 [[projects]]
-  branch = "develop"
-  name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
-  packages = ["."]
-  revision = "5d081b7e77a1fda05af289da801c4a13099bf480"
-
-[[projects]]
   branch = "master"
   name = "gitlab.chainedfinance.com/infra/gocommons"
   packages = ["lru"]

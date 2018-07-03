@@ -5,78 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/eddyzhou/log"
+	"github.com/go-chi/render"
+	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"strings"
-
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/sig"
-
-	"github.com/eddyzhou/log"
-	"github.com/go-chi/render"
 )
-
-func Auth() func(http.Handler) http.Handler {
-	a := &author{
-		client: blockchain.DefaultClient(),
-	}
-	fn := func(h http.Handler) http.Handler {
-		a.h = h
-		return a
-	}
-	return fn
-}
-
-type author struct {
-	h      http.Handler
-	client blockchain.StoreClient
-}
-
-func (a *author) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	signature := r.Header.Get("sig")
-	node := r.Header.Get("nodeName")
-	if signature == "" {
-		log.Error("Auth: no sig Header")
-		render.Render(w, r, g.ErrBadRequest(errors.New("no sig Header")))
-		return
-	}
-	if node == "" {
-		log.Error("Auth: no nodeName Header")
-		render.Render(w, r, g.ErrBadRequest(errors.New("no nodeName Header")))
-		return
-	}
-
-	baseStr, err := baseString(r)
-	log.Debugf("baseString: %s", baseStr)
-	if err != nil {
-		log.Errorf("Auth: bad request. %s", err.Error())
-		render.Render(w, r, g.ErrBadRequest(err))
-		return
-	}
-
-	pubPEM, err := sig.GetKey(a.client, node)
-	if err != nil {
-		log.Errorf("Auth: node err: %s", node)
-		render.Render(w, r, g.ErrInvalidNode)
-		return
-	}
-
-	var errSig error
-	if errSig = sig.VerifySHA256RSA(pubPEM, []byte(baseStr), signature); errSig != nil {
-		if pubPEM, errSig = sig.FetchKey(a.client, node); errSig == nil {
-			errSig = sig.VerifySHA256RSA(pubPEM, []byte(baseStr), signature)
-		}
-	}
-	if errSig != nil {
-		log.Errorf("Auth: verify sig failed. %s", errSig.Error())
-		render.Render(w, r, g.ErrVerifySignature)
-		return
-	}
-
-	a.h.ServeHTTP(w, r)
-}
 
 func baseString(r *http.Request) (string, error) {
 	switch r.Method {
