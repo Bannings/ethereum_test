@@ -16,6 +16,10 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+const (
+	gasLimit uint64 = 4712357
+)
+
 type FxClient struct {
 	cli  *keychain.AccountClient
 	auth *bind.TransactOpts

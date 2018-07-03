@@ -23,10 +23,6 @@
   version = "0.8.0"
 
 [[constraint]]
-  branch = "develop"
-  name = "gitlab.chainedfinance.com/chaincore/dr-contracts"
-
-[[constraint]]
   name = "gitlab.chainedfinance.com/chaincore/contract-gen"
   version = "0.0.5"
 
