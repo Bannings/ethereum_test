@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
@@ -54,7 +55,8 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 	defer cancel()
 	existed, err := adminClient.CallWithFXStorageCaller(ctx).Existed(fxID)
 	if !existed {
-		return nil, errors.New("fxID is not existed")
+		errTxt := fmt.Sprintf("FX:%s is not exist", fxID.Uint64())
+		return nil, errors.New(errTxt)
 	}
 
 	owner, err := adminClient.CallWithERC27TokenCaller(ctx).OwnerOf(fxID)

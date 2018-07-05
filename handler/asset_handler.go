@@ -10,6 +10,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"io/ioutil"
@@ -71,10 +72,9 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	result, companyId := verifyTransaction(&trans)
-	if !result {
-		errText := "company id" + *companyId + " not exist"
-		resp := g.NewBadResponse("400", errText)
+	err = verifyTransaction(&trans)
+	if err != nil {
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
@@ -136,23 +136,49 @@ func saveTransaction(transaction *Transaction) error {
 
 }
 
-func verifyTransaction(trans *Transaction) (bool, *string) {
-	for _, token := range trans.Input {
-		_, err := keychain.DefaultStore().GetAccount(token.Owner)
-		if err != nil {
-			return false, &token.Owner
-		}
-	}
+func verifyTransaction(trans *Transaction) error {
+
 	if strings.ToLower(trans.TxType) == "mintfx" {
-		return true, nil
-	}
-	for _, token := range trans.Output {
-		_, err := keychain.DefaultStore().GetAccount(token.Owner)
-		if err != nil {
-			return false, &token.Owner
+		for _, input := range trans.Input {
+			_, err := keychain.DefaultStore().GetAccount(input.Owner)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	} else {
+		for _, input := range trans.Input {
+			_, err := keychain.DefaultStore().GetAccount(input.Owner)
+			if err != nil {
+				return err
+			}
+			token, err := querFXDetail(&input.Id)
+			if err != nil {
+				errTxt := fmt.Sprintf("FX:%v haven't been stored to blockchain or does't exist", input.Id.Uint64())
+				return errors.New(errTxt)
+			}
+			if token.State == fx.Frozen {
+				errTxt := fmt.Sprintf("FX:%v is frozen", input.Id.Uint64())
+				return errors.New(errTxt)
+			}
+			if token.Owner != input.Owner {
+				errTxt := fmt.Sprintf("The owner of fx:%v is not %v", input.Id.Uint64(), input.Owner)
+				return errors.New(errTxt)
+			}
+			if token.Amount != input.Amount {
+				errTxt := fmt.Sprintf("The amount of fx:%v is wrong", input.Id.Uint64())
+				return errors.New(errTxt)
+			}
+		}
+		for _, token := range trans.Output {
+			_, err := keychain.DefaultStore().GetAccount(token.Owner)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return true, nil
+
+	return nil
 }
 
 type Transaction struct {

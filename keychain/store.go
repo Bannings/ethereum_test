@@ -12,6 +12,7 @@ import (
 
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 
+	"fmt"
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -161,8 +162,8 @@ func (s *Store) GetAccount(companyID string) (Account, error) {
 		rows.Scan(&address, &key, &passphrase)
 		return Account{Address: common.HexToAddress(address), Key: key, Passphrase: passphrase}, nil
 	}
-
-	return Account{}, errors.New("account not exist")
+	errTxt := fmt.Sprintf("account:%s not exist", companyID)
+	return Account{}, errors.New(errTxt)
 }
 
 func (s *Store) IsAccountExist(companyID string) (bool, error) {
