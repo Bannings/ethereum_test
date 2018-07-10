@@ -3,22 +3,18 @@ package fx
 import (
 	"database/sql"
 	"fmt"
-	"math/big"
-	"testing"
-	"time"
-
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"math/big"
+	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
 	passphrase = "123456"
-
-	frozenRate = 0.2
-	feeRate    = 0.001
 )
 
 var (
@@ -29,6 +25,7 @@ var (
 	keystore    *keychain.Store
 	clientCache *ClientCache
 	adminClient *blockchain.FxClient
+	txid        uint64
 )
 
 func init() {
@@ -40,6 +37,7 @@ func init() {
 	privKey, _ := crypto.HexToECDSA(cfKey)
 	address := crypto.PubkeyToAddress(privKey.PublicKey)
 	cfAccount := keychain.Account{Address: address, Key: cfKey}
+	txid = generateTxId()
 
 	dbConfig := conf.DbConfig
 	var err error
@@ -62,125 +60,72 @@ func init() {
 	}
 }
 
-func TestFX(t *testing.T) {
-	defer keystore.Close()
+func TestMintFX(t *testing.T) {
+	//_, err := settleIn(keystore, "supplier001")
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//_, err = settleIn(keystore, "supplier002")
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
 
-	_, err := settleIn(keystore, "supplier001")
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = settleIn(keystore, "supplier002")
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	tokenId := generateTokenId()
+	inToken := Token{*big.NewInt(tokenId - 1), *big.NewInt(0), 14, "supplier001", "Normal", expireTime}
+	token1 := Token{*big.NewInt(tokenId), *big.NewInt(tokenId - 1), 10, "supplier001", "Normal", expireTime}
+	token2 := Token{*big.NewInt(tokenId + 1), *big.NewInt(tokenId - 1), 4, "supplier001", "Frozen", expireTime}
+	tx := Transaction{Input: []Token{inToken}, Output: []Token{token1, token2}, TxType: "MintFX", TxId: "", Id: 88}
 	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
 	if err != nil {
 		t.Fatal(err)
 	}
+	cmd := Command{Tx: tx, txHashes: make(map[string]string)}
 
-	tokenId1 := generateTokenId()
-	err = mintFX(executor, tokenId1, 100000)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tokenId2, tokenId3, err := splitFX4Pay(executor, tokenId1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	tokenId4, _, err := splitFX4Fee(executor, tokenId3)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	txId := time.Now().UnixNano()
-	input := [2]big.Int{*tokenId2, *tokenId4}
-	err = pay(executor, input, uint64(txId))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = confirm(executor, *tokenId2, uint64(txId))
+	err = executor.Execute(cmd)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func confirm(executor *EthExecutor, inputId big.Int, txId uint64) error {
-	token1 := Token{inputId, 50000, "cf", Normal, expireTime}
-	token2 := Token{inputId, 50000, "supplier002", Normal, expireTime}
-	input := []Token{token1}
-	output := []Token{token2}
-	t := Transaction{Input: input, Output: output, TxId: txId, TxType: Confirm}
-	cmd := Command{Tx: t, txHashes: make(map[string]string)}
-	return executor.Execute(cmd)
-}
+func TestTransferFX(t *testing.T) {
+	tokenId := generateTokenId()
+	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
+	inToken1 := Token{*big.NewInt(tokenId), *big.NewInt(0), 140000, "supplier001", "Normal", expireTime}
+	inToken2 := Token{*big.NewInt(tokenId + 1), *big.NewInt(0), 140000, "supplier001", "Normal", expireTime}
+	token1 := Token{*big.NewInt(tokenId + 2), *big.NewInt(tokenId), 100000, "supplier001", "Normal", expireTime}
+	token2 := Token{*big.NewInt(tokenId + 3), *big.NewInt(tokenId), 40000, "supplier001", "Frozen", expireTime}
+	token3 := Token{*big.NewInt(tokenId + 4), *big.NewInt(tokenId + 1), 100000, "supplier001", "Normal", expireTime}
+	token4 := Token{*big.NewInt(tokenId + 5), *big.NewInt(tokenId + 1), 40000, "supplier001", "Frozen", expireTime}
+	tx1 := Transaction{Input: []Token{inToken1, inToken2}, Output: []Token{token1, token2, token3, token4}, TxType: "MintFX", TxId: "jgff", Id: 88}
 
-func pay(executor *EthExecutor, inputIds [2]big.Int, txId uint64) error {
-	token1 := Token{inputIds[0], 50000, "supplier001", Normal, expireTime}
-	token2 := Token{inputIds[1], 50, "supplier001", Normal, expireTime}
-	input := []Token{token1, token2}
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	token3 := Token{inputIds[0], 50000, "cf", Normal, expireTime}
-	token4 := Token{inputIds[1], 50, "cf", Normal, expireTime}
-	output := []Token{token3, token4}
+	cmd := Command{Tx: tx1, txHashes: make(map[string]string)}
 
-	t := Transaction{Input: input, Output: output, TxId: txId, TxType: Payment}
-	cmd := Command{Tx: t, txHashes: make(map[string]string)}
-	return executor.Execute(cmd)
+	err = executor.Execute(cmd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	token5 := Token{*big.NewInt(tokenId + 6), *big.NewInt(tokenId + 2), 100000, "supplier002", "Normal", expireTime}
+	token6 := Token{*big.NewInt(tokenId + 7), *big.NewInt(tokenId + 4), 80000, "supplier002", "Normal", expireTime}
+	token7 := Token{*big.NewInt(tokenId + 8), *big.NewInt(tokenId + 4), 20000, "supplier001", "Normal", expireTime}
+	tx2 := Transaction{Input: []Token{token1, token3}, Output: []Token{token5, token6, token7}, TxType: "Payment", TxId: "hkh", Id: 858}
+	cmd = Command{Tx: tx2, txHashes: make(map[string]string)}
+	err = executor.Execute(cmd)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func generateTokenId() int64 {
-	return time.Now().UnixNano() / 1000000
+	return time.Now().UnixNano()
 }
 
-func splitFX4Pay(executor *EthExecutor, inTokenID int64) (*big.Int, *big.Int, error) {
-	inToken := Token{*big.NewInt(inTokenID), 100000 - uint64(100000*frozenRate), "supplier001", Normal, expireTime}
-
-	tokenId1 := big.NewInt(generateTokenId())
-	tokenId2 := big.NewInt(generateTokenId())
-	outToken1 := Token{*tokenId1, 50000, "supplier001", Normal, expireTime}
-	outToken2 := Token{*tokenId2, 30000, "supplier001", Normal, expireTime}
-
-	input := []Token{inToken}
-	output := []Token{outToken1, outToken2}
-	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
-	cmd := Command{Tx: t, txHashes: make(map[string]string)}
-
-	err := executor.Execute(cmd)
-	return tokenId1, tokenId2, err
-}
-
-func splitFX4Fee(executor *EthExecutor, inTokenID *big.Int) (*big.Int, *big.Int, error) {
-	fee := uint64(50000 * feeRate)
-	inToken := Token{*inTokenID, 30000, "supplier001", Normal, expireTime}
-
-	tokenId1 := big.NewInt(generateTokenId())
-	tokenId2 := big.NewInt(generateTokenId())
-	outToken1 := Token{*tokenId1, 30000 - fee, "supplier001", Normal, expireTime}
-	outToken2 := Token{*tokenId2, fee, "supplier001", Normal, expireTime}
-
-	input := []Token{inToken}
-	output := []Token{outToken1, outToken2}
-	t := Transaction{Input: input, Output: output, TxId: 0, TxType: SplitFX}
-	cmd := Command{Tx: t, txHashes: make(map[string]string)}
-
-	err := executor.Execute(cmd)
-	return tokenId1, tokenId2, err
-}
-
-func mintFX(executor *EthExecutor, tokenId int64, amount uint64) error {
-	frozenAmount := uint64(float64(amount) * frozenRate)
-	activeAmount := amount - frozenAmount
-
-	token1 := Token{*big.NewInt(tokenId), activeAmount, "supplier001", Normal, expireTime}
-	token2 := Token{*big.NewInt(tokenId + 1), frozenAmount, "supplier001", Normal, expireTime}
-	tokens := [2]Token{token1, token2}
-
-	t := Transaction{Output: tokens[:], TxType: MintFX}
-	cmd := Command{Tx: t, txHashes: make(map[string]string)}
-	return executor.Execute(cmd)
+func generateTxId() uint64 {
+	return uint64(time.Now().Unix())
 }
 
 func settleIn(store *keychain.Store, supplierId string) (keychain.Account, error) {
@@ -197,3 +142,5 @@ func settleIn(store *keychain.Store, supplierId string) (keychain.Account, error
 
 	return acc, nil
 }
+
+//eth.getTransactionReceipt("")

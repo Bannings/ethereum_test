@@ -111,8 +111,11 @@ func (e *EthExecutor) handleError(err error, cmd Command, processor *CmdProcesso
 
 func (e *EthExecutor) Execute(cmd Command) error {
 	log.Infof("execute command: %+v", cmd)
-
-	switch cmd.Tx.TxType {
+	txType, err := ParseType(cmd.Tx.TxType)
+	if err != nil {
+		return err
+	}
+	switch txType {
 	case SplitFX, Discount, Payment:
 		return e.executeBySupplier(cmd)
 	case MintFX, Confirm:
@@ -164,8 +167,11 @@ func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 }
 
 func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
-	var err error
-	switch cmd.Tx.TxType {
+	txType, err := ParseType(cmd.Tx.TxType)
+	if err != nil {
+		return err
+	}
+	switch txType {
 	case SplitFX:
 		err = e.splitFX(p)
 	case Discount:
@@ -208,7 +214,11 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 		newTokenIds[i] = &id
 
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
-		states[i] = new(big.Int).SetInt64(int64(t.State))
+		state, err := ParseState(t.State)
+		if err != nil {
+			return err
+		}
+		states[i] = new(big.Int).SetInt64(int64(state))
 	}
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
@@ -396,7 +406,11 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 		newTokenIds[i] = &id
 
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
-		states[i] = new(big.Int).SetInt64(int64(t.State))
+		state, err := ParseState(t.State)
+		if err != nil {
+			return err
+		}
+		states[i] = new(big.Int).SetInt64(int64(state))
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction

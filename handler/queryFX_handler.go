@@ -25,15 +25,15 @@ func QueryFXHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fxId := m["fxId"].(string)
+	fxId := m["tokenId"].(string)
 	if fxId == "" {
-		resp := g.NewBadResponse("400", "no fxid found")
+		resp := g.NewBadResponse("400", "no tokenId found")
 		render.JSON(w, r, resp)
 		return
 	}
 	id, err := strconv.ParseInt(fxId, 10, 64)
 	if err != nil {
-		resp := g.NewBadResponse("400", "invalid fxID")
+		resp := g.NewBadResponse("400", "invalid tokenId")
 		render.JSON(w, r, resp)
 		return
 	}
@@ -65,7 +65,7 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	amount, err := adminClient.CallWithFXStorageCaller(ctx).GetValue(fxID, false)
+	properties, err := adminClient.CallWithFXStorageCaller(ctx).GetProperties(fxID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -73,14 +73,11 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	state, err := fx.ParseState(fxState[stateID.Uint64()])
-	if err != nil {
-		return nil, err
-	}
+	state := fxState[stateID.Uint64()]
 	expire, err := adminClient.CallWithFXLockerCaller(ctx).GetExpire(fxID)
 	if err != nil {
 		return nil, err
 	}
-	token := &fx.Token{Id: *fxID, Amount: amount.Uint64(), State: state, Owner: company, ExpireTime: expire.Int64()}
+	token := &fx.Token{Id: *fxID, Amount: properties.Value.Uint64(), ParentId: *properties.CreateBy, State: state, Owner: company, ExpireTime: expire.Int64()}
 	return token, nil
 }

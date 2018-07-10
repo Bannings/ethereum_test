@@ -35,7 +35,6 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 
 	store := keychain.DefaultStore()
 	account, err := store.GetAccount(companyId)
-	//account, err := GetAccount(companyId)
 	if err != nil && err.Error() != "account not exist" {
 		render.Render(w, r, g.ErrRender(err))
 		return
@@ -47,14 +46,12 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 
 	passphrase := companyId + salt
 	acc, err := store.CreateAccount(passphrase)
-	//acc, err := CreateAccount(passphrase)
 	if err != nil {
 		log.Errorf("Create account failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}
 	err = store.StoreAccount(companyId, acc)
-	//err = StoreAccount(companyId, acc)
 	if err != nil {
 		log.Errorf("Store account failed: %s", err.Error())
 		render.Render(w, r, g.ErrRender(err))

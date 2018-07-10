@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"net/http"
 
 	"context"
@@ -12,10 +13,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"io/ioutil"
-	"math/big"
-	"strings"
 	"time"
 )
 
@@ -33,7 +31,7 @@ func init() {
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
-	var trans Transaction
+	var trans fx.Transaction
 	body, _ := ioutil.ReadAll(r.Body)
 	fmt.Println(string(body))
 	err := json.Unmarshal(body, &trans)
@@ -93,7 +91,9 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 
 func DistributeTask(transaction *fx.Transaction) {
 	var company string
-	if transaction.TxType == fx.MintFX {
+	txType, _ := fx.ParseType(transaction.TxType)
+
+	if txType == fx.MintFX {
 		company = "cf"
 	} else {
 		company = transaction.Input[0].Owner
@@ -113,7 +113,7 @@ func DistributeTask(transaction *fx.Transaction) {
 	}
 }
 
-func saveTransaction(transaction *Transaction) error {
+func saveTransaction(transaction *fx.Transaction) error {
 	input, err := json.Marshal(&transaction.Input)
 	if err != nil {
 		return err
@@ -136,9 +136,12 @@ func saveTransaction(transaction *Transaction) error {
 
 }
 
-func verifyTransaction(trans *Transaction) error {
-
-	if strings.ToLower(trans.TxType) == "mintfx" {
+func verifyTransaction(trans *fx.Transaction) error {
+	txType, err := fx.ParseType(trans.TxType)
+	if err != nil {
+		return err
+	}
+	if txType == fx.MintFX {
 		for _, input := range trans.Input {
 			_, err := keychain.DefaultStore().GetAccount(input.Owner)
 			if err != nil {
@@ -154,19 +157,23 @@ func verifyTransaction(trans *Transaction) error {
 			}
 			token, err := querFXDetail(&input.Id)
 			if err != nil {
-				errTxt := fmt.Sprintf("FX:%v haven't been stored to blockchain or does't exist", input.Id.Uint64())
+				errTxt := fmt.Sprintf("Token:%v haven't been stored to blockchain or does't exist", input.Id.Uint64())
 				return errors.New(errTxt)
 			}
-			if token.State == fx.Frozen {
-				errTxt := fmt.Sprintf("FX:%v is frozen", input.Id.Uint64())
+			state, err := fx.ParseState(token.State)
+			if err != nil {
+				return err
+			}
+			if state == fx.Frozen {
+				errTxt := fmt.Sprintf("Token:%v is frozen", input.Id.Uint64())
 				return errors.New(errTxt)
 			}
 			if token.Owner != input.Owner {
-				errTxt := fmt.Sprintf("The owner of fx:%v is not %v", input.Id.Uint64(), input.Owner)
+				errTxt := fmt.Sprintf("The owner of token:%v is not %v", input.Id.Uint64(), input.Owner)
 				return errors.New(errTxt)
 			}
 			if token.Amount != input.Amount {
-				errTxt := fmt.Sprintf("The amount of fx:%v is wrong", input.Id.Uint64())
+				errTxt := fmt.Sprintf("The amount of token:%v is wrong", input.Id.Uint64())
 				return errors.New(errTxt)
 			}
 		}
@@ -179,21 +186,4 @@ func verifyTransaction(trans *Transaction) error {
 	}
 
 	return nil
-}
-
-type Transaction struct {
-	Id     uint    `json:"id"`
-	Input  []Token `json:"input"`
-	Output []Token `json:"output"`
-	TxId   string  `json:"tx_id"`
-	TxType string  `json:"tx_type"`
-}
-
-type Token struct {
-	Id         big.Int `json:"id"`
-	ParentId   big.Int `json:"parentId"`
-	Amount     uint64  `json:"amount"`
-	Owner      string  `json:"owner"` //company ID
-	State      string  `json:"state"`
-	ExpireTime int64   `json:"expire_time"`
 }

@@ -80,7 +80,7 @@ type Token struct {
 	ParentId   big.Int `json:parentId`
 	Amount     uint64  `json:"amount"`
 	Owner      string  `json:"owner"` //company ID
-	State      State   `json:"state"`
+	State      string  `json:"state"`
 	ExpireTime int64   `json:"expire_time"`
 }
 
@@ -89,7 +89,7 @@ type Transaction struct {
 	Input  []Token `json:"input"`
 	Output []Token `json:"output"`
 	TxId   string  `json:"tx_id"`
-	TxType TxType  `json:"tx_type"`
+	TxType string  `json:"tx_type"`
 }
 
 func (t *Transaction) Sponsor() string {
