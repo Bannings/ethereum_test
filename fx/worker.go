@@ -86,8 +86,8 @@ func sectionalizeCmd(cmds []Command) map[string][]Command {
 	supplierMap := make(map[string][]Command)
 
 	for _, cmd := range cmds {
-
-		if cmd.Tx.TxType == MintFX {
+		txtype, _ := ParseType(cmd.Tx.TxType)
+		if txtype == MintFX {
 			if _, ok := supplierMap["cf"]; ok {
 				temp := supplierMap["cf"]
 				temp = append(temp, cmd)
@@ -128,8 +128,7 @@ func getCmd() ([]Command, error) {
 		rows.Scan(&id, &inputStr, &outputStr, &state, &process_state)
 		json.Unmarshal([]byte(inputStr), &input)
 		json.Unmarshal([]byte(outputStr), &output)
-		txType, _ := ParseType(state)
-		tx := &Transaction{Id: id, Input: input, Output: output, TxType: txType}
+		tx := &Transaction{Id: id, Input: input, Output: output, TxType: state}
 		cmd := &Command{Tx: *tx, txHashes: make(map[string]string)}
 		cmds = append(cmds, *cmd)
 	}

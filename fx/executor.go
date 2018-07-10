@@ -111,8 +111,11 @@ func (e *EthExecutor) handleError(err error, cmd Command, processor *CmdProcesso
 
 func (e *EthExecutor) Execute(cmd Command) error {
 	log.Infof("execute command: %+v", cmd)
-
-	switch cmd.Tx.TxType {
+	txType, err := ParseType(cmd.Tx.TxType)
+	if err != nil {
+		return err
+	}
+	switch txType {
 	case SplitFX, Discount, Payment:
 		return e.executeBySupplier(cmd)
 	case MintFX, Confirm:
@@ -164,8 +167,11 @@ func (e *EthExecutor) process(cmd Command, p *CmdProcessor) error {
 }
 
 func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
-	var err error
-	switch cmd.Tx.TxType {
+	txType, err := ParseType(cmd.Tx.TxType)
+	if err != nil {
+		return err
+	}
+	switch txType {
 	case SplitFX:
 		err = e.splitFX(p)
 	case Discount:
@@ -208,7 +214,11 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 		newTokenIds[i] = &id
 
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
-		states[i] = new(big.Int).SetInt64(int64(t.State))
+		state, err := ParseState(t.State)
+		if err != nil {
+			return err
+		}
+		states[i] = new(big.Int).SetInt64(int64(state))
 	}
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
@@ -254,7 +264,11 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 			}
 		}
 		if len(splitToken) == 1 {
-			splitToken = append(splitToken, Token{Amount: 0, Id: *big.NewInt(0)})
+			splitToken = append(splitToken, Token{Amount: 0, Id: *big.NewInt(0), State: "Normal"})
+		}
+		if len(splitToken) == 0 {
+			log.Errorf("Invalid transation:%v ,can't find parentId for output", p.cmd.Tx.TxId)
+			return fmt.Errorf("Invalid transation:%v ,can't find parentId for output", p.cmd.Tx.TxId)
 		}
 		err := e.split(inputToken, splitToken, p)
 		if err != nil {
@@ -262,7 +276,6 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 			return err
 		}
 	}
-
 	err := e.batchTransfer(input[0], transferToken, p)
 	if err != nil {
 		log.Errorf("transfer fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
@@ -316,8 +329,6 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 }
 
 func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor) error {
-	//fromAccount := p.cmd.Tx.Input[0].Owner
-	//toAccount := p.cmd.Tx.Output[0].Owner
 	fromAccount := input.Owner
 	toAccount := output[0].Owner
 	toAcc, err := e.keystore.GetAccount(toAccount)
@@ -354,7 +365,7 @@ func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
 		return ErrTxExecuteFailed
 	}
-	log.Infof("transfer success :%v ,receipt info:%v", tx, receipt.TxHash)
+	log.Infof("transfer success,input: %v,output:%v", input, output)
 
 	return nil
 }
@@ -377,7 +388,7 @@ func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 		}
 		err = e.split(t, splitToken, p)
 		if err != nil {
-
+			return err
 		}
 	}
 
@@ -396,7 +407,11 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 		newTokenIds[i] = &id
 
 		amounts[i] = new(big.Int).SetUint64(t.Amount)
-		states[i] = new(big.Int).SetInt64(int64(t.State))
+		state, err := ParseState(t.State)
+		if err != nil {
+			return err
+		}
+		states[i] = new(big.Int).SetInt64(int64(state))
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction

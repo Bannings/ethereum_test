@@ -5,16 +5,14 @@ import (
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"net/http"
 
 	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 	"io/ioutil"
-	"math/big"
-	"strings"
 	"time"
 )
 
@@ -32,7 +30,7 @@ func init() {
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
-	var trans Transaction
+	var trans fx.Transaction
 	body, _ := ioutil.ReadAll(r.Body)
 	fmt.Println(string(body))
 	err := json.Unmarshal(body, &trans)
@@ -71,10 +69,9 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	result, companyId := verifyTransaction(&trans)
-	if !result {
-		errText := "company id" + *companyId + " not exist"
-		resp := g.NewBadResponse("400", errText)
+	err = verifyTransaction(&trans)
+	if err != nil {
+		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
@@ -93,7 +90,9 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 
 func DistributeTask(transaction *fx.Transaction) {
 	var company string
-	if transaction.TxType == fx.MintFX {
+	txType, _ := fx.ParseType(transaction.TxType)
+
+	if txType == fx.MintFX {
 		company = "cf"
 	} else {
 		company = transaction.Input[0].Owner
@@ -113,7 +112,7 @@ func DistributeTask(transaction *fx.Transaction) {
 	}
 }
 
-func saveTransaction(transaction *Transaction) error {
+func saveTransaction(transaction *fx.Transaction) error {
 	input, err := json.Marshal(&transaction.Input)
 	if err != nil {
 		return err
@@ -136,38 +135,63 @@ func saveTransaction(transaction *Transaction) error {
 
 }
 
-func verifyTransaction(trans *Transaction) (bool, *string) {
-	for _, token := range trans.Input {
-		_, err := keychain.DefaultStore().GetAccount(token.Owner)
-		if err != nil {
-			return false, &token.Owner
+func verifyTransaction(trans *fx.Transaction) error {
+	txType, err := fx.ParseType(trans.TxType)
+	if err != nil {
+		return err
+	}
+	if txType == fx.MintFX {
+		if len(trans.Output) == 0 {
+			return fmt.Errorf("Invalid transaction:%v, output not found")
+		}
+		for _, input := range trans.Input {
+			_, err := keychain.DefaultStore().GetAccount(input.Owner)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	} else {
+		for _, inputToken := range trans.Input {
+			_, err := keychain.DefaultStore().GetAccount(inputToken.Owner)
+			if err != nil {
+				return err
+			}
+			token, err := querFXDetail(&inputToken.Id)
+			if err != nil {
+				return fmt.Errorf("Token:%v haven't been stored to blockchain or does't exist", inputToken.Id.Uint64())
+			}
+			state, err := fx.ParseState(token.State)
+			if err != nil {
+				return err
+			}
+			if state == fx.Frozen {
+				return fmt.Errorf("Token:%v is frozen", inputToken.Id.Uint64())
+			}
+			if token.Owner != inputToken.Owner {
+				return fmt.Errorf("The owner of token:%v is not %v", inputToken.Id.Uint64(), inputToken.Owner)
+			}
+			if token.Amount != inputToken.Amount {
+				return fmt.Errorf("The amount of token:%v is wrong", inputToken.Id.Uint64())
+			}
+		}
+
+		for _, outputToken := range trans.Output {
+			_, err := keychain.DefaultStore().GetAccount(outputToken.Owner)
+			if err != nil {
+				return err
+			}
+			count := 0
+			for _, inputToken := range trans.Input {
+				if inputToken.Id.Uint64() == outputToken.ParentId.Uint64() {
+					count++
+				}
+			}
+			if count == 0 {
+				return fmt.Errorf("Invalid transation output:%v ,can't find parentId for output", outputToken)
+			}
 		}
 	}
-	if strings.ToLower(trans.TxType) == "mintfx" {
-		return true, nil
-	}
-	for _, token := range trans.Output {
-		_, err := keychain.DefaultStore().GetAccount(token.Owner)
-		if err != nil {
-			return false, &token.Owner
-		}
-	}
-	return true, nil
-}
 
-type Transaction struct {
-	Id     uint    `json:"id"`
-	Input  []Token `json:"input"`
-	Output []Token `json:"output"`
-	TxId   string  `json:"tx_id"`
-	TxType string  `json:"tx_type"`
-}
-
-type Token struct {
-	Id         big.Int `json:"id"`
-	ParentId   big.Int `json:"parentId"`
-	Amount     uint64  `json:"amount"`
-	Owner      string  `json:"owner"` //company ID
-	State      string  `json:"state"`
-	ExpireTime int64   `json:"expire_time"`
+	return nil
 }
