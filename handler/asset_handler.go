@@ -11,7 +11,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -150,37 +149,43 @@ func verifyTransaction(trans *fx.Transaction) error {
 		}
 		return nil
 	} else {
-		for _, input := range trans.Input {
-			_, err := keychain.DefaultStore().GetAccount(input.Owner)
+		for _, inputToken := range trans.Input {
+			_, err := keychain.DefaultStore().GetAccount(inputToken.Owner)
 			if err != nil {
 				return err
 			}
-			token, err := querFXDetail(&input.Id)
+			token, err := querFXDetail(&inputToken.Id)
 			if err != nil {
-				errTxt := fmt.Sprintf("Token:%v haven't been stored to blockchain or does't exist", input.Id.Uint64())
-				return errors.New(errTxt)
+				return fmt.Errorf("Token:%v haven't been stored to blockchain or does't exist", inputToken.Id.Uint64())
 			}
 			state, err := fx.ParseState(token.State)
 			if err != nil {
 				return err
 			}
 			if state == fx.Frozen {
-				errTxt := fmt.Sprintf("Token:%v is frozen", input.Id.Uint64())
-				return errors.New(errTxt)
+				return fmt.Errorf("Token:%v is frozen", inputToken.Id.Uint64())
 			}
-			if token.Owner != input.Owner {
-				errTxt := fmt.Sprintf("The owner of token:%v is not %v", input.Id.Uint64(), input.Owner)
-				return errors.New(errTxt)
+			if token.Owner != inputToken.Owner {
+				return fmt.Errorf("The owner of token:%v is not %v", inputToken.Id.Uint64(), inputToken.Owner)
 			}
-			if token.Amount != input.Amount {
-				errTxt := fmt.Sprintf("The amount of token:%v is wrong", input.Id.Uint64())
-				return errors.New(errTxt)
+			if token.Amount != inputToken.Amount {
+				return fmt.Errorf("The amount of token:%v is wrong", inputToken.Id.Uint64())
 			}
 		}
-		for _, token := range trans.Output {
-			_, err := keychain.DefaultStore().GetAccount(token.Owner)
+
+		for _, outputToken := range trans.Output {
+			_, err := keychain.DefaultStore().GetAccount(outputToken.Owner)
 			if err != nil {
 				return err
+			}
+			count := 0
+			for _, inputToken := range trans.Input {
+				if inputToken.Id.Uint64() == outputToken.ParentId.Uint64() {
+					count++
+				}
+			}
+			if count == 0 {
+				return fmt.Errorf("Invalid transation output:%v ,can't find parentId for output", outputToken)
 			}
 		}
 	}
