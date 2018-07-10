@@ -455,7 +455,7 @@ type FuxBatchMigrated struct {
 
 // FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxBatch *FuxBatchFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxBatchMigratedIterator, error) {
 
 	logs, sub, err := _FuxBatch.contract.FilterLogs(opts, "Migrated")
@@ -467,7 +467,7 @@ func (_FuxBatch *FuxBatchFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxBa
 
 // WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxBatch *FuxBatchFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxBatchMigrated) (event.Subscription, error) {
 
 	logs, sub, err := _FuxBatch.contract.WatchLogs(opts, "Migrated")

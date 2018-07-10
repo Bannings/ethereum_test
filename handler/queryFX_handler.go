@@ -59,7 +59,7 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 		return nil, errors.New(errTxt)
 	}
 
-	owner, err := adminClient.CallWithERC27TokenCaller(ctx).OwnerOf(fxID)
+	owner, err := adminClient.CallWithERC721TokenCaller(ctx).OwnerOf(fxID)
 	var company string
 	err = fx.DefaultDBConnection().QueryRow("SELECT firm_id FROM accounts WHERE address = ?", owner.String()).Scan(&company)
 	if err != nil {

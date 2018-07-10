@@ -16,7 +16,7 @@ import (
 )
 
 // FuxLockerABI is the input ABI used to generate the binding from.
-const FuxLockerABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_EXPIRE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_STATE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_EXISTED\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"lockList\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"deltaT\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_deltaT\",\"type\":\"uint256\"}],\"name\":\"DeltaTimeSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_lock\",\"type\":\"bool\"}],\"name\":\"LockStateSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"}],\"name\":\"StateSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"ExpireSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_lock\",\"type\":\"bool\"}],\"name\":\"setLockState\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"}],\"name\":\"setState\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"getState\",\"outputs\":[{\"name\":\"state\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"setExpire\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"getExpire\",\"outputs\":[{\"name\":\"expire\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"isLock\",\"outputs\":[{\"name\":\"ret\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_deltaT\",\"type\":\"uint256\"}],\"name\":\"setDeltaT\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const FuxLockerABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"IDX_FUNC_LOCK_MAX\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_EXPIRE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_STATE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_EXISTED\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_FUNC_LOCK_MIN\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"lockList\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"deltaT\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_deltaT\",\"type\":\"uint256\"}],\"name\":\"DeltaTimeSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_lock\",\"type\":\"bool\"}],\"name\":\"LockStateSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"}],\"name\":\"StateSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"ExpireSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_funcId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_lock\",\"type\":\"uint256\"}],\"name\":\"FunctionLockSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_lock\",\"type\":\"bool\"}],\"name\":\"setLockState\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"}],\"name\":\"setState\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"getState\",\"outputs\":[{\"name\":\"state\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"setExpire\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"getExpire\",\"outputs\":[{\"name\":\"expire\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_funcId\",\"type\":\"uint256\"},{\"name\":\"_lock\",\"type\":\"uint256\"}],\"name\":\"setFunctionLock\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_funcId\",\"type\":\"uint256\"}],\"name\":\"getFunctionLock\",\"outputs\":[{\"name\":\"lock\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"isLock\",\"outputs\":[{\"name\":\"ret\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_deltaT\",\"type\":\"uint256\"}],\"name\":\"setDeltaT\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxLocker is an auto generated Go binding around an Ethereum contract.
 type FuxLocker struct {
@@ -212,6 +212,58 @@ func (_FuxLocker *FuxLockerCallerSession) IDXEXPIRE() (*big.Int, error) {
 	return _FuxLocker.Contract.IDXEXPIRE(&_FuxLocker.CallOpts)
 }
 
+// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+//
+// Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
+func (_FuxLocker *FuxLockerCaller) IDXFUNCLOCKMAX(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxLocker.contract.Call(opts, out, "IDX_FUNC_LOCK_MAX")
+	return *ret0, err
+}
+
+// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+//
+// Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
+func (_FuxLocker *FuxLockerSession) IDXFUNCLOCKMAX() (*big.Int, error) {
+	return _FuxLocker.Contract.IDXFUNCLOCKMAX(&_FuxLocker.CallOpts)
+}
+
+// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+//
+// Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
+func (_FuxLocker *FuxLockerCallerSession) IDXFUNCLOCKMAX() (*big.Int, error) {
+	return _FuxLocker.Contract.IDXFUNCLOCKMAX(&_FuxLocker.CallOpts)
+}
+
+// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+//
+// Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
+func (_FuxLocker *FuxLockerCaller) IDXFUNCLOCKMIN(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxLocker.contract.Call(opts, out, "IDX_FUNC_LOCK_MIN")
+	return *ret0, err
+}
+
+// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+//
+// Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
+func (_FuxLocker *FuxLockerSession) IDXFUNCLOCKMIN() (*big.Int, error) {
+	return _FuxLocker.Contract.IDXFUNCLOCKMIN(&_FuxLocker.CallOpts)
+}
+
+// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+//
+// Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
+func (_FuxLocker *FuxLockerCallerSession) IDXFUNCLOCKMIN() (*big.Int, error) {
+	return _FuxLocker.Contract.IDXFUNCLOCKMIN(&_FuxLocker.CallOpts)
+}
+
 // IDXSTATE is a free data retrieval call binding the contract method 0x79aa0b41.
 //
 // Solidity: function IDX_STATE() constant returns(uint256)
@@ -368,6 +420,32 @@ func (_FuxLocker *FuxLockerCallerSession) GetExpire(_tokenId *big.Int) (*big.Int
 	return _FuxLocker.Contract.GetExpire(&_FuxLocker.CallOpts, _tokenId)
 }
 
+// GetFunctionLock is a free data retrieval call binding the contract method 0x7d24993a.
+//
+// Solidity: function getFunctionLock(_tokenId uint256, _funcId uint256) constant returns(lock uint256)
+func (_FuxLocker *FuxLockerCaller) GetFunctionLock(opts *bind.CallOpts, _tokenId *big.Int, _funcId *big.Int) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxLocker.contract.Call(opts, out, "getFunctionLock", _tokenId, _funcId)
+	return *ret0, err
+}
+
+// GetFunctionLock is a free data retrieval call binding the contract method 0x7d24993a.
+//
+// Solidity: function getFunctionLock(_tokenId uint256, _funcId uint256) constant returns(lock uint256)
+func (_FuxLocker *FuxLockerSession) GetFunctionLock(_tokenId *big.Int, _funcId *big.Int) (*big.Int, error) {
+	return _FuxLocker.Contract.GetFunctionLock(&_FuxLocker.CallOpts, _tokenId, _funcId)
+}
+
+// GetFunctionLock is a free data retrieval call binding the contract method 0x7d24993a.
+//
+// Solidity: function getFunctionLock(_tokenId uint256, _funcId uint256) constant returns(lock uint256)
+func (_FuxLocker *FuxLockerCallerSession) GetFunctionLock(_tokenId *big.Int, _funcId *big.Int) (*big.Int, error) {
+	return _FuxLocker.Contract.GetFunctionLock(&_FuxLocker.CallOpts, _tokenId, _funcId)
+}
+
 // GetState is a free data retrieval call binding the contract method 0x44c9af28.
 //
 // Solidity: function getState(_tokenId uint256) constant returns(state uint256)
@@ -498,25 +576,25 @@ func (_FuxLocker *FuxLockerCallerSession) Rbac() (common.Address, error) {
 	return _FuxLocker.Contract.Rbac(&_FuxLocker.CallOpts)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
+// Initialize is a paid mutator transaction binding the contract method 0x485cc955.
 //
-// Solidity: function initialize(_rbac address) returns()
-func (_FuxLocker *FuxLockerTransactor) Initialize(opts *bind.TransactOpts, _rbac common.Address) (*types.Transaction, error) {
-	return _FuxLocker.contract.Transact(opts, "initialize", _rbac)
+// Solidity: function initialize(_rbac address, _fuxStorage address) returns()
+func (_FuxLocker *FuxLockerTransactor) Initialize(opts *bind.TransactOpts, _rbac common.Address, _fuxStorage common.Address) (*types.Transaction, error) {
+	return _FuxLocker.contract.Transact(opts, "initialize", _rbac, _fuxStorage)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
+// Initialize is a paid mutator transaction binding the contract method 0x485cc955.
 //
-// Solidity: function initialize(_rbac address) returns()
-func (_FuxLocker *FuxLockerSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
-	return _FuxLocker.Contract.Initialize(&_FuxLocker.TransactOpts, _rbac)
+// Solidity: function initialize(_rbac address, _fuxStorage address) returns()
+func (_FuxLocker *FuxLockerSession) Initialize(_rbac common.Address, _fuxStorage common.Address) (*types.Transaction, error) {
+	return _FuxLocker.Contract.Initialize(&_FuxLocker.TransactOpts, _rbac, _fuxStorage)
 }
 
-// Initialize is a paid mutator transaction binding the contract method 0xc4d66de8.
+// Initialize is a paid mutator transaction binding the contract method 0x485cc955.
 //
-// Solidity: function initialize(_rbac address) returns()
-func (_FuxLocker *FuxLockerTransactorSession) Initialize(_rbac common.Address) (*types.Transaction, error) {
-	return _FuxLocker.Contract.Initialize(&_FuxLocker.TransactOpts, _rbac)
+// Solidity: function initialize(_rbac address, _fuxStorage address) returns()
+func (_FuxLocker *FuxLockerTransactorSession) Initialize(_rbac common.Address, _fuxStorage common.Address) (*types.Transaction, error) {
+	return _FuxLocker.Contract.Initialize(&_FuxLocker.TransactOpts, _rbac, _fuxStorage)
 }
 
 // SetDeltaT is a paid mutator transaction binding the contract method 0x52fc1d58.
@@ -559,6 +637,27 @@ func (_FuxLocker *FuxLockerSession) SetExpire(_tokenId *big.Int, _expire *big.In
 // Solidity: function setExpire(_tokenId uint256, _expire uint256) returns()
 func (_FuxLocker *FuxLockerTransactorSession) SetExpire(_tokenId *big.Int, _expire *big.Int) (*types.Transaction, error) {
 	return _FuxLocker.Contract.SetExpire(&_FuxLocker.TransactOpts, _tokenId, _expire)
+}
+
+// SetFunctionLock is a paid mutator transaction binding the contract method 0x60a0bd7c.
+//
+// Solidity: function setFunctionLock(_tokenId uint256, _funcId uint256, _lock uint256) returns()
+func (_FuxLocker *FuxLockerTransactor) SetFunctionLock(opts *bind.TransactOpts, _tokenId *big.Int, _funcId *big.Int, _lock *big.Int) (*types.Transaction, error) {
+	return _FuxLocker.contract.Transact(opts, "setFunctionLock", _tokenId, _funcId, _lock)
+}
+
+// SetFunctionLock is a paid mutator transaction binding the contract method 0x60a0bd7c.
+//
+// Solidity: function setFunctionLock(_tokenId uint256, _funcId uint256, _lock uint256) returns()
+func (_FuxLocker *FuxLockerSession) SetFunctionLock(_tokenId *big.Int, _funcId *big.Int, _lock *big.Int) (*types.Transaction, error) {
+	return _FuxLocker.Contract.SetFunctionLock(&_FuxLocker.TransactOpts, _tokenId, _funcId, _lock)
+}
+
+// SetFunctionLock is a paid mutator transaction binding the contract method 0x60a0bd7c.
+//
+// Solidity: function setFunctionLock(_tokenId uint256, _funcId uint256, _lock uint256) returns()
+func (_FuxLocker *FuxLockerTransactorSession) SetFunctionLock(_tokenId *big.Int, _funcId *big.Int, _lock *big.Int) (*types.Transaction, error) {
+	return _FuxLocker.Contract.SetFunctionLock(&_FuxLocker.TransactOpts, _tokenId, _funcId, _lock)
 }
 
 // SetLockState is a paid mutator transaction binding the contract method 0x2a291e11.
@@ -679,7 +778,7 @@ type FuxLockerDeltaTimeSet struct {
 
 // FilterDeltaTimeSet is a free log retrieval operation binding the contract event 0xacd17757a3133f061ef65177bb74cd35cf1e005becb93c65f73f9c95d4a98794.
 //
-// Solidity: event DeltaTimeSet(_caller address, _deltaT uint256)
+// Solidity: e DeltaTimeSet(_caller address, _deltaT uint256)
 func (_FuxLocker *FuxLockerFilterer) FilterDeltaTimeSet(opts *bind.FilterOpts) (*FuxLockerDeltaTimeSetIterator, error) {
 
 	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "DeltaTimeSet")
@@ -691,7 +790,7 @@ func (_FuxLocker *FuxLockerFilterer) FilterDeltaTimeSet(opts *bind.FilterOpts) (
 
 // WatchDeltaTimeSet is a free log subscription operation binding the contract event 0xacd17757a3133f061ef65177bb74cd35cf1e005becb93c65f73f9c95d4a98794.
 //
-// Solidity: event DeltaTimeSet(_caller address, _deltaT uint256)
+// Solidity: e DeltaTimeSet(_caller address, _deltaT uint256)
 func (_FuxLocker *FuxLockerFilterer) WatchDeltaTimeSet(opts *bind.WatchOpts, sink chan<- *FuxLockerDeltaTimeSet) (event.Subscription, error) {
 
 	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "DeltaTimeSet")
@@ -803,7 +902,7 @@ type FuxLockerExpireSet struct {
 
 // FilterExpireSet is a free log retrieval operation binding the contract event 0x78cd799f5d099bdd3586a6ab5a947eb80e932459410dc30146b47705e952de57.
 //
-// Solidity: event ExpireSet(_caller address, _tokenId uint256, _expire uint256)
+// Solidity: e ExpireSet(_caller address, _tokenId uint256, _expire uint256)
 func (_FuxLocker *FuxLockerFilterer) FilterExpireSet(opts *bind.FilterOpts) (*FuxLockerExpireSetIterator, error) {
 
 	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "ExpireSet")
@@ -815,7 +914,7 @@ func (_FuxLocker *FuxLockerFilterer) FilterExpireSet(opts *bind.FilterOpts) (*Fu
 
 // WatchExpireSet is a free log subscription operation binding the contract event 0x78cd799f5d099bdd3586a6ab5a947eb80e932459410dc30146b47705e952de57.
 //
-// Solidity: event ExpireSet(_caller address, _tokenId uint256, _expire uint256)
+// Solidity: e ExpireSet(_caller address, _tokenId uint256, _expire uint256)
 func (_FuxLocker *FuxLockerFilterer) WatchExpireSet(opts *bind.WatchOpts, sink chan<- *FuxLockerExpireSet) (event.Subscription, error) {
 
 	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "ExpireSet")
@@ -830,6 +929,131 @@ func (_FuxLocker *FuxLockerFilterer) WatchExpireSet(opts *bind.WatchOpts, sink c
 				// New log arrived, parse the event and forward to the user
 				event := new(FuxLockerExpireSet)
 				if err := _FuxLocker.contract.UnpackLog(event, "ExpireSet", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// FuxLockerFunctionLockSetIterator is returned from FilterFunctionLockSet and is used to iterate over the raw logs and unpacked data for FunctionLockSet events raised by the FuxLocker contract.
+type FuxLockerFunctionLockSetIterator struct {
+	Event *FuxLockerFunctionLockSet // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *FuxLockerFunctionLockSetIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(FuxLockerFunctionLockSet)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(FuxLockerFunctionLockSet)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *FuxLockerFunctionLockSetIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *FuxLockerFunctionLockSetIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// FuxLockerFunctionLockSet represents a FunctionLockSet event raised by the FuxLocker contract.
+type FuxLockerFunctionLockSet struct {
+	Caller  common.Address
+	TokenId *big.Int
+	FuncId  *big.Int
+	Lock    *big.Int
+	Raw     types.Log // Blockchain specific contextual infos
+}
+
+// FilterFunctionLockSet is a free log retrieval operation binding the contract event 0xc93e147af259a8b65d8f09a4df8a9ce187f29e04e41bf69310536743578196ad.
+//
+// Solidity: e FunctionLockSet(_caller address, _tokenId uint256, _funcId uint256, _lock uint256)
+func (_FuxLocker *FuxLockerFilterer) FilterFunctionLockSet(opts *bind.FilterOpts) (*FuxLockerFunctionLockSetIterator, error) {
+
+	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "FunctionLockSet")
+	if err != nil {
+		return nil, err
+	}
+	return &FuxLockerFunctionLockSetIterator{contract: _FuxLocker.contract, event: "FunctionLockSet", logs: logs, sub: sub}, nil
+}
+
+// WatchFunctionLockSet is a free log subscription operation binding the contract event 0xc93e147af259a8b65d8f09a4df8a9ce187f29e04e41bf69310536743578196ad.
+//
+// Solidity: e FunctionLockSet(_caller address, _tokenId uint256, _funcId uint256, _lock uint256)
+func (_FuxLocker *FuxLockerFilterer) WatchFunctionLockSet(opts *bind.WatchOpts, sink chan<- *FuxLockerFunctionLockSet) (event.Subscription, error) {
+
+	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "FunctionLockSet")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(FuxLockerFunctionLockSet)
+				if err := _FuxLocker.contract.UnpackLog(event, "FunctionLockSet", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -927,7 +1151,7 @@ type FuxLockerLockStateSet struct {
 
 // FilterLockStateSet is a free log retrieval operation binding the contract event 0xb8640e2eb4b26293f0742ae8635ee5e79149eda9dbc2d72a22730d96cdcae63b.
 //
-// Solidity: event LockStateSet(_caller address, _state uint256, _lock bool)
+// Solidity: e LockStateSet(_caller address, _state uint256, _lock bool)
 func (_FuxLocker *FuxLockerFilterer) FilterLockStateSet(opts *bind.FilterOpts) (*FuxLockerLockStateSetIterator, error) {
 
 	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "LockStateSet")
@@ -939,7 +1163,7 @@ func (_FuxLocker *FuxLockerFilterer) FilterLockStateSet(opts *bind.FilterOpts) (
 
 // WatchLockStateSet is a free log subscription operation binding the contract event 0xb8640e2eb4b26293f0742ae8635ee5e79149eda9dbc2d72a22730d96cdcae63b.
 //
-// Solidity: event LockStateSet(_caller address, _state uint256, _lock bool)
+// Solidity: e LockStateSet(_caller address, _state uint256, _lock bool)
 func (_FuxLocker *FuxLockerFilterer) WatchLockStateSet(opts *bind.WatchOpts, sink chan<- *FuxLockerLockStateSet) (event.Subscription, error) {
 
 	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "LockStateSet")
@@ -1050,7 +1274,7 @@ type FuxLockerMigrated struct {
 
 // FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxLocker *FuxLockerFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxLockerMigratedIterator, error) {
 
 	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "Migrated")
@@ -1062,7 +1286,7 @@ func (_FuxLocker *FuxLockerFilterer) FilterMigrated(opts *bind.FilterOpts) (*Fux
 
 // WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxLocker *FuxLockerFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxLockerMigrated) (event.Subscription, error) {
 
 	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "Migrated")
@@ -1174,7 +1398,7 @@ type FuxLockerStateSet struct {
 
 // FilterStateSet is a free log retrieval operation binding the contract event 0x1d79a6e0d9992f96b2facb02f3f2430911c472085429997f740dd1c9fbcbc445.
 //
-// Solidity: event StateSet(_caller address, _tokenId uint256, _state uint256)
+// Solidity: e StateSet(_caller address, _tokenId uint256, _state uint256)
 func (_FuxLocker *FuxLockerFilterer) FilterStateSet(opts *bind.FilterOpts) (*FuxLockerStateSetIterator, error) {
 
 	logs, sub, err := _FuxLocker.contract.FilterLogs(opts, "StateSet")
@@ -1186,7 +1410,7 @@ func (_FuxLocker *FuxLockerFilterer) FilterStateSet(opts *bind.FilterOpts) (*Fux
 
 // WatchStateSet is a free log subscription operation binding the contract event 0x1d79a6e0d9992f96b2facb02f3f2430911c472085429997f740dd1c9fbcbc445.
 //
-// Solidity: event StateSet(_caller address, _tokenId uint256, _state uint256)
+// Solidity: e StateSet(_caller address, _tokenId uint256, _state uint256)
 func (_FuxLocker *FuxLockerFilterer) WatchStateSet(opts *bind.WatchOpts, sink chan<- *FuxLockerStateSet) (event.Subscription, error) {
 
 	logs, sub, err := _FuxLocker.contract.WatchLogs(opts, "StateSet")

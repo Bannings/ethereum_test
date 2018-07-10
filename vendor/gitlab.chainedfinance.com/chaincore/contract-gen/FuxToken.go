@@ -16,7 +16,7 @@ import (
 )
 
 // FuxTokenABI is the input ABI used to generate the binding from.
-const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxCoin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxCoin\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_caller\",\"type\":\"address\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFromInCluster\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const FuxTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"fuxCoin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"autoTransferLock\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxStorage\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"TRANSFER_LOCK_STATE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"IDX_TRANSFER_FUNC_LOCK\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"erc721token\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxLocker\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_value\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_state\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_caller\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_erc721token\",\"type\":\"address\"},{\"name\":\"_fuxCoin\",\"type\":\"address\"},{\"name\":\"_fuxStorage\",\"type\":\"address\"},{\"name\":\"_fuxLocker\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"open\",\"type\":\"bool\"}],\"name\":\"setAutoTransferLock\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"},{\"name\":\"_value\",\"type\":\"uint256\"},{\"name\":\"_state\",\"type\":\"uint256\"},{\"name\":\"_expire\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_caller\",\"type\":\"address\"},{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFromInCluster\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxToken is an auto generated Go binding around an Ethereum contract.
 type FuxToken struct {
@@ -160,6 +160,32 @@ func (_FuxToken *FuxTokenTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _FuxToken.Contract.contract.Transact(opts, method, params...)
 }
 
+// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+//
+// Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
+func (_FuxToken *FuxTokenCaller) IDXTRANSFERFUNCLOCK(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "IDX_TRANSFER_FUNC_LOCK")
+	return *ret0, err
+}
+
+// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+//
+// Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
+func (_FuxToken *FuxTokenSession) IDXTRANSFERFUNCLOCK() (*big.Int, error) {
+	return _FuxToken.Contract.IDXTRANSFERFUNCLOCK(&_FuxToken.CallOpts)
+}
+
+// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+//
+// Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
+func (_FuxToken *FuxTokenCallerSession) IDXTRANSFERFUNCLOCK() (*big.Int, error) {
+	return _FuxToken.Contract.IDXTRANSFERFUNCLOCK(&_FuxToken.CallOpts)
+}
+
 // ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
@@ -210,6 +236,58 @@ func (_FuxToken *FuxTokenSession) ROLECLUSTER() (string, error) {
 // Solidity: function ROLE_CLUSTER() constant returns(string)
 func (_FuxToken *FuxTokenCallerSession) ROLECLUSTER() (string, error) {
 	return _FuxToken.Contract.ROLECLUSTER(&_FuxToken.CallOpts)
+}
+
+// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+//
+// Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
+func (_FuxToken *FuxTokenCaller) TRANSFERLOCKSTATE(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "TRANSFER_LOCK_STATE")
+	return *ret0, err
+}
+
+// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+//
+// Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
+func (_FuxToken *FuxTokenSession) TRANSFERLOCKSTATE() (*big.Int, error) {
+	return _FuxToken.Contract.TRANSFERLOCKSTATE(&_FuxToken.CallOpts)
+}
+
+// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+//
+// Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
+func (_FuxToken *FuxTokenCallerSession) TRANSFERLOCKSTATE() (*big.Int, error) {
+	return _FuxToken.Contract.TRANSFERLOCKSTATE(&_FuxToken.CallOpts)
+}
+
+// AutoTransferLock is a free data retrieval call binding the contract method 0x07564737.
+//
+// Solidity: function autoTransferLock() constant returns(bool)
+func (_FuxToken *FuxTokenCaller) AutoTransferLock(opts *bind.CallOpts) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _FuxToken.contract.Call(opts, out, "autoTransferLock")
+	return *ret0, err
+}
+
+// AutoTransferLock is a free data retrieval call binding the contract method 0x07564737.
+//
+// Solidity: function autoTransferLock() constant returns(bool)
+func (_FuxToken *FuxTokenSession) AutoTransferLock() (bool, error) {
+	return _FuxToken.Contract.AutoTransferLock(&_FuxToken.CallOpts)
+}
+
+// AutoTransferLock is a free data retrieval call binding the contract method 0x07564737.
+//
+// Solidity: function autoTransferLock() constant returns(bool)
+func (_FuxToken *FuxTokenCallerSession) AutoTransferLock() (bool, error) {
+	return _FuxToken.Contract.AutoTransferLock(&_FuxToken.CallOpts)
 }
 
 // Erc721token is a free data retrieval call binding the contract method 0xe5ebccf4.
@@ -473,6 +551,27 @@ func (_FuxToken *FuxTokenTransactorSession) SafeTransferFromInCluster(_caller co
 	return _FuxToken.Contract.SafeTransferFromInCluster(&_FuxToken.TransactOpts, _caller, _from, _to, _tokenId)
 }
 
+// SetAutoTransferLock is a paid mutator transaction binding the contract method 0x84a29a28.
+//
+// Solidity: function setAutoTransferLock(open bool) returns()
+func (_FuxToken *FuxTokenTransactor) SetAutoTransferLock(opts *bind.TransactOpts, open bool) (*types.Transaction, error) {
+	return _FuxToken.contract.Transact(opts, "setAutoTransferLock", open)
+}
+
+// SetAutoTransferLock is a paid mutator transaction binding the contract method 0x84a29a28.
+//
+// Solidity: function setAutoTransferLock(open bool) returns()
+func (_FuxToken *FuxTokenSession) SetAutoTransferLock(open bool) (*types.Transaction, error) {
+	return _FuxToken.Contract.SetAutoTransferLock(&_FuxToken.TransactOpts, open)
+}
+
+// SetAutoTransferLock is a paid mutator transaction binding the contract method 0x84a29a28.
+//
+// Solidity: function setAutoTransferLock(open bool) returns()
+func (_FuxToken *FuxTokenTransactorSession) SetAutoTransferLock(open bool) (*types.Transaction, error) {
+	return _FuxToken.Contract.SetAutoTransferLock(&_FuxToken.TransactOpts, open)
+}
+
 // FuxTokenBurnedIterator is returned from FilterBurned and is used to iterate over the raw logs and unpacked data for Burned events raised by the FuxToken contract.
 type FuxTokenBurnedIterator struct {
 	Event *FuxTokenBurned // Event containing the contract specifics and raw log
@@ -550,7 +649,7 @@ type FuxTokenBurned struct {
 
 // FilterBurned is a free log retrieval operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
 //
-// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
+// Solidity: e Burned(_caller address, _owner address, _tokenId uint256)
 func (_FuxToken *FuxTokenFilterer) FilterBurned(opts *bind.FilterOpts) (*FuxTokenBurnedIterator, error) {
 
 	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Burned")
@@ -562,7 +661,7 @@ func (_FuxToken *FuxTokenFilterer) FilterBurned(opts *bind.FilterOpts) (*FuxToke
 
 // WatchBurned is a free log subscription operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
 //
-// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
+// Solidity: e Burned(_caller address, _owner address, _tokenId uint256)
 func (_FuxToken *FuxTokenFilterer) WatchBurned(opts *bind.WatchOpts, sink chan<- *FuxTokenBurned) (event.Subscription, error) {
 
 	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Burned")
@@ -673,7 +772,7 @@ type FuxTokenMigrated struct {
 
 // FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxToken *FuxTokenFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxTokenMigratedIterator, error) {
 
 	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Migrated")
@@ -685,7 +784,7 @@ func (_FuxToken *FuxTokenFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxTo
 
 // WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxToken *FuxTokenFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxTokenMigrated) (event.Subscription, error) {
 
 	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Migrated")
@@ -800,7 +899,7 @@ type FuxTokenMinted struct {
 
 // FilterMinted is a free log retrieval operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
 //
-// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
+// Solidity: e Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
 func (_FuxToken *FuxTokenFilterer) FilterMinted(opts *bind.FilterOpts) (*FuxTokenMintedIterator, error) {
 
 	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Minted")
@@ -812,7 +911,7 @@ func (_FuxToken *FuxTokenFilterer) FilterMinted(opts *bind.FilterOpts) (*FuxToke
 
 // WatchMinted is a free log subscription operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
 //
-// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
+// Solidity: e Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
 func (_FuxToken *FuxTokenFilterer) WatchMinted(opts *bind.WatchOpts, sink chan<- *FuxTokenMinted) (event.Subscription, error) {
 
 	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Minted")
@@ -925,7 +1024,7 @@ type FuxTokenTransfer struct {
 
 // FilterTransfer is a free log retrieval operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
 //
-// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
+// Solidity: e Transfer(_caller address, _from address, _to address, _tokenId uint256)
 func (_FuxToken *FuxTokenFilterer) FilterTransfer(opts *bind.FilterOpts) (*FuxTokenTransferIterator, error) {
 
 	logs, sub, err := _FuxToken.contract.FilterLogs(opts, "Transfer")
@@ -937,7 +1036,7 @@ func (_FuxToken *FuxTokenFilterer) FilterTransfer(opts *bind.FilterOpts) (*FuxTo
 
 // WatchTransfer is a free log subscription operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
 //
-// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
+// Solidity: e Transfer(_caller address, _from address, _to address, _tokenId uint256)
 func (_FuxToken *FuxTokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *FuxTokenTransfer) (event.Subscription, error) {
 
 	logs, sub, err := _FuxToken.contract.WatchLogs(opts, "Transfer")

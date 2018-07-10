@@ -7,6 +7,7 @@ import (
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
 
+	"fmt"
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 )
@@ -35,7 +36,7 @@ func RegisterSupplierHandler(w http.ResponseWriter, r *http.Request) {
 
 	store := keychain.DefaultStore()
 	account, err := store.GetAccount(companyId)
-	if err != nil && err.Error() != "account not exist" {
+	if err != nil && err.Error() != fmt.Sprintf("account:%s not exist", companyId) {
 		render.Render(w, r, g.ErrRender(err))
 		return
 	}

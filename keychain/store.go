@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
-	"errors"
 	"math/big"
 	"sync"
 	"sync/atomic"
@@ -93,7 +92,7 @@ func (s *Store) CreateAccount(passphrase string) (Account, error) {
 	address := crypto.PubkeyToAddress(key.PublicKey)
 
 	v := new(big.Int)
-	v = v.Mul(Eth1(), big.NewInt(10))
+	v = v.Mul(Eth1(), big.NewInt(50))
 	if err := s.TransferEther(address, v); err != nil {
 		log.Errorf("transfer Ether failed: %v", err)
 		return Account{}, err
@@ -162,8 +161,7 @@ func (s *Store) GetAccount(companyID string) (Account, error) {
 		rows.Scan(&address, &key, &passphrase)
 		return Account{Address: common.HexToAddress(address), Key: key, Passphrase: passphrase}, nil
 	}
-	errTxt := fmt.Sprintf("account:%s not exist", companyID)
-	return Account{}, errors.New(errTxt)
+	return Account{}, fmt.Errorf("account:%s not exist", companyID)
 }
 
 func (s *Store) IsAccountExist(companyID string) (bool, error) {

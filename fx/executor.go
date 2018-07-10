@@ -203,12 +203,12 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	token := cmd.Tx.Input[0]
 	tokenId := token.Id
 
-	var tokens [2]Token
-	copy(tokens[:], cmd.Tx.Output[:2])
+	var tokens []Token
+	copy(tokens[:], cmd.Tx.Output[:])
 
-	var newTokenIds [2]*big.Int
-	var amounts [2]*big.Int
-	var states [2]*big.Int
+	var newTokenIds []*big.Int
+	var amounts []*big.Int
+	var states []*big.Int
 	for i, t := range tokens {
 		id := t.Id
 		newTokenIds[i] = &id
@@ -223,8 +223,8 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSplitTransactor(
-		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithFxSpliterTransactor(
+		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
@@ -397,11 +397,11 @@ func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 
 func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error {
 	tokenId := input.Id
-	var tokens [2]Token
-	copy(tokens[:], output[:2])
-	var newTokenIds [2]*big.Int
-	var amounts [2]*big.Int
-	var states [2]*big.Int
+	var tokens []Token
+	copy(tokens[:], output[:])
+	var newTokenIds []*big.Int
+	var amounts []*big.Int
+	var states []*big.Int
 	for i, t := range tokens {
 		id := t.Id
 		newTokenIds[i] = &id
@@ -415,8 +415,8 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSplitTransactor(
-		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithFxSpliterTransactor(
+		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
