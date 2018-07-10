@@ -141,6 +141,9 @@ func verifyTransaction(trans *fx.Transaction) error {
 		return err
 	}
 	if txType == fx.MintFX {
+		if len(trans.Output) == 0 {
+			return fmt.Errorf("Invalid transaction:%v, output not found")
+		}
 		for _, input := range trans.Input {
 			_, err := keychain.DefaultStore().GetAccount(input.Owner)
 			if err != nil {
