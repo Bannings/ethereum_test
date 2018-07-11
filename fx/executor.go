@@ -203,22 +203,16 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	token := cmd.Tx.Input[0]
 	tokenId := token.Id
 
-	var tokens []Token
-	copy(tokens[:], cmd.Tx.Output[:])
-
-	var newTokenIds []*big.Int
-	var amounts []*big.Int
-	var states []*big.Int
-	for i, t := range tokens {
+	var newTokenIds, amounts, states []*big.Int
+	for _, t := range p.cmd.Tx.Output {
 		id := t.Id
-		newTokenIds[i] = &id
-
-		amounts[i] = new(big.Int).SetUint64(t.Amount)
+		newTokenIds = append(newTokenIds, &id)
+		amounts = append(amounts, new(big.Int).SetUint64(t.Amount))
 		state, err := ParseState(t.State)
 		if err != nil {
 			return err
 		}
-		states[i] = new(big.Int).SetInt64(int64(state))
+		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
@@ -397,21 +391,16 @@ func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 
 func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error {
 	tokenId := input.Id
-	var tokens []Token
-	copy(tokens[:], output[:])
-	var newTokenIds []*big.Int
-	var amounts []*big.Int
-	var states []*big.Int
-	for i, t := range tokens {
+	var newTokenIds, amounts, states []*big.Int
+	for _, t := range output {
 		id := t.Id
-		newTokenIds[i] = &id
-
-		amounts[i] = new(big.Int).SetUint64(t.Amount)
+		newTokenIds = append(newTokenIds, &id)
+		amounts = append(amounts, new(big.Int).SetUint64(t.Amount))
 		state, err := ParseState(t.State)
 		if err != nil {
 			return err
 		}
-		states[i] = new(big.Int).SetInt64(int64(state))
+		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction
