@@ -257,9 +257,6 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 				transferToken = append(transferToken, outputToken)
 			}
 		}
-		if len(splitToken) == 1 {
-			splitToken = append(splitToken, Token{Amount: 0, Id: *big.NewInt(0), State: "Normal"})
-		}
 		if len(splitToken) == 0 {
 			log.Errorf("Invalid transation:%v ,can't find parentId for output", p.cmd.Tx.TxId)
 			return fmt.Errorf("Invalid transation:%v ,can't find parentId for output", p.cmd.Tx.TxId)
@@ -367,7 +364,7 @@ func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor
 func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 	err := e.mintFX(p)
 	if err != nil {
-		log.Errorf("mint fx failed: %v, txid:%v", err, p.cmd.Tx.TxId)
+		log.Errorf("Mint token failed: %v, txid:%v", err, p.cmd.Tx.TxId)
 		return err
 	}
 	cmd := p.cmd
