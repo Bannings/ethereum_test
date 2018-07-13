@@ -33,7 +33,7 @@ type FxClient struct {
 	fxStorage    *contract_gen.FuxStorage
 }
 
-func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
+func NewTokenClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
 	key, err := acccount.GetKey()
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g
 		return nil, err
 	}
 
-	c, err := NewFxClient(cli, acccount, contractAddrs)
+	c, err := NewTokenClient(cli, acccount, contractAddrs)
 	if err != nil {
 		return nil, err
 	}

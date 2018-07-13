@@ -1,4 +1,4 @@
-package fx
+package tokens
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func DefaultExecutor() *EthExecutor {
 		}
 		store := keychain.DefaultStore()
 		cache := DefaultCache()
-		adminClient, err := blockchain.NewFxClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+		adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
 		if err != nil {
 			panic(err)
 		}

@@ -20,7 +20,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gitlab.chainedfinance.com/chaincore/r2/fx"
+	"gitlab.chainedfinance.com/chaincore/r2/tokens"
 )
 
 const (
@@ -106,7 +106,7 @@ func main() {
 
 	done := make(chan struct{})
 	defer close(done)
-	go fx.ExcuteTransaction(done)
+	go tokens.ExcuteTransaction(done)
 
 	log.Infof("listening on: %v", *port)
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", *port), Handler: r}
