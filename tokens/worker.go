@@ -1,4 +1,4 @@
-package fx
+package tokens
 
 import (
 	"time"
@@ -16,7 +16,7 @@ var (
 )
 
 func ExcuteTransaction(done <-chan struct{}) {
-	ticker := time.NewTicker(300 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	for {

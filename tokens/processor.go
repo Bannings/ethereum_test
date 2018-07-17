@@ -1,4 +1,4 @@
-package fx
+package tokens
 
 import (
 	"context"
@@ -51,12 +51,12 @@ func (p *CmdProcessor) CallWithFxTokenTransactor(
 	return nil
 }
 
-func (p *CmdProcessor) CallWithFxSplitTransactor(
-	fn func(*contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error),
+func (p *CmdProcessor) CallWithFxSpliterTransactor(
+	fn func(*contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error),
 ) error {
 	p.initCmdNonce()
 	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithFxSplitTransactor(fn)
+		tx, err := p.fxClient.CallWithFxSpliterTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
 			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash

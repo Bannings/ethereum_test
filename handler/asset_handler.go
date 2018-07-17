@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
-	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"gitlab.chainedfinance.com/chaincore/r2/tokens"
 	"net/http"
 
 	"context"
@@ -17,20 +17,20 @@ import (
 )
 
 var (
-	supplierMap map[string]chan fx.Transaction
+	supplierMap map[string]chan tokens.Transaction
 	tradeTypes  []string
 	fxState     []string
 	db          *sql.DB
 )
 
 func init() {
-	supplierMap = make(map[string]chan fx.Transaction)
+	supplierMap = make(map[string]chan tokens.Transaction)
 	tradeTypes = []string{"Payment", "Discount", "SplitFX", "MintFX", "Confirm"}
 	fxState = []string{"Frozen", "Normal", "Historic"}
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
-	var trans fx.Transaction
+	var trans tokens.Transaction
 	body, _ := ioutil.ReadAll(r.Body)
 	fmt.Println(string(body))
 	err := json.Unmarshal(body, &trans)
@@ -40,14 +40,15 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	_, err = fx.ParseType(trans.TxType)
+	_, err = tokens.ParseType(trans.TxType)
+
 	if err != nil {
 		resp := g.NewBadResponse("400", err.Error())
 		render.JSON(w, r, resp)
 		return
 	}
 	for _, token := range trans.Input {
-		_, err = fx.ParseState(token.State)
+		_, err = tokens.ParseState(token.State)
 		if err != nil {
 			resp := g.NewBadResponse("400", err.Error())
 			render.JSON(w, r, resp)
@@ -55,7 +56,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	for _, token := range trans.Output {
-		_, err = fx.ParseState(token.State)
+		_, err = tokens.ParseState(token.State)
 		if err != nil {
 			resp := g.NewBadResponse("400", err.Error())
 			render.JSON(w, r, resp)
@@ -88,11 +89,11 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DistributeTask(transaction *fx.Transaction) {
+func DistributeTask(transaction *tokens.Transaction) {
 	var company string
-	txType, _ := fx.ParseType(transaction.TxType)
+	txType, _ := tokens.ParseType(transaction.TxType)
 
-	if txType == fx.MintFX {
+	if txType == tokens.MintFX {
 		company = "cf"
 	} else {
 		company = transaction.Input[0].Owner
@@ -102,17 +103,17 @@ func DistributeTask(transaction *fx.Transaction) {
 			supplierChain <- *transaction
 		} else {
 			supplierChain <- *transaction
-			go fx.HandleTransaction(supplierChain)
+			go tokens.HandleTransaction(supplierChain)
 		}
 	} else {
-		supplierChain := make(chan fx.Transaction, 5)
+		supplierChain := make(chan tokens.Transaction, 5)
 		supplierMap[company] = supplierChain
 		supplierChain <- *transaction
-		go fx.HandleTransaction(supplierChain)
+		go tokens.HandleTransaction(supplierChain)
 	}
 }
 
-func saveTransaction(transaction *fx.Transaction) error {
+func saveTransaction(transaction *tokens.Transaction) error {
 	input, err := json.Marshal(&transaction.Input)
 	if err != nil {
 		return err
@@ -123,7 +124,7 @@ func saveTransaction(transaction *fx.Transaction) error {
 		return err
 	}
 
-	stmt, err := fx.DefaultDBConnection().Prepare("INSERT INTO transactions(deal_id, input, output,state) VALUES(?, ?, ?, ?)")
+	stmt, err := tokens.DefaultDBConnection().Prepare("INSERT INTO transactions(deal_id, input, output,state) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
@@ -135,12 +136,12 @@ func saveTransaction(transaction *fx.Transaction) error {
 
 }
 
-func verifyTransaction(trans *fx.Transaction) error {
-	txType, err := fx.ParseType(trans.TxType)
+func verifyTransaction(trans *tokens.Transaction) error {
+	txType, err := tokens.ParseType(trans.TxType)
 	if err != nil {
 		return err
 	}
-	if txType == fx.MintFX {
+	if txType == tokens.MintFX {
 		if len(trans.Output) == 0 {
 			return fmt.Errorf("Invalid transaction:%v, output not found")
 		}
@@ -161,11 +162,11 @@ func verifyTransaction(trans *fx.Transaction) error {
 			if err != nil {
 				return fmt.Errorf("Token:%v haven't been stored to blockchain or does't exist", inputToken.Id.Uint64())
 			}
-			state, err := fx.ParseState(token.State)
+			state, err := tokens.ParseState(token.State)
 			if err != nil {
 				return err
 			}
-			if state == fx.Frozen {
+			if state == tokens.Frozen {
 				return fmt.Errorf("Token:%v is frozen", inputToken.Id.Uint64())
 			}
 			if token.Owner != inputToken.Owner {

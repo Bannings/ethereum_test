@@ -550,7 +550,7 @@ type FuxStorageCreated struct {
 
 // FilterCreated is a free log retrieval operation binding the contract event 0x7191c0804172ee8ac080b63e93fd6c2f26bbea256aed023d843c2a9f3dee0d3b.
 //
-// Solidity: event Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
+// Solidity: e Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
 func (_FuxStorage *FuxStorageFilterer) FilterCreated(opts *bind.FilterOpts) (*FuxStorageCreatedIterator, error) {
 
 	logs, sub, err := _FuxStorage.contract.FilterLogs(opts, "Created")
@@ -562,7 +562,7 @@ func (_FuxStorage *FuxStorageFilterer) FilterCreated(opts *bind.FilterOpts) (*Fu
 
 // WatchCreated is a free log subscription operation binding the contract event 0x7191c0804172ee8ac080b63e93fd6c2f26bbea256aed023d843c2a9f3dee0d3b.
 //
-// Solidity: event Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
+// Solidity: e Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
 func (_FuxStorage *FuxStorageFilterer) WatchCreated(opts *bind.WatchOpts, sink chan<- *FuxStorageCreated) (event.Subscription, error) {
 
 	logs, sub, err := _FuxStorage.contract.WatchLogs(opts, "Created")
@@ -673,7 +673,7 @@ type FuxStorageMigrated struct {
 
 // FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxStorage *FuxStorageFilterer) FilterMigrated(opts *bind.FilterOpts) (*FuxStorageMigratedIterator, error) {
 
 	logs, sub, err := _FuxStorage.contract.FilterLogs(opts, "Migrated")
@@ -685,7 +685,7 @@ func (_FuxStorage *FuxStorageFilterer) FilterMigrated(opts *bind.FilterOpts) (*F
 
 // WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
 //
-// Solidity: event Migrated(contractName string, migrationId string)
+// Solidity: e Migrated(contractName string, migrationId string)
 func (_FuxStorage *FuxStorageFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *FuxStorageMigrated) (event.Subscription, error) {
 
 	logs, sub, err := _FuxStorage.contract.WatchLogs(opts, "Migrated")
@@ -796,7 +796,7 @@ type FuxStorageRemoved struct {
 
 // FilterRemoved is a free log retrieval operation binding the contract event 0xbe80a446a00b8794a7d05e8386915bdde937fe8b48da8d16175a5362b4c3f4f8.
 //
-// Solidity: event Removed(_caller address, _tokenId uint256)
+// Solidity: e Removed(_caller address, _tokenId uint256)
 func (_FuxStorage *FuxStorageFilterer) FilterRemoved(opts *bind.FilterOpts) (*FuxStorageRemovedIterator, error) {
 
 	logs, sub, err := _FuxStorage.contract.FilterLogs(opts, "Removed")
@@ -808,7 +808,7 @@ func (_FuxStorage *FuxStorageFilterer) FilterRemoved(opts *bind.FilterOpts) (*Fu
 
 // WatchRemoved is a free log subscription operation binding the contract event 0xbe80a446a00b8794a7d05e8386915bdde937fe8b48da8d16175a5362b4c3f4f8.
 //
-// Solidity: event Removed(_caller address, _tokenId uint256)
+// Solidity: e Removed(_caller address, _tokenId uint256)
 func (_FuxStorage *FuxStorageFilterer) WatchRemoved(opts *bind.WatchOpts, sink chan<- *FuxStorageRemoved) (event.Subscription, error) {
 
 	logs, sub, err := _FuxStorage.contract.WatchLogs(opts, "Removed")

@@ -26,14 +26,14 @@ type FxClient struct {
 
 	fxToken      *contract_gen.FuxToken
 	fxBoxFactory *contract_gen.FuxPayBoxFactory
-	fxSplit      *contract_gen.FuxSplit
+	fxSpliter    *contract_gen.FuxSpliter
 	fxBatch      *contract_gen.FuxBatch
-	erc27Token   *contract_gen.ERC27Token
+	erc721Token  *contract_gen.ERC721Token
 	fxLocker     *contract_gen.FuxLocker
 	fxStorage    *contract_gen.FuxStorage
 }
 
-func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
+func NewTokenClient(cli *keychain.AccountClient, acccount keychain.Account, contractAddrs g.ContractAddrs) (*FxClient, error) {
 	key, err := acccount.GetKey()
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		return nil, err
 	}
 
-	fxSplit, err := contract_gen.NewFuxSplit(common.HexToAddress(contractAddrs.FxSplitAddr), cli.EthClient)
+	fxSpliter, err := contract_gen.NewFuxSpliter(common.HexToAddress(contractAddrs.FxSpliterAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
@@ -63,7 +63,7 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
 		return nil, err
 	}
-	erc27Token, err := contract_gen.NewERC27Token(common.HexToAddress(contractAddrs.ERC27TokenAddr), cli.EthClient)
+	erc721Token, err := contract_gen.NewERC721Token(common.HexToAddress(contractAddrs.ERC721TokenAddr), cli.EthClient)
 	if err != nil {
 		log.Errorf("Failed to instantiate a erc27Token contract: %v", err)
 		return nil, err
@@ -83,9 +83,9 @@ func NewFxClient(cli *keychain.AccountClient, acccount keychain.Account, contrac
 		auth:         auth,
 		fxToken:      fxToken,
 		fxBoxFactory: fxBoxFactory,
-		fxSplit:      fxSplit,
+		fxSpliter:    fxSpliter,
 		fxBatch:      fxBatch,
-		erc27Token:   erc27Token,
+		erc721Token:  erc721Token,
 		fxLocker:     fxLocker,
 		fxStorage:    fxStorage,
 	}
@@ -100,7 +100,7 @@ func NewPersonalClient(rawUrl string, acccount keychain.Account, contractAddrs g
 		return nil, err
 	}
 
-	c, err := NewFxClient(cli, acccount, contractAddrs)
+	c, err := NewTokenClient(cli, acccount, contractAddrs)
 	if err != nil {
 		return nil, err
 	}
@@ -133,13 +133,13 @@ func (c *FxClient) CallWithFxTokenTransactor(
 	return tx, nil
 }
 
-func (c *FxClient) CallWithFxSplitTransactor(
-	fn func(*contract_gen.FuxSplitTransactorSession) (*types.Transaction, error),
+func (c *FxClient) CallWithFxSpliterTransactor(
+	fn func(*contract_gen.FuxSpliterTransactorSession) (*types.Transaction, error),
 ) (*types.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
 	defer cancel()
-	s := &contract_gen.FuxSplitTransactorSession{
-		Contract: &c.fxSplit.FuxSplitTransactor,
+	s := &contract_gen.FuxSpliterTransactorSession{
+		Contract: &c.fxSpliter.FuxSpliterTransactor,
 		TransactOpts: bind.TransactOpts{
 			From:     c.auth.From,
 			Signer:   c.auth.Signer,
@@ -262,9 +262,9 @@ func (c *FxClient) CallWithFxTokenCaller(ctx context.Context, fn func(*contract_
 	return fn(s)
 }
 
-func (c *FxClient) CallWithERC27TokenCaller(ctx context.Context) *contract_gen.ERC27TokenCallerSession {
-	session := &contract_gen.ERC27TokenCallerSession{
-		Contract: &c.erc27Token.ERC27TokenCaller,
+func (c *FxClient) CallWithERC721TokenCaller(ctx context.Context) *contract_gen.ERC721TokenCallerSession {
+	session := &contract_gen.ERC721TokenCallerSession{
+		Contract: &c.erc721Token.ERC721TokenCaller,
 		CallOpts: bind.CallOpts{
 			Pending: true,
 			From:    c.auth.From,

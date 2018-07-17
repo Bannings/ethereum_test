@@ -7,9 +7,9 @@ import (
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/fx"
 	"gitlab.chainedfinance.com/chaincore/r2/g"
 	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"gitlab.chainedfinance.com/chaincore/r2/tokens"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -46,11 +46,11 @@ func QueryFXHandler(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, g.NewSuccResponse(token))
 }
 
-func querFXDetail(fxID *big.Int) (*fx.Token, error) {
+func querFXDetail(fxID *big.Int) (*tokens.Token, error) {
 	conf := g.GetConfig()
 	bConf := conf.BlockchainConfig
 	store := keychain.DefaultStore()
-	adminClient, err := blockchain.NewFxClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+	adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	existed, err := adminClient.CallWithFXStorageCaller(ctx).Existed(fxID)
@@ -59,9 +59,9 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 		return nil, errors.New(errTxt)
 	}
 
-	owner, err := adminClient.CallWithERC27TokenCaller(ctx).OwnerOf(fxID)
+	owner, err := adminClient.CallWithERC721TokenCaller(ctx).OwnerOf(fxID)
 	var company string
-	err = fx.DefaultDBConnection().QueryRow("SELECT firm_id FROM accounts WHERE address = ?", owner.String()).Scan(&company)
+	err = tokens.DefaultDBConnection().QueryRow("SELECT firm_id FROM accounts WHERE address = ?", owner.String()).Scan(&company)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +78,6 @@ func querFXDetail(fxID *big.Int) (*fx.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	token := &fx.Token{Id: *fxID, Amount: properties.Value.Uint64(), ParentId: *properties.CreateBy, State: state, Owner: company, ExpireTime: expire.Int64()}
+	token := &tokens.Token{Id: *fxID, Amount: properties.Value.Uint64(), ParentId: *properties.CreateBy, State: state, Owner: company, ExpireTime: expire.Int64()}
 	return token, nil
 }

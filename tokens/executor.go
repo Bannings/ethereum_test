@@ -1,4 +1,4 @@
-package fx
+package tokens
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func DefaultExecutor() *EthExecutor {
 		}
 		store := keychain.DefaultStore()
 		cache := DefaultCache()
-		adminClient, err := blockchain.NewFxClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+		adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
 		if err != nil {
 			panic(err)
 		}
@@ -203,28 +203,22 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	token := cmd.Tx.Input[0]
 	tokenId := token.Id
 
-	var tokens [2]Token
-	copy(tokens[:], cmd.Tx.Output[:2])
-
-	var newTokenIds [2]*big.Int
-	var amounts [2]*big.Int
-	var states [2]*big.Int
-	for i, t := range tokens {
+	var newTokenIds, amounts, states []*big.Int
+	for _, t := range p.cmd.Tx.Output {
 		id := t.Id
-		newTokenIds[i] = &id
-
-		amounts[i] = new(big.Int).SetUint64(t.Amount)
+		newTokenIds = append(newTokenIds, &id)
+		amounts = append(amounts, new(big.Int).SetUint64(t.Amount))
 		state, err := ParseState(t.State)
 		if err != nil {
 			return err
 		}
-		states[i] = new(big.Int).SetInt64(int64(state))
+		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSplitTransactor(
-		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithFxSpliterTransactor(
+		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
@@ -262,9 +256,6 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 			if outputToken.Owner != owner && n == 0 {
 				transferToken = append(transferToken, outputToken)
 			}
-		}
-		if len(splitToken) == 1 {
-			splitToken = append(splitToken, Token{Amount: 0, Id: *big.NewInt(0), State: "Normal"})
 		}
 		if len(splitToken) == 0 {
 			log.Errorf("Invalid transation:%v ,can't find parentId for output", p.cmd.Tx.TxId)
@@ -373,7 +364,7 @@ func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor
 func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 	err := e.mintFX(p)
 	if err != nil {
-		log.Errorf("mint fx failed: %v, txid:%v", err, p.cmd.Tx.TxId)
+		log.Errorf("Mint token failed: %v, txid:%v", err, p.cmd.Tx.TxId)
 		return err
 	}
 	cmd := p.cmd
@@ -397,26 +388,21 @@ func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
 
 func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error {
 	tokenId := input.Id
-	var tokens [2]Token
-	copy(tokens[:], output[:2])
-	var newTokenIds [2]*big.Int
-	var amounts [2]*big.Int
-	var states [2]*big.Int
-	for i, t := range tokens {
+	var newTokenIds, amounts, states []*big.Int
+	for _, t := range output {
 		id := t.Id
-		newTokenIds[i] = &id
-
-		amounts[i] = new(big.Int).SetUint64(t.Amount)
+		newTokenIds = append(newTokenIds, &id)
+		amounts = append(amounts, new(big.Int).SetUint64(t.Amount))
 		state, err := ParseState(t.State)
 		if err != nil {
 			return err
 		}
-		states[i] = new(big.Int).SetInt64(int64(state))
+		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSplitTransactor(
-		func(session *contract_gen.FuxSplitTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithFxSpliterTransactor(
+		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr

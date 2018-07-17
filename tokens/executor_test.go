@@ -1,4 +1,4 @@
-package fx
+package tokens
 
 import (
 	"database/sql"
@@ -54,7 +54,7 @@ func init() {
 	clientCache = NewCache(bConf.RawUrl, keystore, 30)
 	acc := keystore.GetAdminAccount()
 	cli := keystore.GetAdminClient()
-	adminClient, err = blockchain.NewFxClient(cli, acc, bConf.ContractAddrs)
+	adminClient, err = blockchain.NewTokenClient(cli, acc, bConf.ContractAddrs)
 	if err != nil {
 		panic(err)
 	}
@@ -72,9 +72,10 @@ func TestMintFX(t *testing.T) {
 
 	tokenId := generateTokenId()
 	inToken := Token{*big.NewInt(tokenId - 1), *big.NewInt(0), 14, "supplier001", "Normal", expireTime}
-	token1 := Token{*big.NewInt(tokenId), *big.NewInt(tokenId - 1), 10, "supplier001", "Normal", expireTime}
-	token2 := Token{*big.NewInt(tokenId + 1), *big.NewInt(tokenId - 1), 4, "supplier001", "Frozen", expireTime}
-	tx := Transaction{Input: []Token{inToken}, Output: []Token{token1, token2}, TxType: "MintFX", TxId: "", Id: 88}
+	token1 := Token{*big.NewInt(tokenId), *big.NewInt(tokenId - 1), 5, "supplier001", "Normal", expireTime}
+	token2 := Token{*big.NewInt(tokenId + 1), *big.NewInt(tokenId - 1), 5, "supplier001", "Normal", expireTime}
+	token3 := Token{*big.NewInt(tokenId + 2), *big.NewInt(tokenId - 1), 4, "supplier001", "Frozen", expireTime}
+	tx := Transaction{Input: []Token{inToken}, Output: []Token{token1, token2, token3}, TxType: "MintFX", TxId: "", Id: 88}
 	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
 	if err != nil {
 		t.Fatal(err)
@@ -110,12 +111,76 @@ func TestTransferFX(t *testing.T) {
 	}
 
 	token5 := Token{*big.NewInt(tokenId + 6), *big.NewInt(tokenId + 2), 100000, "supplier002", "Normal", expireTime}
-	token6 := Token{*big.NewInt(tokenId + 7), *big.NewInt(tokenId + 4), 80000, "supplier002", "Normal", expireTime}
-	token7 := Token{*big.NewInt(tokenId + 8), *big.NewInt(tokenId + 4), 20000, "supplier001", "Normal", expireTime}
-	tx2 := Transaction{Input: []Token{token1, token3}, Output: []Token{token5, token6, token7}, TxType: "Payment", TxId: "hkh", Id: 858}
+	token6 := Token{*big.NewInt(tokenId + 7), *big.NewInt(tokenId + 4), 60000, "supplier002", "Normal", expireTime}
+	token7 := Token{*big.NewInt(tokenId + 8), *big.NewInt(tokenId + 4), 20000, "supplier002", "Normal", expireTime}
+	token8 := Token{*big.NewInt(tokenId + 9), *big.NewInt(tokenId + 4), 20000, "supplier001", "Normal", expireTime}
+	tx2 := Transaction{Input: []Token{token1, token3}, Output: []Token{token5, token6, token7, token8}, TxType: "Payment", TxId: "hkh", Id: 858}
 	cmd = Command{Tx: tx2, txHashes: make(map[string]string)}
 	err = executor.Execute(cmd)
 	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestBatchTransfer(t *testing.T) {
+	tokenId := generateTokenId()
+	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
+	inToken1 := Token{*big.NewInt(tokenId), *big.NewInt(0), 140000, "supplier001", "Normal", expireTime}
+	token1 := Token{*big.NewInt(tokenId + 2), *big.NewInt(tokenId), 100000, "supplier001", "Normal", expireTime}
+	token2 := Token{*big.NewInt(tokenId + 3), *big.NewInt(tokenId), 40000, "supplier001", "Frozen", expireTime}
+	tx1 := Transaction{Input: []Token{inToken1}, Output: []Token{token1, token2}, TxType: "MintFX", TxId: "jgff", Id: 88}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := Command{Tx: tx1, txHashes: make(map[string]string)}
+
+	err = executor.Execute(cmd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	token3 := Token{*big.NewInt(tokenId + 7), *big.NewInt(tokenId + 3), 20000, "supplier002", "Normal", expireTime}
+	token4 := Token{*big.NewInt(tokenId + 8), *big.NewInt(tokenId + 3), 20000, "supplier002", "Normal", expireTime}
+	tx2 := Transaction{Input: []Token{token2}, Output: []Token{token3, token4}, TxType: "Payment", TxId: "hkh", Id: 858}
+	cmd = Command{Tx: tx2, txHashes: make(map[string]string)}
+	err = executor.Execute(cmd)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSplitFX(t *testing.T) {
+	tokenId := generateTokenId()
+	executor, err := NewEthExecutor(keystore, bConf, db, clientCache, adminClient)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token1 := Token{*big.NewInt(tokenId), *big.NewInt(0), 100, "supplier001", "Normal", expireTime}
+	tx1 := Transaction{Input: []Token{token1}, Output: []Token{}, TxType: "MintFX"}
+	cmd1 := Command{Tx: tx1, txHashes: make(map[string]string)}
+	err = executor.Execute(cmd1)
+	if err != nil {
+		t.Logf("mint failed")
+		t.Fatal(err)
+	}
+	token2 := Token{*big.NewInt(tokenId + 1), *big.NewInt(tokenId), 50, "supplier001", "Normal", expireTime}
+	token3 := Token{*big.NewInt(tokenId + 2), *big.NewInt(tokenId), 50, "supplier001", "Frozen", expireTime}
+	tx2 := Transaction{Input: []Token{token1}, Output: []Token{token2, token3}, TxType: "SplitFX"}
+	cmd2 := Command{Tx: tx2, txHashes: make(map[string]string)}
+	err = executor.Execute(cmd2)
+	if err != nil {
+		t.Logf("first split failed")
+		t.Fatal(err)
+	}
+	token4 := Token{*big.NewInt(tokenId + 3), *big.NewInt(tokenId + 2), 30, "supplier001", "Normal", expireTime}
+	token5 := Token{*big.NewInt(0), *big.NewInt(tokenId + 2), 20, "supplier001", "Normal", expireTime}
+	tx3 := Transaction{Input: []Token{token3}, Output: []Token{token4, token5}, TxType: "SplitFX"}
+	cmd3 := Command{Tx: tx3, txHashes: make(map[string]string)}
+	err = executor.Execute(cmd3)
+	if err != nil {
+		t.Logf("second split failed")
 		t.Fatal(err)
 	}
 }
