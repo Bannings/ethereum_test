@@ -3,7 +3,7 @@ package keychain
 import (
 	"testing"
 
-	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
 
 	"github.com/ethereum/go-ethereum/crypto"
 )

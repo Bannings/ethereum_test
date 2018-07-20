@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/eddyzhou/log"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
 	"sync"
 )
 

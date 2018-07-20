@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/contract-gen"
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
+	"gitlab.zhuronglink.com/chaincore/contract-gen"
+	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
