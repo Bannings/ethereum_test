@@ -3,10 +3,10 @@ package tokens
 import (
 	"sync"
 
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
-	"gitlab.chainedfinance.com/infra/gocommons/lru"
+	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/keychain"
+	"gitlab.zhuronglink.com/infra/gocommons/lru"
 )
 
 var (

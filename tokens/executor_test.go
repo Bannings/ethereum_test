@@ -3,9 +3,9 @@ package tokens
 import (
 	"database/sql"
 	"fmt"
-	"gitlab.chainedfinance.com/chaincore/r2/blockchain"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/keychain"
 	"math/big"
 	"testing"
 	"time"

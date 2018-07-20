@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
-	"gitlab.chainedfinance.com/chaincore/r2/tokens"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/keychain"
+	"gitlab.zhuronglink.com/chaincore/r2/tokens"
 	"net/http"
 
 	"context"
@@ -32,7 +32,7 @@ func init() {
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var trans tokens.Transaction
 	body, _ := ioutil.ReadAll(r.Body)
-	fmt.Println(string(body))
+	log.Infof("Receive request:%v", body)
 	err := json.Unmarshal(body, &trans)
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())

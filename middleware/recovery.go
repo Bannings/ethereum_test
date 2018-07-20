@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/getsentry/raven-go"

@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
 
 	"fmt"
 	"github.com/eddyzhou/log"

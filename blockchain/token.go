@@ -5,9 +5,9 @@ import (
 	"math/big"
 	"time"
 
-	"gitlab.chainedfinance.com/chaincore/contract-gen"
-	"gitlab.chainedfinance.com/chaincore/r2/g"
-	"gitlab.chainedfinance.com/chaincore/r2/keychain"
+	"gitlab.zhuronglink.com/chaincore/contract-gen"
+	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
