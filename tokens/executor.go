@@ -267,7 +267,7 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 			return err
 		}
 	}
-	err := e.batchTransfer(input[0], transferToken, p)
+	err := e.BatchTransfer(input[0], transferToken, p)
 	if err != nil {
 		log.Errorf("transfer fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
 		return err
@@ -319,7 +319,51 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 	return nil
 }
 
-func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor) error {
+func (e *EthExecutor) MultiTransfer(input Token, output []Token, p *CmdProcessor) error {
+	fromAccount := input.Owner
+	var toAdd []common.Address
+	fromAcc, err := e.keystore.GetAccount(fromAccount)
+	if err != nil {
+		log.Errorf("GET Account failed :%v", err)
+		return err
+	}
+	ids := make([]*big.Int, len(output))
+	for i, t := range output {
+		id := t.Id
+		ids[i] = &id
+		toAccount := output[i].Owner
+		add, _ := e.keystore.GetAccount(toAccount)
+		toAdd = append(toAdd, add.Address)
+	}
+	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAdd[0].String(), ids)
+	var tx *ethTypes.Transaction
+	err = p.CallWithFxBatchTransactor(
+		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+			var innerErr error
+			tx, innerErr = session.SafeTransferFromToMulti(fromAcc.Address, toAdd, ids)
+			return tx, innerErr
+		},
+	)
+
+	if err != nil {
+		log.Errorf("call FuxBatch.Transfer contract failed: %v", err)
+		return err
+	}
+
+	receipt, err := p.WaitMined(context.Background(), tx)
+	if err != nil {
+		log.Errorf("transfer failed : %v", err)
+		return err
+	}
+	if receipt.Status == ethTypes.ReceiptStatusFailed {
+		return ErrTxExecuteFailed
+	}
+	log.Infof("transfer success,input: %v,output:%v", input, output)
+
+	return nil
+}
+
+func (e *EthExecutor) BatchTransfer(input Token, output []Token, p *CmdProcessor) error {
 	fromAccount := input.Owner
 	toAccount := output[0].Owner
 	toAcc, err := e.keystore.GetAccount(toAccount)
@@ -356,7 +400,7 @@ func (e *EthExecutor) batchTransfer(input Token, output []Token, p *CmdProcessor
 	if receipt.Status == ethTypes.ReceiptStatusFailed {
 		return ErrTxExecuteFailed
 	}
-	log.Infof("transfer success,input: %v,output:%v", input, output)
+	log.Infof("transfer success,input: %v,output:%v", p.cmd.Tx.Input, output)
 
 	return nil
 }
