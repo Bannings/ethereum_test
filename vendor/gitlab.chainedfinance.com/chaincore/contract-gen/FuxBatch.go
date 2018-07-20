@@ -16,7 +16,7 @@ import (
 )
 
 // FuxBatchABI is the input ABI used to generate the binding from.
-const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_fuxToken\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_length\",\"type\":\"uint256\"}],\"name\":\"updateMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenIds\",\"type\":\"uint256[]\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_tos\",\"type\":\"address[]\"},{\"name\":\"_tokenIds\",\"type\":\"uint256[]\"}],\"name\":\"safeTransferFromToMulti\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+const FuxBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"rbac\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_CLUSTER\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"contractName\",\"type\":\"string\"},{\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"isMigrated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maxLength\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"ROLE_ADMIN\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"fuxToken\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"contractName\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"migrationId\",\"type\":\"string\"}],\"name\":\"Migrated\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"},{\"name\":\"_fuxToken\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_rbac\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_length\",\"type\":\"uint256\"}],\"name\":\"updateMaxLength\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_tokenIds\",\"type\":\"uint256[]\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // FuxBatch is an auto generated Go binding around an Ethereum contract.
 type FuxBatch struct {
@@ -356,27 +356,6 @@ func (_FuxBatch *FuxBatchSession) SafeTransferFrom(_from common.Address, _to com
 // Solidity: function safeTransferFrom(_from address, _to address, _tokenIds uint256[]) returns()
 func (_FuxBatch *FuxBatchTransactorSession) SafeTransferFrom(_from common.Address, _to common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
 	return _FuxBatch.Contract.SafeTransferFrom(&_FuxBatch.TransactOpts, _from, _to, _tokenIds)
-}
-
-// SafeTransferFromToMulti is a paid mutator transaction binding the contract method 0x7009e6bd.
-//
-// Solidity: function safeTransferFromToMulti(_from address, _tos address[], _tokenIds uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactor) SafeTransferFromToMulti(opts *bind.TransactOpts, _from common.Address, _tos []common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.contract.Transact(opts, "safeTransferFromToMulti", _from, _tos, _tokenIds)
-}
-
-// SafeTransferFromToMulti is a paid mutator transaction binding the contract method 0x7009e6bd.
-//
-// Solidity: function safeTransferFromToMulti(_from address, _tos address[], _tokenIds uint256[]) returns()
-func (_FuxBatch *FuxBatchSession) SafeTransferFromToMulti(_from common.Address, _tos []common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SafeTransferFromToMulti(&_FuxBatch.TransactOpts, _from, _tos, _tokenIds)
-}
-
-// SafeTransferFromToMulti is a paid mutator transaction binding the contract method 0x7009e6bd.
-//
-// Solidity: function safeTransferFromToMulti(_from address, _tos address[], _tokenIds uint256[]) returns()
-func (_FuxBatch *FuxBatchTransactorSession) SafeTransferFromToMulti(_from common.Address, _tos []common.Address, _tokenIds []*big.Int) (*types.Transaction, error) {
-	return _FuxBatch.Contract.SafeTransferFromToMulti(&_FuxBatch.TransactOpts, _from, _tos, _tokenIds)
 }
 
 // UpdateMaxLength is a paid mutator transaction binding the contract method 0x23969d51.
