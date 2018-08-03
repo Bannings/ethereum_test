@@ -93,7 +93,7 @@ func DistributeTask(transaction *tokens.Transaction) {
 	var company string
 	txType, _ := tokens.ParseType(transaction.TxType)
 
-	if txType == tokens.MintFX {
+	if txType == tokens.MintToken {
 		company = "cf"
 	} else {
 		company = transaction.Input[0].Owner
@@ -141,7 +141,7 @@ func verifyTransaction(trans *tokens.Transaction) error {
 	if err != nil {
 		return err
 	}
-	if txType == tokens.MintFX {
+	if txType == tokens.MintToken {
 		if len(trans.Output) == 0 {
 			return fmt.Errorf("Invalid transaction:%v, output not found")
 		}

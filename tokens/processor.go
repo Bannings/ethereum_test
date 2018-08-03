@@ -28,17 +28,17 @@ var (
 )
 
 type CmdProcessor struct {
-	fxClient *blockchain.FxClient
-	cmd      Command
-	db       *sql.DB
+	tokenClient *blockchain.TokenClient
+	cmd         Command
+	db          *sql.DB
 }
 
-func (p *CmdProcessor) CallWithFxTokenTransactor(
-	fn func(*contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error),
+func (p *CmdProcessor) CallWithTokenTransactor(
+	fn func(*contract_gen.ZrlTokenTransactorSession) (*ethTypes.Transaction, error),
 ) error {
 	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithFxTokenTransactor(fn)
+	if p.cmd.currNonce >= p.tokenClient.Nonce() {
+		tx, err := p.tokenClient.CallWithTokenTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
 			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
@@ -51,12 +51,12 @@ func (p *CmdProcessor) CallWithFxTokenTransactor(
 	return nil
 }
 
-func (p *CmdProcessor) CallWithFxSpliterTransactor(
-	fn func(*contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error),
+func (p *CmdProcessor) CallWithSpliterTransactor(
+	fn func(*contract_gen.ZrlSpliterTransactorSession) (*ethTypes.Transaction, error),
 ) error {
 	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithFxSpliterTransactor(fn)
+	if p.cmd.currNonce >= p.tokenClient.Nonce() {
+		tx, err := p.tokenClient.CallWithSpliterTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
 			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
@@ -69,12 +69,12 @@ func (p *CmdProcessor) CallWithFxSpliterTransactor(
 	return nil
 }
 
-func (p *CmdProcessor) CallWithFxBatchTransactor(
-	fn func(*contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error),
+func (p *CmdProcessor) CallWithBatchTransactor(
+	fn func(*contract_gen.ZrlBatchTransactorSession) (*ethTypes.Transaction, error),
 ) error {
 	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithFxBatchTransactor(fn)
+	if p.cmd.currNonce >= p.tokenClient.Nonce() {
+		tx, err := p.tokenClient.CallWithBatchTransactor(fn)
 		if err == nil {
 			txHash := tx.Hash().Hex()
 			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
@@ -89,7 +89,7 @@ func (p *CmdProcessor) CallWithFxBatchTransactor(
 
 func (p *CmdProcessor) initCmdNonce() {
 	if p.cmd.startNonce == 0 {
-		currNonce := p.fxClient.Nonce()
+		currNonce := p.tokenClient.Nonce()
 		p.cmd.startNonce = currNonce
 		p.cmd.currNonce = currNonce
 		log.Infof(
@@ -177,55 +177,18 @@ func (p *CmdProcessor) updateStatus() error {
 
 }
 
-func (p *CmdProcessor) CallWithBoxTransactor(
-	box *contract_gen.FuxPayBox,
-	fn func(*contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error),
-) error {
-	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithBoxTransactor(box, fn)
-		if err == nil {
-			txHash := tx.Hash().Hex()
-			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
-			p.saveTxHash(txHash)
-			p.cmd.currNonce += 1
-		}
-		return err
-	}
-	p.cmd.currNonce += 1
-	return nil
-}
-
-func (p *CmdProcessor) CallWithBoxFactoryTransactor(
-	fn func(*contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error),
-) error {
-	p.initCmdNonce()
-	if p.cmd.currNonce >= p.fxClient.Nonce() {
-		tx, err := p.fxClient.CallWithBoxFactoryTransactor(fn)
-		if err == nil {
-			txHash := tx.Hash().Hex()
-			p.cmd.txHashes[string(p.cmd.currNonce)] = txHash
-			p.saveTxHash(txHash)
-			p.cmd.currNonce += 1
-		}
-		return err
-	}
-	p.cmd.currNonce += 1
-	return nil
-}
-
 func (p *CmdProcessor) WaitMined(ctx context.Context, tx *ethTypes.Transaction) (*ethTypes.Receipt, error) {
 	nonce := p.cmd.currNonce
 	if txHash, ok := p.cmd.txHashes[string(nonce)]; ok {
 		log.Infof("txhash:%v", txHash)
-		return waitMined(ctx, p.fxClient.EthClient(), txHash)
+		return waitMined(ctx, p.tokenClient.EthClient(), txHash)
 	}
 
 	if tx == nil {
 		return nil, ErrNoTxHash
 	}
 
-	receipt, err := bind.WaitMined(ctx, p.fxClient.EthClient(), tx)
+	receipt, err := bind.WaitMined(ctx, p.tokenClient.EthClient(), tx)
 	if err != nil {
 		return nil, err
 	}
