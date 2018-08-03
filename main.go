@@ -92,7 +92,7 @@ func main() {
 		h.ServeHTTP(rw, req)
 	})
 
-	r.Route("/api/fx", func(r chi.Router) {
+	r.Route("/api/token", func(r chi.Router) {
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 		r.Post("/asset", handler.AssetHandler)

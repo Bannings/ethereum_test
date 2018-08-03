@@ -53,7 +53,7 @@ func querFXDetail(fxID *big.Int) (*tokens.Token, error) {
 	adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := adminClient.CallWithFXStorageCaller(ctx).Existed(fxID)
+	existed, err := adminClient.CallWithStorageCaller(ctx).Existed(fxID)
 	if !existed {
 		errTxt := fmt.Sprintf("FX:%s is not exist", fxID.Uint64())
 		return nil, errors.New(errTxt)
@@ -65,16 +65,16 @@ func querFXDetail(fxID *big.Int) (*tokens.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	properties, err := adminClient.CallWithFXStorageCaller(ctx).GetProperties(fxID, false)
+	properties, err := adminClient.CallWithStorageCaller(ctx).GetProperties(fxID, false)
 	if err != nil {
 		return nil, err
 	}
-	stateID, err := adminClient.CallWithFXLockerCaller(ctx).GetState(fxID)
+	stateID, err := adminClient.CallWithLockerCaller(ctx).GetState(fxID)
 	if err != nil {
 		return nil, err
 	}
 	state := fxState[stateID.Uint64()]
-	expire, err := adminClient.CallWithFXLockerCaller(ctx).GetExpire(fxID)
+	expire, err := adminClient.CallWithLockerCaller(ctx).GetExpire(fxID)
 	if err != nil {
 		return nil, err
 	}

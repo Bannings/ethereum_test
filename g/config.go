@@ -35,13 +35,13 @@ type BlockChainConfig struct {
 }
 
 type ContractAddrs struct {
-	FxTokenAddr      string `json:"fxTokenAddr"`
-	FxBoxFactoryAddr string `json:"fxBoxFactoryAddr"`
-	FxSpliterAddr    string `json:"fxSplitAddr"`
-	FxBatchAddr      string `json:"fxBatchAddr"`
-	ERC721TokenAddr  string `json:"erc27TokenAddr"`
-	FXLockerAddr     string `json:"fxLockerAddr"`
-	FXStorageAddr    string `json:"fxStorageAddr"`
+	TokenAddr       string `json:"tokenAddr"`
+	BoxFactoryAddr  string `json:"tokenFactoryAddr"`
+	SpliterAddr     string `json:"tokenSplitAddr"`
+	BatchAddr       string `json:"tokenBatchAddr"`
+	ERC721TokenAddr string `json:"erc27TokenAddr"`
+	LockerAddr      string `json:"tokenLockerAddr"`
+	StorageAddr     string `json:"tokenStorageAddr"`
 
 	NodeAddr  string `json:"nodeAddr"`
 	StoreAddr string `json:"storeAddr"`

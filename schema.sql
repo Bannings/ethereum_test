@@ -1,5 +1,5 @@
-create database fx_blockchain;
-use fx_blockchain;
+﻿create database blockchain;
+use blockchain;
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -13,7 +13,7 @@ CREATE TABLE `accounts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `tx_procedure`;
+DROP TABLE IF EXISTS `cmd_procedure`;
 CREATE TABLE `cmd_procedure` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `transaction_id` int(11) NOT NULL,

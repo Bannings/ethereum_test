@@ -46,7 +46,7 @@ func NewCache(rawUrl string, keystore *keychain.Store, maxEntries int) *ClientCa
 	c := new(ClientCache)
 	c.lru = lru.New(maxEntries)
 	c.lru.OnEvicted = func(key lru.Key, value interface{}) {
-		entry := value.(*blockchain.FxClient)
+		entry := value.(*blockchain.TokenClient)
 		c.handleEvicted(entry)
 	}
 	c.rawUrl = rawUrl
@@ -54,15 +54,15 @@ func NewCache(rawUrl string, keystore *keychain.Store, maxEntries int) *ClientCa
 	return c
 }
 
-func (c *ClientCache) handleEvicted(entry *blockchain.FxClient) {
+func (c *ClientCache) handleEvicted(entry *blockchain.TokenClient) {
 	entry.Close()
 }
 
-func (c *ClientCache) GetOrCreate(companyId string) (*blockchain.FxClient, error) {
+func (c *ClientCache) GetOrCreate(companyId string) (*blockchain.TokenClient, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var entry *blockchain.FxClient
+	var entry *blockchain.TokenClient
 	val, ok := c.lru.Get(companyId)
 	if !ok {
 		acc, err := c.keystore.GetAccount(companyId)
@@ -78,7 +78,7 @@ func (c *ClientCache) GetOrCreate(companyId string) (*blockchain.FxClient, error
 
 		c.lru.Put(companyId, entry)
 	} else {
-		entry = val.(*blockchain.FxClient)
+		entry = val.(*blockchain.TokenClient)
 	}
 
 	return entry, nil

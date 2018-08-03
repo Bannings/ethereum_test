@@ -87,14 +87,14 @@ func sectionalizeCmd(cmds []Command) map[string][]Command {
 
 	for _, cmd := range cmds {
 		txtype, _ := ParseType(cmd.Tx.TxType)
-		if txtype == MintFX {
-			if _, ok := supplierMap["cf"]; ok {
-				temp := supplierMap["cf"]
+		if txtype == MintToken {
+			if _, ok := supplierMap["admin"]; ok {
+				temp := supplierMap["admin"]
 				temp = append(temp, cmd)
-				supplierMap["cf"] = temp
+				supplierMap["admin"] = temp
 			} else {
-				supplierMap["cf"] = []Command{}
-				supplierMap["cf"] = append(supplierMap["cf"], cmd)
+				supplierMap["admin"] = []Command{}
+				supplierMap["admin"] = append(supplierMap["admin"], cmd)
 			}
 		} else {
 			if _, ok := supplierMap[cmd.Tx.Input[0].Owner]; ok {

@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math/big"
+	"sync"
+
 	"gitlab.zhuronglink.com/chaincore/contract-gen"
 	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
 	"gitlab.zhuronglink.com/chaincore/r2/g"
 	"gitlab.zhuronglink.com/chaincore/r2/keychain"
-	"math/big"
-	"sync"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/common"
@@ -42,7 +43,7 @@ type EthExecutor struct {
 	keystore      *keychain.Store
 	db            *sql.DB
 	clientCache   *ClientCache
-	adminClient   *blockchain.FxClient
+	adminClient   *blockchain.TokenClient
 	opts          *options
 }
 
@@ -73,7 +74,7 @@ func NewEthExecutor(
 	conf g.BlockChainConfig,
 	db *sql.DB,
 	clientCache *ClientCache,
-	adminClient *blockchain.FxClient,
+	adminClient *blockchain.TokenClient,
 	eos ...ExecuteOption,
 ) (*EthExecutor, error) {
 	executor := new(EthExecutor)
@@ -93,7 +94,7 @@ func NewEthExecutor(
 }
 
 func (e *EthExecutor) handleError(err error, cmd Command, processor *CmdProcessor) {
-	processor.fxClient.RefreshNonce()
+	processor.tokenClient.RefreshNonce()
 
 	switch err {
 	case core.ErrInsufficientFunds:
@@ -116,9 +117,9 @@ func (e *EthExecutor) Execute(cmd Command) error {
 		return err
 	}
 	switch txType {
-	case SplitFX, Discount, Payment:
+	case SplitToken, Discount, Payment:
 		return e.executeBySupplier(cmd)
-	case MintFX, Confirm:
+	case MintToken, Confirm:
 		return e.executeByPlatform(cmd)
 	default:
 		return fmt.Errorf("unknow command: %+v", cmd)
@@ -132,7 +133,7 @@ func (e *EthExecutor) executeBySupplier(cmd Command) error {
 		log.Errorf("create personal client failed: %v", err1)
 		return err1
 	}
-	p := &CmdProcessor{fxClient: c, cmd: cmd, db: e.db}
+	p := &CmdProcessor{tokenClient: c, cmd: cmd, db: e.db}
 
 	return e.process(cmd, p)
 }
@@ -172,13 +173,13 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 		return err
 	}
 	switch txType {
-	case SplitFX:
+	case SplitToken:
 		err = e.splitFX(p)
 	case Discount:
 		err = e.payByTransfer(p)
 	case Payment:
 		err = e.payTransaction(p)
-	case MintFX:
+	case MintToken:
 		err = e.mintTransaction(p)
 	case Confirm:
 		err = e.payByTransfer(p)
@@ -194,7 +195,7 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 }
 
 func (e *EthExecutor) executeByPlatform(cmd Command) error {
-	p := &CmdProcessor{fxClient: e.adminClient, cmd: cmd, db: e.db}
+	p := &CmdProcessor{tokenClient: e.adminClient, cmd: cmd, db: e.db}
 	return e.process(cmd, p)
 }
 
@@ -217,8 +218,8 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSpliterTransactor(
-		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithSpliterTransactor(
+		func(session *contract_gen.ZrlSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
@@ -267,7 +268,7 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 			return err
 		}
 	}
-	err := e.BatchTransfer(input[0], transferToken, p)
+	err := e.MultiTransfer(input[0], transferToken, p)
 	if err != nil {
 		log.Errorf("transfer fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
 		return err
@@ -291,8 +292,8 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 		id := t.Id
 		ids[i] = &id
 		var tx *ethTypes.Transaction
-		err = p.CallWithFxTokenTransactor(
-			func(session *contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error) {
+		err = p.CallWithTokenTransactor(
+			func(session *contract_gen.ZrlTokenTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.SafeTransferFrom(fromAcc.Address, toAcc.Address, &id)
 				return tx, innerErr
@@ -337,8 +338,8 @@ func (e *EthExecutor) MultiTransfer(input Token, output []Token, p *CmdProcessor
 	}
 	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAdd[0].String(), ids)
 	var tx *ethTypes.Transaction
-	err = p.CallWithFxBatchTransactor(
-		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+	err = p.CallWithBatchTransactor(
+		func(session *contract_gen.ZrlBatchTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.SafeTransferFromToMulti(fromAcc.Address, toAdd, ids)
 			return tx, innerErr
@@ -379,8 +380,8 @@ func (e *EthExecutor) BatchTransfer(input Token, output []Token, p *CmdProcessor
 	}
 	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAccount, ids)
 	var tx *ethTypes.Transaction
-	err = p.CallWithFxBatchTransactor(
-		func(session *contract_gen.FuxBatchTransactorSession) (*ethTypes.Transaction, error) {
+	err = p.CallWithBatchTransactor(
+		func(session *contract_gen.ZrlBatchTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.SafeTransferFrom(fromAcc.Address, toAcc.Address, ids)
 			return tx, innerErr
@@ -406,7 +407,7 @@ func (e *EthExecutor) BatchTransfer(input Token, output []Token, p *CmdProcessor
 }
 
 func (e *EthExecutor) mintTransaction(p *CmdProcessor) error {
-	err := e.mintFX(p)
+	err := e.mintToken(p)
 	if err != nil {
 		log.Errorf("Mint token failed: %v, txid:%v", err, p.cmd.Tx.TxId)
 		return err
@@ -445,8 +446,8 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 	}
 	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction
-	err := p.CallWithFxSpliterTransactor(
-		func(session *contract_gen.FuxSpliterTransactorSession) (*ethTypes.Transaction, error) {
+	err := p.CallWithSpliterTransactor(
+		func(session *contract_gen.ZrlSpliterTransactorSession) (*ethTypes.Transaction, error) {
 			var innerErr error
 			tx, innerErr = session.Split(&tokenId, newTokenIds, amounts, states)
 			return tx, innerErr
@@ -468,78 +469,7 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 	return nil
 }
 
-// Input tokens should be same with pay input tokens
-func (e *EthExecutor) confirm(p *CmdProcessor) error {
-	cmd := p.cmd
-	//txId := cmd.Tx.TxId
-	txId := 0
-	boxId := generateBoxId(uint64(txId), 0)
-
-	var boxAddr common.Address
-	err := p.fxClient.CallWithBoxFactoryCaller(
-		func(session *contract_gen.FuxPayBoxFactoryCallerSession) error {
-			var innerErr error
-			boxAddr, innerErr = session.GetPayBoxAddress(new(big.Int).SetUint64(boxId))
-			return innerErr
-		},
-	)
-	if err != nil {
-		return err
-	}
-	box, err := contract_gen.NewFuxPayBox(boxAddr, p.fxClient.EthClient())
-	if err != nil {
-		return err
-	}
-
-	input := cmd.Tx.Input
-	to := cmd.Tx.Output[0].Owner
-	toAcc, err := e.keystore.GetAccount(to)
-	if err != nil {
-		log.Errorf("get account of %v failed: %v", to, err)
-		return err
-	}
-
-	var tx *ethTypes.Transaction
-	for _, t := range input {
-		err := p.CallWithBoxTransactor(
-			box,
-			func(session *contract_gen.FuxPayBoxTransactorSession) (*ethTypes.Transaction, error) {
-				var innerErr error
-				tx, innerErr = session.Transfer(toAcc.Address, &t.Id)
-				return tx, innerErr
-			},
-		)
-		if err != nil {
-			log.Errorf("call FuxPayBox.Transfer contract failed: %v", err)
-			return err
-		}
-	}
-
-	log.Infof("destroy box: %v", boxId)
-	err = p.CallWithBoxFactoryTransactor(
-		func(session *contract_gen.FuxPayBoxFactoryTransactorSession) (*ethTypes.Transaction, error) {
-			var innerErr error
-			tx, innerErr = session.CloseBox(boxAddr)
-			return tx, innerErr
-		},
-	)
-	if err != nil {
-		log.Errorf("call FuxPayBoxFactory.CloseBox contract failed: %v", err)
-		return err
-	}
-
-	receipt, err := p.WaitMined(context.Background(), tx)
-	if err != nil {
-		return err
-	}
-	if receipt.Status == ethTypes.ReceiptStatusFailed {
-		return ErrTxExecuteFailed
-	}
-
-	return nil
-}
-
-func (e *EthExecutor) mintFX(p *CmdProcessor) error {
+func (e *EthExecutor) mintToken(p *CmdProcessor) error {
 	cmd := p.cmd
 	input := cmd.Tx.Input
 	var tx *ethTypes.Transaction
@@ -551,8 +481,8 @@ func (e *EthExecutor) mintFX(p *CmdProcessor) error {
 			return err
 		}
 
-		err = p.CallWithFxTokenTransactor(
-			func(session *contract_gen.FuxTokenTransactorSession) (*ethTypes.Transaction, error) {
+		err = p.CallWithTokenTransactor(
+			func(session *contract_gen.ZrlTokenTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.Mint(
 					acc.Address,
