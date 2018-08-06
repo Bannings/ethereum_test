@@ -32,7 +32,6 @@ func init() {
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
 	var trans tokens.Transaction
 	body, _ := ioutil.ReadAll(r.Body)
-	log.Infof("Receive request:%v", body)
 	err := json.Unmarshal(body, &trans)
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
@@ -40,6 +39,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
+	log.Infof("Receive request:%v", body)
 	_, err = tokens.ParseType(trans.TxType)
 
 	if err != nil {
@@ -70,12 +70,12 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	err = verifyTransaction(&trans)
-	if err != nil {
-		resp := g.NewBadResponse("400", err.Error())
-		render.JSON(w, r, resp)
-		return
-	}
+	//err = verifyTransaction(&trans)
+	//if err != nil {
+	//	resp := g.NewBadResponse("400", err.Error())
+	//	render.JSON(w, r, resp)
+	//	return
+	//}
 	err = saveTransaction(&trans)
 	if err != nil {
 		log.Errorf("%v", err)
