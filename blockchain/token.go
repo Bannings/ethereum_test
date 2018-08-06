@@ -41,19 +41,19 @@ func NewTokenClient(cli *keychain.AccountClient, acccount keychain.Account, cont
 
 	token, err := contract_gen.NewZrlToken(common.HexToAddress(contractAddrs.TokenAddr), cli.EthClient)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxToken contract: %v", err)
+		log.Errorf("Failed to instantiate a Token contract: %v", err)
 		return nil, err
 	}
 
 	tokenSpliter, err := contract_gen.NewZrlSpliter(common.HexToAddress(contractAddrs.SpliterAddr), cli.EthClient)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		log.Errorf("Failed to instantiate a Split contract: %v", err)
 		return nil, err
 	}
 
 	tokenBatch, err := contract_gen.NewZrlBatch(common.HexToAddress(contractAddrs.BatchAddr), cli.EthClient)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		log.Errorf("Failed to instantiate a Split contract: %v", err)
 		return nil, err
 	}
 	erc721Token, err := contract_gen.NewERC721Token(common.HexToAddress(contractAddrs.ERC721TokenAddr), cli.EthClient)
@@ -63,12 +63,12 @@ func NewTokenClient(cli *keychain.AccountClient, acccount keychain.Account, cont
 	}
 	tokenLocker, err := contract_gen.NewZrlLocker(common.HexToAddress(contractAddrs.LockerAddr), cli.EthClient)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		log.Errorf("Failed to instantiate a Split contract: %v", err)
 		return nil, err
 	}
 	tokenStorage, err := contract_gen.NewZrlStorage(common.HexToAddress(contractAddrs.StorageAddr), cli.EthClient)
 	if err != nil {
-		log.Errorf("Failed to instantiate a fxSplit contract: %v", err)
+		log.Errorf("Failed to instantiate a Split contract: %v", err)
 		return nil, err
 	}
 	c := &TokenClient{

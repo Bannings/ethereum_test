@@ -96,7 +96,7 @@ func main() {
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 		r.Post("/asset", handler.AssetHandler)
-		r.Get("/query", handler.QueryFXHandler)
+		r.Get("/query", handler.QueryTokenHandler)
 	})
 
 	r.Mount("/debug", middleware.Profiler())
