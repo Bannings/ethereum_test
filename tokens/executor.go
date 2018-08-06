@@ -174,7 +174,7 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	}
 	switch txType {
 	case SplitToken:
-		err = e.splitFX(p)
+		err = e.splitToken(p)
 	case Discount:
 		err = e.payByTransfer(p)
 	case Payment:
@@ -199,7 +199,7 @@ func (e *EthExecutor) executeByPlatform(cmd Command) error {
 	return e.process(cmd, p)
 }
 
-func (e *EthExecutor) splitFX(p *CmdProcessor) error {
+func (e *EthExecutor) splitToken(p *CmdProcessor) error {
 	cmd := p.cmd
 	token := cmd.Tx.Input[0]
 	tokenId := token.Id
@@ -215,7 +215,7 @@ func (e *EthExecutor) splitFX(p *CmdProcessor) error {
 		}
 		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
-	log.Infof("--- split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
+	log.Infof("--- split token: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 
 	var tx *ethTypes.Transaction
 	err := p.CallWithSpliterTransactor(
@@ -264,13 +264,13 @@ func (e *EthExecutor) payTransaction(p *CmdProcessor) error {
 		}
 		err := e.split(inputToken, splitToken, p)
 		if err != nil {
-			log.Errorf("split fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
+			log.Errorf("split token failed: %v,txid:%v", p.cmd.Tx.TxId, err)
 			return err
 		}
 	}
 	err := e.MultiTransfer(input[0], transferToken, p)
 	if err != nil {
-		log.Errorf("transfer fx failed: %v,txid:%v", p.cmd.Tx.TxId, err)
+		log.Errorf("transfer token failed: %v,txid:%v", p.cmd.Tx.TxId, err)
 		return err
 	}
 	return nil
@@ -315,7 +315,7 @@ func (e *EthExecutor) payByTransfer(p *CmdProcessor) error {
 		}
 		log.Infof("transfer success :%v ,receipt info:%v", tx, receipt.TxHash)
 	}
-	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAccount, ids)
+	log.Infof("Transfer token from:%v to:%v, token id is :%v", fromAccount, toAccount, ids)
 
 	return nil
 }
@@ -336,7 +336,7 @@ func (e *EthExecutor) MultiTransfer(input Token, output []Token, p *CmdProcessor
 		add, _ := e.keystore.GetAccount(toAccount)
 		toAdd = append(toAdd, add.Address)
 	}
-	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAdd[0].String(), ids)
+	log.Infof("Transfer token from:%v to:%v, token id is :%v", fromAccount, toAdd[0].String(), ids)
 	var tx *ethTypes.Transaction
 	err = p.CallWithBatchTransactor(
 		func(session *contract_gen.ZrlBatchTransactorSession) (*ethTypes.Transaction, error) {
@@ -378,7 +378,7 @@ func (e *EthExecutor) BatchTransfer(input Token, output []Token, p *CmdProcessor
 		id := t.Id
 		ids[i] = &id
 	}
-	log.Infof("Transfer FX from:%v to:%v, FX id is :%v", fromAccount, toAccount, ids)
+	log.Infof("Transfer token from:%v to:%v, token id is :%v", fromAccount, toAccount, ids)
 	var tx *ethTypes.Transaction
 	err = p.CallWithBatchTransactor(
 		func(session *contract_gen.ZrlBatchTransactorSession) (*ethTypes.Transaction, error) {
@@ -444,7 +444,7 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 		}
 		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
-	log.Infof("Split fx: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
+	log.Infof("Split token: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
 	var tx *ethTypes.Transaction
 	err := p.CallWithSpliterTransactor(
 		func(session *contract_gen.ZrlSpliterTransactorSession) (*ethTypes.Transaction, error) {
@@ -474,7 +474,7 @@ func (e *EthExecutor) mintToken(p *CmdProcessor) error {
 	input := cmd.Tx.Input
 	var tx *ethTypes.Transaction
 	for _, t := range input {
-		log.Infof("mint fx: id: %v, owner: %v, amount: %v, state: %v", t.Id.String(), t.Owner, t.Amount, t.State)
+		log.Infof("mint token: id: %v, owner: %v, amount: %v, state: %v", t.Id.String(), t.Owner, t.Amount, t.State)
 		acc, err := e.keystore.GetAccount(t.Owner)
 		if err != nil {
 			log.Errorf("get account of %v failed: %v", t.Owner, err)

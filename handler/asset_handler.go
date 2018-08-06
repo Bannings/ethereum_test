@@ -19,14 +19,14 @@ import (
 var (
 	supplierMap map[string]chan tokens.Transaction
 	tradeTypes  []string
-	fxState     []string
+	state       []string
 	db          *sql.DB
 )
 
 func init() {
 	supplierMap = make(map[string]chan tokens.Transaction)
-	tradeTypes = []string{"Payment", "Discount", "SplitFX", "MintFX", "Confirm"}
-	fxState = []string{"Frozen", "Normal", "Historic"}
+	tradeTypes = []string{"Payment", "Discount", "SplitToken", "MintToken", "Confirm"}
+	state = []string{"Frozen", "Normal", "Historic"}
 }
 
 func AssetHandler(w http.ResponseWriter, r *http.Request) {
@@ -158,7 +158,7 @@ func verifyTransaction(trans *tokens.Transaction) error {
 			if err != nil {
 				return err
 			}
-			token, err := querFXDetail(&inputToken.Id)
+			token, err := querTokenDetail(&inputToken.Id)
 			if err != nil {
 				return fmt.Errorf("Token:%v haven't been stored to blockchain or does't exist", inputToken.Id.Uint64())
 			}
