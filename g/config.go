@@ -36,15 +36,11 @@ type BlockChainConfig struct {
 
 type ContractAddrs struct {
 	TokenAddr       string `json:"tokenAddr"`
-	BoxFactoryAddr  string `json:"tokenFactoryAddr"`
 	SpliterAddr     string `json:"tokenSplitAddr"`
 	BatchAddr       string `json:"tokenBatchAddr"`
 	ERC721TokenAddr string `json:"erc27TokenAddr"`
 	LockerAddr      string `json:"tokenLockerAddr"`
 	StorageAddr     string `json:"tokenStorageAddr"`
-
-	NodeAddr  string `json:"nodeAddr"`
-	StoreAddr string `json:"storeAddr"`
 }
 
 func LoadConfig(jsonFile string) (*Config, error) {

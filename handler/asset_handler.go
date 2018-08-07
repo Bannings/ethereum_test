@@ -39,7 +39,7 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	log.Infof("Receive request:%v", body)
+	log.Infof("Receive request:%v", trans)
 	_, err = tokens.ParseType(trans.TxType)
 
 	if err != nil {
