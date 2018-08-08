@@ -17,6 +17,8 @@
 package vm
 
 import (
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params"
@@ -117,8 +119,9 @@ func gasReturnDataCopy(gt params.GasTable, evm *EVM, contract *Contract, stack *
 
 func gasSStore(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	var (
+		db   = getDualState(evm, contract.Address())
 		y, x = stack.Back(1), stack.Back(0)
-		val  = evm.StateDB.GetState(contract.Address(), common.BigToHash(x))
+		val  = db.GetState(contract.Address(), common.BigToHash(x))
 	)
 	// This checks for 3 scenario's and calculates gas accordingly
 	// 1. From a zero-value address to a non-zero value         (NEW VALUE)
@@ -128,7 +131,7 @@ func gasSStore(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, m
 		// 0 => non 0
 		return params.SstoreSetGas, nil
 	} else if !common.EmptyHash(val) && common.EmptyHash(common.BigToHash(y)) {
-		evm.StateDB.AddRefund(params.SstoreRefundGas)
+		db.AddRefund(new(big.Int).SetUint64(params.SstoreRefundGas))
 
 		return params.SstoreClearGas, nil
 	} else {
@@ -322,10 +325,10 @@ func gasCall(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem
 		eip158         = evm.ChainConfig().IsEIP158(evm.BlockNumber)
 	)
 	if eip158 {
-		if transfersValue && evm.StateDB.Empty(address) {
+		if transfersValue && getDualState(evm, address).Empty(address) {
 			gas += params.CallNewAccountGas
 		}
-	} else if !evm.StateDB.Exist(address) {
+	} else if !getDualState(evm, address).Exist(address) {
 		gas += params.CallNewAccountGas
 	}
 	if transfersValue {
@@ -340,11 +343,19 @@ func gasCall(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem
 		return 0, errGasUintOverflow
 	}
 
-	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
+	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+	// Replace the stack item with the new gas calculation. This means that
+	// either the original item is left on the stack or the item is replaced by:
+	// (availableGas - gas) * 63 / 64
+	// We replace the stack item so that it's available when the opCall instruction is
+	// called. This information is otherwise lost due to the dependency on *current*
+	// available gas.
+	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
+
+	if gas, overflow = math.SafeAdd(gas, cg); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -364,11 +375,19 @@ func gasCallCode(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack,
 		return 0, errGasUintOverflow
 	}
 
-	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
+	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+	// Replace the stack item with the new gas calculation. This means that
+	// either the original item is left on the stack or the item is replaced by:
+	// (availableGas - gas) * 63 / 64
+	// We replace the stack item so that it's available when the opCall instruction is
+	// called. This information is otherwise lost due to the dependency on *current*
+	// available gas.
+	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
+
+	if gas, overflow = math.SafeAdd(gas, cg); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -383,6 +402,7 @@ func gasRevert(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, m
 }
 
 func gasSuicide(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
+	var db StateDB
 	var gas uint64
 	// EIP150 homestead gas reprice fork:
 	if evm.ChainConfig().IsEIP150(evm.BlockNumber) {
@@ -391,19 +411,20 @@ func gasSuicide(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, 
 			address = common.BigToAddress(stack.Back(0))
 			eip158  = evm.ChainConfig().IsEIP158(evm.BlockNumber)
 		)
+		db = getDualState(evm, address)
 
 		if eip158 {
 			// if empty and transfers value
-			if evm.StateDB.Empty(address) && evm.StateDB.GetBalance(contract.Address()).Sign() != 0 {
+			if db.Empty(address) && db.GetBalance(contract.Address()).Sign() != 0 {
 				gas += gt.CreateBySuicide
 			}
-		} else if !evm.StateDB.Exist(address) {
+		} else if !db.Exist(address) {
 			gas += gt.CreateBySuicide
 		}
 	}
 
-	if !evm.StateDB.HasSuicided(contract.Address()) {
-		evm.StateDB.AddRefund(params.SuicideRefundGas)
+	if !db.HasSuicided(contract.Address()) {
+		db.AddRefund(new(big.Int).SetUint64(params.SuicideRefundGas))
 	}
 	return gas, nil
 }
@@ -418,11 +439,18 @@ func gasDelegateCall(gt params.GasTable, evm *EVM, contract *Contract, stack *St
 		return 0, errGasUintOverflow
 	}
 
-	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
+	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+	// Replace the stack item with the new gas calculation. This means that
+	// either the original item is left on the stack or the item is replaced by:
+	// (availableGas - gas) * 63 / 64
+	// We replace the stack item so that it's available when the opCall instruction is
+	// called.
+	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
+
+	if gas, overflow = math.SafeAdd(gas, cg); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil
@@ -438,11 +466,18 @@ func gasStaticCall(gt params.GasTable, evm *EVM, contract *Contract, stack *Stac
 		return 0, errGasUintOverflow
 	}
 
-	evm.callGasTemp, err = callGas(gt, contract.Gas, gas, stack.Back(0))
+	cg, err := callGas(gt, contract.Gas, gas, stack.Back(0))
 	if err != nil {
 		return 0, err
 	}
-	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+	// Replace the stack item with the new gas calculation. This means that
+	// either the original item is left on the stack or the item is replaced by:
+	// (availableGas - gas) * 63 / 64
+	// We replace the stack item so that it's available when the opCall instruction is
+	// called.
+	stack.data[stack.len()-1] = new(big.Int).SetUint64(cg)
+
+	if gas, overflow = math.SafeAdd(gas, cg); overflow {
 		return 0, errGasUintOverflow
 	}
 	return gas, nil

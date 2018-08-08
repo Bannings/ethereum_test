@@ -47,7 +47,6 @@ var (
 	headHeaderKey = []byte("LastHeader")
 	headBlockKey  = []byte("LastBlock")
 	headFastKey   = []byte("LastFast")
-	trieSyncKey   = []byte("TrieSync")
 
 	// Data item prefixes (use single byte to avoid mixing data types, avoid `i`).
 	headerPrefix        = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
@@ -71,13 +70,18 @@ var (
 
 	ErrChainConfigNotFound = errors.New("ChainConfig not found") // general config not found error
 
-	preimageCounter    = metrics.NewRegisteredCounter("db/preimage/total", nil)
-	preimageHitCounter = metrics.NewRegisteredCounter("db/preimage/hits", nil)
+	preimageCounter    = metrics.NewCounter("db/preimage/total")
+	preimageHitCounter = metrics.NewCounter("db/preimage/hits")
+
+	privateRootPrefix          = []byte("P")
+	privateblockReceiptsPrefix = []byte("Pr") // blockReceiptsPrefix + num (uint64 big endian) + hash -> block receipts
+	privateReceiptPrefix       = []byte("Prs")
+	privateBloomPrefix         = []byte("Pb")
 )
 
-// TxLookupEntry is a positional metadata to help looking up the data content of
+// txLookupEntry is a positional metadata to help looking up the data content of
 // a transaction or receipt given only its hash.
-type TxLookupEntry struct {
+type txLookupEntry struct {
 	BlockHash  common.Hash
 	BlockIndex uint64
 	Index      uint64
@@ -145,16 +149,6 @@ func GetHeadFastBlockHash(db DatabaseReader) common.Hash {
 		return common.Hash{}
 	}
 	return common.BytesToHash(data)
-}
-
-// GetTrieSyncProgress retrieves the number of tries nodes fast synced to allow
-// reportinc correct numbers across restarts.
-func GetTrieSyncProgress(db DatabaseReader) uint64 {
-	data, _ := db.Get(trieSyncKey)
-	if len(data) == 0 {
-		return 0
-	}
-	return new(big.Int).SetBytes(data).Uint64()
 }
 
 // GetHeaderRLP retrieves a block header in its raw RLP database encoding, or nil
@@ -271,7 +265,7 @@ func GetTxLookupEntry(db DatabaseReader, hash common.Hash) (common.Hash, uint64,
 		return common.Hash{}, 0, 0
 	}
 	// Parse and return the contents of the lookup entry
-	var entry TxLookupEntry
+	var entry txLookupEntry
 	if err := rlp.DecodeBytes(data, &entry); err != nil {
 		log.Error("Invalid lookup entry RLP", "hash", hash, "err", err)
 		return common.Hash{}, 0, 0
@@ -307,7 +301,7 @@ func GetTransaction(db DatabaseReader, hash common.Hash) (*types.Transaction, co
 	if len(data) == 0 {
 		return nil, common.Hash{}, 0, 0
 	}
-	var entry TxLookupEntry
+	var entry txLookupEntry
 	if err := rlp.DecodeBytes(data, &entry); err != nil {
 		return nil, common.Hash{}, 0, 0
 	}
@@ -343,13 +337,14 @@ func GetReceipt(db DatabaseReader, hash common.Hash) (*types.Receipt, common.Has
 
 // GetBloomBits retrieves the compressed bloom bit vector belonging to the given
 // section and bit index from the.
-func GetBloomBits(db DatabaseReader, bit uint, section uint64, head common.Hash) ([]byte, error) {
+func GetBloomBits(db DatabaseReader, bit uint, section uint64, head common.Hash) []byte {
 	key := append(append(bloomBitsPrefix, make([]byte, 10)...), head.Bytes()...)
 
 	binary.BigEndian.PutUint16(key[1:], uint16(bit))
 	binary.BigEndian.PutUint64(key[3:], section)
 
-	return db.Get(key)
+	bits, _ := db.Get(key)
+	return bits
 }
 
 // WriteCanonicalHash stores the canonical hash for the given block number.
@@ -381,15 +376,6 @@ func WriteHeadBlockHash(db ethdb.Putter, hash common.Hash) error {
 func WriteHeadFastBlockHash(db ethdb.Putter, hash common.Hash) error {
 	if err := db.Put(headFastKey, hash.Bytes()); err != nil {
 		log.Crit("Failed to store last fast block's hash", "err", err)
-	}
-	return nil
-}
-
-// WriteTrieSyncProgress stores the fast sync trie process counter to support
-// retrieving it across restarts.
-func WriteTrieSyncProgress(db ethdb.Putter, count uint64) error {
-	if err := db.Put(trieSyncKey, new(big.Int).SetUint64(count).Bytes()); err != nil {
-		log.Crit("Failed to store fast sync trie progress", "err", err)
 	}
 	return nil
 }
@@ -484,7 +470,7 @@ func WriteBlockReceipts(db ethdb.Putter, hash common.Hash, number uint64, receip
 func WriteTxLookupEntries(db ethdb.Putter, block *types.Block) error {
 	// Iterate over each transaction and encode its metadata
 	for i, tx := range block.Transactions() {
-		entry := TxLookupEntry{
+		entry := txLookupEntry{
 			BlockHash:  block.Hash(),
 			BlockIndex: block.NumberU64(),
 			Index:      uint64(i),
@@ -649,4 +635,29 @@ func FindCommonAncestor(db DatabaseReader, a, b *types.Header) *types.Header {
 		}
 	}
 	return a
+}
+
+func GetPrivateStateRoot(db ethdb.Database, blockRoot common.Hash) common.Hash {
+	root, _ := db.Get(append(privateRootPrefix, blockRoot[:]...))
+	return common.BytesToHash(root)
+}
+
+func WritePrivateStateRoot(db ethdb.Database, blockRoot, root common.Hash) error {
+	return db.Put(append(privateRootPrefix, blockRoot[:]...), root[:])
+}
+
+// WritePrivateBlockBloom creates a bloom filter for the given receipts and saves it to the database
+// with the number given as identifier (i.e. block number).
+func WritePrivateBlockBloom(db ethdb.Database, number uint64, receipts types.Receipts) error {
+	rbloom := types.CreateBloom(receipts)
+	return db.Put(append(privateBloomPrefix, encodeBlockNumber(number)...), rbloom[:])
+}
+
+// GetPrivateBlockBloom retrieves the private bloom associated with the given number.
+func GetPrivateBlockBloom(db ethdb.Database, number uint64) (bloom types.Bloom) {
+	data, _ := db.Get(append(privateBloomPrefix, encodeBlockNumber(number)...))
+	if len(data) > 0 {
+		bloom = types.BytesToBloom(data)
+	}
+	return bloom
 }

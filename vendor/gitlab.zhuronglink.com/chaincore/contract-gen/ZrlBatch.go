@@ -7,12 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
 )
 
 // ZrlBatchABI is the input ABI used to generate the binding from.
@@ -22,7 +20,6 @@ const ZrlBatchABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"zrlToken\",\"o
 type ZrlBatch struct {
 	ZrlBatchCaller     // Read-only binding to the contract
 	ZrlBatchTransactor // Write-only binding to the contract
-	ZrlBatchFilterer   // Log filterer for contract events
 }
 
 // ZrlBatchCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -32,11 +29,6 @@ type ZrlBatchCaller struct {
 
 // ZrlBatchTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type ZrlBatchTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// ZrlBatchFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type ZrlBatchFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -79,16 +71,16 @@ type ZrlBatchTransactorRaw struct {
 
 // NewZrlBatch creates a new instance of ZrlBatch, bound to a specific deployed contract.
 func NewZrlBatch(address common.Address, backend bind.ContractBackend) (*ZrlBatch, error) {
-	contract, err := bindZrlBatch(address, backend, backend, backend)
+	contract, err := bindZrlBatch(address, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &ZrlBatch{ZrlBatchCaller: ZrlBatchCaller{contract: contract}, ZrlBatchTransactor: ZrlBatchTransactor{contract: contract}, ZrlBatchFilterer: ZrlBatchFilterer{contract: contract}}, nil
+	return &ZrlBatch{ZrlBatchCaller: ZrlBatchCaller{contract: contract}, ZrlBatchTransactor: ZrlBatchTransactor{contract: contract}}, nil
 }
 
 // NewZrlBatchCaller creates a new read-only instance of ZrlBatch, bound to a specific deployed contract.
 func NewZrlBatchCaller(address common.Address, caller bind.ContractCaller) (*ZrlBatchCaller, error) {
-	contract, err := bindZrlBatch(address, caller, nil, nil)
+	contract, err := bindZrlBatch(address, caller, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,29 +89,20 @@ func NewZrlBatchCaller(address common.Address, caller bind.ContractCaller) (*Zrl
 
 // NewZrlBatchTransactor creates a new write-only instance of ZrlBatch, bound to a specific deployed contract.
 func NewZrlBatchTransactor(address common.Address, transactor bind.ContractTransactor) (*ZrlBatchTransactor, error) {
-	contract, err := bindZrlBatch(address, nil, transactor, nil)
+	contract, err := bindZrlBatch(address, nil, transactor)
 	if err != nil {
 		return nil, err
 	}
 	return &ZrlBatchTransactor{contract: contract}, nil
 }
 
-// NewZrlBatchFilterer creates a new log filterer instance of ZrlBatch, bound to a specific deployed contract.
-func NewZrlBatchFilterer(address common.Address, filterer bind.ContractFilterer) (*ZrlBatchFilterer, error) {
-	contract, err := bindZrlBatch(address, nil, nil, filterer)
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlBatchFilterer{contract: contract}, nil
-}
-
 // bindZrlBatch binds a generic wrapper to an already deployed contract.
-func bindZrlBatch(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+func bindZrlBatch(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(ZrlBatchABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -160,10 +143,10 @@ func (_ZrlBatch *ZrlBatchTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _ZrlBatch.Contract.contract.Transact(opts, method, params...)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlBatch *ZrlBatchCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+func (_ZrlBatch *ZrlBatchCaller) ROLE_ADMIN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -172,24 +155,24 @@ func (_ZrlBatch *ZrlBatchCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) 
 	return *ret0, err
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlBatch *ZrlBatchSession) ROLEADMIN() (string, error) {
-	return _ZrlBatch.Contract.ROLEADMIN(&_ZrlBatch.CallOpts)
+func (_ZrlBatch *ZrlBatchSession) ROLE_ADMIN() (string, error) {
+	return _ZrlBatch.Contract.ROLE_ADMIN(&_ZrlBatch.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlBatch *ZrlBatchCallerSession) ROLEADMIN() (string, error) {
-	return _ZrlBatch.Contract.ROLEADMIN(&_ZrlBatch.CallOpts)
+func (_ZrlBatch *ZrlBatchCallerSession) ROLE_ADMIN() (string, error) {
+	return _ZrlBatch.Contract.ROLE_ADMIN(&_ZrlBatch.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlBatch *ZrlBatchCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error) {
+func (_ZrlBatch *ZrlBatchCaller) ROLE_CLUSTER(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -198,18 +181,18 @@ func (_ZrlBatch *ZrlBatchCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error
 	return *ret0, err
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlBatch *ZrlBatchSession) ROLECLUSTER() (string, error) {
-	return _ZrlBatch.Contract.ROLECLUSTER(&_ZrlBatch.CallOpts)
+func (_ZrlBatch *ZrlBatchSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlBatch.Contract.ROLE_CLUSTER(&_ZrlBatch.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlBatch *ZrlBatchCallerSession) ROLECLUSTER() (string, error) {
-	return _ZrlBatch.Contract.ROLECLUSTER(&_ZrlBatch.CallOpts)
+func (_ZrlBatch *ZrlBatchCallerSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlBatch.Contract.ROLE_CLUSTER(&_ZrlBatch.CallOpts)
 }
 
 // IsMigrated is a free data retrieval call binding the contract method 0xc0bac1a8.
@@ -398,127 +381,4 @@ func (_ZrlBatch *ZrlBatchSession) UpdateMaxLength(_length *big.Int) (*types.Tran
 // Solidity: function updateMaxLength(_length uint256) returns()
 func (_ZrlBatch *ZrlBatchTransactorSession) UpdateMaxLength(_length *big.Int) (*types.Transaction, error) {
 	return _ZrlBatch.Contract.UpdateMaxLength(&_ZrlBatch.TransactOpts, _length)
-}
-
-// ZrlBatchMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the ZrlBatch contract.
-type ZrlBatchMigratedIterator struct {
-	Event *ZrlBatchMigrated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlBatchMigratedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlBatchMigrated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlBatchMigrated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlBatchMigratedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlBatchMigratedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlBatchMigrated represents a Migrated event raised by the ZrlBatch contract.
-type ZrlBatchMigrated struct {
-	ContractName string
-	MigrationId  string
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlBatch *ZrlBatchFilterer) FilterMigrated(opts *bind.FilterOpts) (*ZrlBatchMigratedIterator, error) {
-
-	logs, sub, err := _ZrlBatch.contract.FilterLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlBatchMigratedIterator{contract: _ZrlBatch.contract, event: "Migrated", logs: logs, sub: sub}, nil
-}
-
-// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlBatch *ZrlBatchFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *ZrlBatchMigrated) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlBatch.contract.WatchLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlBatchMigrated)
-				if err := _ZrlBatch.contract.UnpackLog(event, "Migrated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
 }

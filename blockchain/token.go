@@ -16,8 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-const (
-	gasLimit uint64 = 4712357
+var (
+	gasLimit = big.NewInt(4712357)
 )
 
 type TokenClient struct {

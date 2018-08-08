@@ -7,12 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
 )
 
 // ZrlTokenABI is the input ABI used to generate the binding from.
@@ -22,7 +20,6 @@ const ZrlTokenABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"autoTransferLo
 type ZrlToken struct {
 	ZrlTokenCaller     // Read-only binding to the contract
 	ZrlTokenTransactor // Write-only binding to the contract
-	ZrlTokenFilterer   // Log filterer for contract events
 }
 
 // ZrlTokenCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -32,11 +29,6 @@ type ZrlTokenCaller struct {
 
 // ZrlTokenTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type ZrlTokenTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// ZrlTokenFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type ZrlTokenFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -79,16 +71,16 @@ type ZrlTokenTransactorRaw struct {
 
 // NewZrlToken creates a new instance of ZrlToken, bound to a specific deployed contract.
 func NewZrlToken(address common.Address, backend bind.ContractBackend) (*ZrlToken, error) {
-	contract, err := bindZrlToken(address, backend, backend, backend)
+	contract, err := bindZrlToken(address, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &ZrlToken{ZrlTokenCaller: ZrlTokenCaller{contract: contract}, ZrlTokenTransactor: ZrlTokenTransactor{contract: contract}, ZrlTokenFilterer: ZrlTokenFilterer{contract: contract}}, nil
+	return &ZrlToken{ZrlTokenCaller: ZrlTokenCaller{contract: contract}, ZrlTokenTransactor: ZrlTokenTransactor{contract: contract}}, nil
 }
 
 // NewZrlTokenCaller creates a new read-only instance of ZrlToken, bound to a specific deployed contract.
 func NewZrlTokenCaller(address common.Address, caller bind.ContractCaller) (*ZrlTokenCaller, error) {
-	contract, err := bindZrlToken(address, caller, nil, nil)
+	contract, err := bindZrlToken(address, caller, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,29 +89,20 @@ func NewZrlTokenCaller(address common.Address, caller bind.ContractCaller) (*Zrl
 
 // NewZrlTokenTransactor creates a new write-only instance of ZrlToken, bound to a specific deployed contract.
 func NewZrlTokenTransactor(address common.Address, transactor bind.ContractTransactor) (*ZrlTokenTransactor, error) {
-	contract, err := bindZrlToken(address, nil, transactor, nil)
+	contract, err := bindZrlToken(address, nil, transactor)
 	if err != nil {
 		return nil, err
 	}
 	return &ZrlTokenTransactor{contract: contract}, nil
 }
 
-// NewZrlTokenFilterer creates a new log filterer instance of ZrlToken, bound to a specific deployed contract.
-func NewZrlTokenFilterer(address common.Address, filterer bind.ContractFilterer) (*ZrlTokenFilterer, error) {
-	contract, err := bindZrlToken(address, nil, nil, filterer)
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlTokenFilterer{contract: contract}, nil
-}
-
 // bindZrlToken binds a generic wrapper to an already deployed contract.
-func bindZrlToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+func bindZrlToken(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(ZrlTokenABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -160,10 +143,10 @@ func (_ZrlToken *ZrlTokenTransactorRaw) Transact(opts *bind.TransactOpts, method
 	return _ZrlToken.Contract.contract.Transact(opts, method, params...)
 }
 
-// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+// IDX_TRANSFER_FUNC_LOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
 //
 // Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
-func (_ZrlToken *ZrlTokenCaller) IDXTRANSFERFUNCLOCK(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlToken *ZrlTokenCaller) IDX_TRANSFER_FUNC_LOCK(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -172,24 +155,24 @@ func (_ZrlToken *ZrlTokenCaller) IDXTRANSFERFUNCLOCK(opts *bind.CallOpts) (*big.
 	return *ret0, err
 }
 
-// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+// IDX_TRANSFER_FUNC_LOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
 //
 // Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
-func (_ZrlToken *ZrlTokenSession) IDXTRANSFERFUNCLOCK() (*big.Int, error) {
-	return _ZrlToken.Contract.IDXTRANSFERFUNCLOCK(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenSession) IDX_TRANSFER_FUNC_LOCK() (*big.Int, error) {
+	return _ZrlToken.Contract.IDX_TRANSFER_FUNC_LOCK(&_ZrlToken.CallOpts)
 }
 
-// IDXTRANSFERFUNCLOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
+// IDX_TRANSFER_FUNC_LOCK is a free data retrieval call binding the contract method 0xc8f3a5f1.
 //
 // Solidity: function IDX_TRANSFER_FUNC_LOCK() constant returns(uint256)
-func (_ZrlToken *ZrlTokenCallerSession) IDXTRANSFERFUNCLOCK() (*big.Int, error) {
-	return _ZrlToken.Contract.IDXTRANSFERFUNCLOCK(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenCallerSession) IDX_TRANSFER_FUNC_LOCK() (*big.Int, error) {
+	return _ZrlToken.Contract.IDX_TRANSFER_FUNC_LOCK(&_ZrlToken.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlToken *ZrlTokenCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+func (_ZrlToken *ZrlTokenCaller) ROLE_ADMIN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -198,24 +181,24 @@ func (_ZrlToken *ZrlTokenCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) 
 	return *ret0, err
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlToken *ZrlTokenSession) ROLEADMIN() (string, error) {
-	return _ZrlToken.Contract.ROLEADMIN(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenSession) ROLE_ADMIN() (string, error) {
+	return _ZrlToken.Contract.ROLE_ADMIN(&_ZrlToken.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlToken *ZrlTokenCallerSession) ROLEADMIN() (string, error) {
-	return _ZrlToken.Contract.ROLEADMIN(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenCallerSession) ROLE_ADMIN() (string, error) {
+	return _ZrlToken.Contract.ROLE_ADMIN(&_ZrlToken.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlToken *ZrlTokenCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error) {
+func (_ZrlToken *ZrlTokenCaller) ROLE_CLUSTER(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -224,24 +207,24 @@ func (_ZrlToken *ZrlTokenCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error
 	return *ret0, err
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlToken *ZrlTokenSession) ROLECLUSTER() (string, error) {
-	return _ZrlToken.Contract.ROLECLUSTER(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlToken.Contract.ROLE_CLUSTER(&_ZrlToken.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlToken *ZrlTokenCallerSession) ROLECLUSTER() (string, error) {
-	return _ZrlToken.Contract.ROLECLUSTER(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenCallerSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlToken.Contract.ROLE_CLUSTER(&_ZrlToken.CallOpts)
 }
 
-// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+// TRANSFER_LOCK_STATE is a free data retrieval call binding the contract method 0x337dd622.
 //
 // Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
-func (_ZrlToken *ZrlTokenCaller) TRANSFERLOCKSTATE(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlToken *ZrlTokenCaller) TRANSFER_LOCK_STATE(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -250,18 +233,18 @@ func (_ZrlToken *ZrlTokenCaller) TRANSFERLOCKSTATE(opts *bind.CallOpts) (*big.In
 	return *ret0, err
 }
 
-// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+// TRANSFER_LOCK_STATE is a free data retrieval call binding the contract method 0x337dd622.
 //
 // Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
-func (_ZrlToken *ZrlTokenSession) TRANSFERLOCKSTATE() (*big.Int, error) {
-	return _ZrlToken.Contract.TRANSFERLOCKSTATE(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenSession) TRANSFER_LOCK_STATE() (*big.Int, error) {
+	return _ZrlToken.Contract.TRANSFER_LOCK_STATE(&_ZrlToken.CallOpts)
 }
 
-// TRANSFERLOCKSTATE is a free data retrieval call binding the contract method 0x337dd622.
+// TRANSFER_LOCK_STATE is a free data retrieval call binding the contract method 0x337dd622.
 //
 // Solidity: function TRANSFER_LOCK_STATE() constant returns(uint256)
-func (_ZrlToken *ZrlTokenCallerSession) TRANSFERLOCKSTATE() (*big.Int, error) {
-	return _ZrlToken.Contract.TRANSFERLOCKSTATE(&_ZrlToken.CallOpts)
+func (_ZrlToken *ZrlTokenCallerSession) TRANSFER_LOCK_STATE() (*big.Int, error) {
+	return _ZrlToken.Contract.TRANSFER_LOCK_STATE(&_ZrlToken.CallOpts)
 }
 
 // AutoTransferLock is a free data retrieval call binding the contract method 0x07564737.
@@ -570,503 +553,4 @@ func (_ZrlToken *ZrlTokenSession) SetAutoTransferLock(open bool) (*types.Transac
 // Solidity: function setAutoTransferLock(open bool) returns()
 func (_ZrlToken *ZrlTokenTransactorSession) SetAutoTransferLock(open bool) (*types.Transaction, error) {
 	return _ZrlToken.Contract.SetAutoTransferLock(&_ZrlToken.TransactOpts, open)
-}
-
-// ZrlTokenBurnedIterator is returned from FilterBurned and is used to iterate over the raw logs and unpacked data for Burned events raised by the ZrlToken contract.
-type ZrlTokenBurnedIterator struct {
-	Event *ZrlTokenBurned // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlTokenBurnedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlTokenBurned)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlTokenBurned)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlTokenBurnedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlTokenBurnedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlTokenBurned represents a Burned event raised by the ZrlToken contract.
-type ZrlTokenBurned struct {
-	Caller  common.Address
-	Owner   common.Address
-	TokenId *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterBurned is a free log retrieval operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
-//
-// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
-func (_ZrlToken *ZrlTokenFilterer) FilterBurned(opts *bind.FilterOpts) (*ZrlTokenBurnedIterator, error) {
-
-	logs, sub, err := _ZrlToken.contract.FilterLogs(opts, "Burned")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlTokenBurnedIterator{contract: _ZrlToken.contract, event: "Burned", logs: logs, sub: sub}, nil
-}
-
-// WatchBurned is a free log subscription operation binding the contract event 0x6ab368f832c266c8eb942b84fbcaa20aedc24a699d2a05fae2568028733b1d09.
-//
-// Solidity: event Burned(_caller address, _owner address, _tokenId uint256)
-func (_ZrlToken *ZrlTokenFilterer) WatchBurned(opts *bind.WatchOpts, sink chan<- *ZrlTokenBurned) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlToken.contract.WatchLogs(opts, "Burned")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlTokenBurned)
-				if err := _ZrlToken.contract.UnpackLog(event, "Burned", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlTokenMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the ZrlToken contract.
-type ZrlTokenMigratedIterator struct {
-	Event *ZrlTokenMigrated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlTokenMigratedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlTokenMigrated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlTokenMigrated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlTokenMigratedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlTokenMigratedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlTokenMigrated represents a Migrated event raised by the ZrlToken contract.
-type ZrlTokenMigrated struct {
-	ContractName string
-	MigrationId  string
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlToken *ZrlTokenFilterer) FilterMigrated(opts *bind.FilterOpts) (*ZrlTokenMigratedIterator, error) {
-
-	logs, sub, err := _ZrlToken.contract.FilterLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlTokenMigratedIterator{contract: _ZrlToken.contract, event: "Migrated", logs: logs, sub: sub}, nil
-}
-
-// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlToken *ZrlTokenFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *ZrlTokenMigrated) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlToken.contract.WatchLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlTokenMigrated)
-				if err := _ZrlToken.contract.UnpackLog(event, "Migrated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlTokenMintedIterator is returned from FilterMinted and is used to iterate over the raw logs and unpacked data for Minted events raised by the ZrlToken contract.
-type ZrlTokenMintedIterator struct {
-	Event *ZrlTokenMinted // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlTokenMintedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlTokenMinted)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlTokenMinted)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlTokenMintedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlTokenMintedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlTokenMinted represents a Minted event raised by the ZrlToken contract.
-type ZrlTokenMinted struct {
-	Caller  common.Address
-	To      common.Address
-	TokenId *big.Int
-	Value   *big.Int
-	State   *big.Int
-	Expire  *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterMinted is a free log retrieval operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
-//
-// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
-func (_ZrlToken *ZrlTokenFilterer) FilterMinted(opts *bind.FilterOpts) (*ZrlTokenMintedIterator, error) {
-
-	logs, sub, err := _ZrlToken.contract.FilterLogs(opts, "Minted")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlTokenMintedIterator{contract: _ZrlToken.contract, event: "Minted", logs: logs, sub: sub}, nil
-}
-
-// WatchMinted is a free log subscription operation binding the contract event 0x8f9cc53f42d35118d48a1cb6cff6d69109ae0898e83402061ffe1e4d05748be0.
-//
-// Solidity: event Minted(_caller address, _to address, _tokenId uint256, _value uint256, _state uint256, _expire uint256)
-func (_ZrlToken *ZrlTokenFilterer) WatchMinted(opts *bind.WatchOpts, sink chan<- *ZrlTokenMinted) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlToken.contract.WatchLogs(opts, "Minted")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlTokenMinted)
-				if err := _ZrlToken.contract.UnpackLog(event, "Minted", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlTokenTransferIterator is returned from FilterTransfer and is used to iterate over the raw logs and unpacked data for Transfer events raised by the ZrlToken contract.
-type ZrlTokenTransferIterator struct {
-	Event *ZrlTokenTransfer // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlTokenTransferIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlTokenTransfer)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlTokenTransfer)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlTokenTransferIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlTokenTransferIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlTokenTransfer represents a Transfer event raised by the ZrlToken contract.
-type ZrlTokenTransfer struct {
-	Caller  common.Address
-	From    common.Address
-	To      common.Address
-	TokenId *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterTransfer is a free log retrieval operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
-//
-// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
-func (_ZrlToken *ZrlTokenFilterer) FilterTransfer(opts *bind.FilterOpts) (*ZrlTokenTransferIterator, error) {
-
-	logs, sub, err := _ZrlToken.contract.FilterLogs(opts, "Transfer")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlTokenTransferIterator{contract: _ZrlToken.contract, event: "Transfer", logs: logs, sub: sub}, nil
-}
-
-// WatchTransfer is a free log subscription operation binding the contract event 0xd1398bee19313d6bf672ccb116e51f4a1a947e91c757907f51fbb5b5e56c698f.
-//
-// Solidity: event Transfer(_caller address, _from address, _to address, _tokenId uint256)
-func (_ZrlToken *ZrlTokenFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *ZrlTokenTransfer) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlToken.contract.WatchLogs(opts, "Transfer")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlTokenTransfer)
-				if err := _ZrlToken.contract.UnpackLog(event, "Transfer", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
 }

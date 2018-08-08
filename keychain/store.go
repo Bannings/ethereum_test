@@ -111,7 +111,7 @@ func (s *Store) TransferEther(to common.Address, amount *big.Int) error {
 	defer s.mux.Unlock()
 	nonce := s.adminClient.Nonce()
 	log.Debugf("nonce: %v", nonce)
-	tx := types.NewTransaction(nonce, to, amount, 100000, new(big.Int), nil)
+	tx := types.NewTransaction(nonce, to, amount, big.NewInt(100000), new(big.Int), nil)
 	signTx, err := types.SignTx(tx, types.HomesteadSigner{}, key)
 	//signTx, err := types.SignTx(tx, types.NewEIP155Signer(chainId), s.adminPrivKey)
 	if err != nil {

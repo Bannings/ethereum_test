@@ -7,12 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
 )
 
 // ZrlLockerABI is the input ABI used to generate the binding from.
@@ -22,7 +20,6 @@ const ZrlLockerABI = "[{\"constant\":true,\"inputs\":[],\"name\":\"zrlStorage\",
 type ZrlLocker struct {
 	ZrlLockerCaller     // Read-only binding to the contract
 	ZrlLockerTransactor // Write-only binding to the contract
-	ZrlLockerFilterer   // Log filterer for contract events
 }
 
 // ZrlLockerCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -32,11 +29,6 @@ type ZrlLockerCaller struct {
 
 // ZrlLockerTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type ZrlLockerTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// ZrlLockerFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type ZrlLockerFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -79,16 +71,16 @@ type ZrlLockerTransactorRaw struct {
 
 // NewZrlLocker creates a new instance of ZrlLocker, bound to a specific deployed contract.
 func NewZrlLocker(address common.Address, backend bind.ContractBackend) (*ZrlLocker, error) {
-	contract, err := bindZrlLocker(address, backend, backend, backend)
+	contract, err := bindZrlLocker(address, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &ZrlLocker{ZrlLockerCaller: ZrlLockerCaller{contract: contract}, ZrlLockerTransactor: ZrlLockerTransactor{contract: contract}, ZrlLockerFilterer: ZrlLockerFilterer{contract: contract}}, nil
+	return &ZrlLocker{ZrlLockerCaller: ZrlLockerCaller{contract: contract}, ZrlLockerTransactor: ZrlLockerTransactor{contract: contract}}, nil
 }
 
 // NewZrlLockerCaller creates a new read-only instance of ZrlLocker, bound to a specific deployed contract.
 func NewZrlLockerCaller(address common.Address, caller bind.ContractCaller) (*ZrlLockerCaller, error) {
-	contract, err := bindZrlLocker(address, caller, nil, nil)
+	contract, err := bindZrlLocker(address, caller, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,29 +89,20 @@ func NewZrlLockerCaller(address common.Address, caller bind.ContractCaller) (*Zr
 
 // NewZrlLockerTransactor creates a new write-only instance of ZrlLocker, bound to a specific deployed contract.
 func NewZrlLockerTransactor(address common.Address, transactor bind.ContractTransactor) (*ZrlLockerTransactor, error) {
-	contract, err := bindZrlLocker(address, nil, transactor, nil)
+	contract, err := bindZrlLocker(address, nil, transactor)
 	if err != nil {
 		return nil, err
 	}
 	return &ZrlLockerTransactor{contract: contract}, nil
 }
 
-// NewZrlLockerFilterer creates a new log filterer instance of ZrlLocker, bound to a specific deployed contract.
-func NewZrlLockerFilterer(address common.Address, filterer bind.ContractFilterer) (*ZrlLockerFilterer, error) {
-	contract, err := bindZrlLocker(address, nil, nil, filterer)
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerFilterer{contract: contract}, nil
-}
-
 // bindZrlLocker binds a generic wrapper to an already deployed contract.
-func bindZrlLocker(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+func bindZrlLocker(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(ZrlLockerABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -160,10 +143,10 @@ func (_ZrlLocker *ZrlLockerTransactorRaw) Transact(opts *bind.TransactOpts, meth
 	return _ZrlLocker.Contract.contract.Transact(opts, method, params...)
 }
 
-// IDXEXISTED is a free data retrieval call binding the contract method 0x82185f8c.
+// IDX_EXISTED is a free data retrieval call binding the contract method 0x82185f8c.
 //
 // Solidity: function IDX_EXISTED() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCaller) IDXEXISTED(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlLocker *ZrlLockerCaller) IDX_EXISTED(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -172,24 +155,24 @@ func (_ZrlLocker *ZrlLockerCaller) IDXEXISTED(opts *bind.CallOpts) (*big.Int, er
 	return *ret0, err
 }
 
-// IDXEXISTED is a free data retrieval call binding the contract method 0x82185f8c.
+// IDX_EXISTED is a free data retrieval call binding the contract method 0x82185f8c.
 //
 // Solidity: function IDX_EXISTED() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerSession) IDXEXISTED() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXEXISTED(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) IDX_EXISTED() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_EXISTED(&_ZrlLocker.CallOpts)
 }
 
-// IDXEXISTED is a free data retrieval call binding the contract method 0x82185f8c.
+// IDX_EXISTED is a free data retrieval call binding the contract method 0x82185f8c.
 //
 // Solidity: function IDX_EXISTED() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCallerSession) IDXEXISTED() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXEXISTED(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) IDX_EXISTED() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_EXISTED(&_ZrlLocker.CallOpts)
 }
 
-// IDXEXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
+// IDX_EXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
 //
 // Solidity: function IDX_EXPIRE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCaller) IDXEXPIRE(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlLocker *ZrlLockerCaller) IDX_EXPIRE(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -198,24 +181,24 @@ func (_ZrlLocker *ZrlLockerCaller) IDXEXPIRE(opts *bind.CallOpts) (*big.Int, err
 	return *ret0, err
 }
 
-// IDXEXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
+// IDX_EXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
 //
 // Solidity: function IDX_EXPIRE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerSession) IDXEXPIRE() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXEXPIRE(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) IDX_EXPIRE() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_EXPIRE(&_ZrlLocker.CallOpts)
 }
 
-// IDXEXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
+// IDX_EXPIRE is a free data retrieval call binding the contract method 0x66a41a70.
 //
 // Solidity: function IDX_EXPIRE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCallerSession) IDXEXPIRE() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXEXPIRE(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) IDX_EXPIRE() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_EXPIRE(&_ZrlLocker.CallOpts)
 }
 
-// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+// IDX_FUNC_LOCK_MAX is a free data retrieval call binding the contract method 0x2cb902cf.
 //
 // Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCaller) IDXFUNCLOCKMAX(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlLocker *ZrlLockerCaller) IDX_FUNC_LOCK_MAX(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -224,24 +207,24 @@ func (_ZrlLocker *ZrlLockerCaller) IDXFUNCLOCKMAX(opts *bind.CallOpts) (*big.Int
 	return *ret0, err
 }
 
-// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+// IDX_FUNC_LOCK_MAX is a free data retrieval call binding the contract method 0x2cb902cf.
 //
 // Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerSession) IDXFUNCLOCKMAX() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXFUNCLOCKMAX(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) IDX_FUNC_LOCK_MAX() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_FUNC_LOCK_MAX(&_ZrlLocker.CallOpts)
 }
 
-// IDXFUNCLOCKMAX is a free data retrieval call binding the contract method 0x2cb902cf.
+// IDX_FUNC_LOCK_MAX is a free data retrieval call binding the contract method 0x2cb902cf.
 //
 // Solidity: function IDX_FUNC_LOCK_MAX() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCallerSession) IDXFUNCLOCKMAX() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXFUNCLOCKMAX(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) IDX_FUNC_LOCK_MAX() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_FUNC_LOCK_MAX(&_ZrlLocker.CallOpts)
 }
 
-// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+// IDX_FUNC_LOCK_MIN is a free data retrieval call binding the contract method 0xa3e09cfb.
 //
 // Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCaller) IDXFUNCLOCKMIN(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlLocker *ZrlLockerCaller) IDX_FUNC_LOCK_MIN(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -250,24 +233,24 @@ func (_ZrlLocker *ZrlLockerCaller) IDXFUNCLOCKMIN(opts *bind.CallOpts) (*big.Int
 	return *ret0, err
 }
 
-// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+// IDX_FUNC_LOCK_MIN is a free data retrieval call binding the contract method 0xa3e09cfb.
 //
 // Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerSession) IDXFUNCLOCKMIN() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXFUNCLOCKMIN(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) IDX_FUNC_LOCK_MIN() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_FUNC_LOCK_MIN(&_ZrlLocker.CallOpts)
 }
 
-// IDXFUNCLOCKMIN is a free data retrieval call binding the contract method 0xa3e09cfb.
+// IDX_FUNC_LOCK_MIN is a free data retrieval call binding the contract method 0xa3e09cfb.
 //
 // Solidity: function IDX_FUNC_LOCK_MIN() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCallerSession) IDXFUNCLOCKMIN() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXFUNCLOCKMIN(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) IDX_FUNC_LOCK_MIN() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_FUNC_LOCK_MIN(&_ZrlLocker.CallOpts)
 }
 
-// IDXSTATE is a free data retrieval call binding the contract method 0x79aa0b41.
+// IDX_STATE is a free data retrieval call binding the contract method 0x79aa0b41.
 //
 // Solidity: function IDX_STATE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCaller) IDXSTATE(opts *bind.CallOpts) (*big.Int, error) {
+func (_ZrlLocker *ZrlLockerCaller) IDX_STATE(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
@@ -276,24 +259,24 @@ func (_ZrlLocker *ZrlLockerCaller) IDXSTATE(opts *bind.CallOpts) (*big.Int, erro
 	return *ret0, err
 }
 
-// IDXSTATE is a free data retrieval call binding the contract method 0x79aa0b41.
+// IDX_STATE is a free data retrieval call binding the contract method 0x79aa0b41.
 //
 // Solidity: function IDX_STATE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerSession) IDXSTATE() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXSTATE(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) IDX_STATE() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_STATE(&_ZrlLocker.CallOpts)
 }
 
-// IDXSTATE is a free data retrieval call binding the contract method 0x79aa0b41.
+// IDX_STATE is a free data retrieval call binding the contract method 0x79aa0b41.
 //
 // Solidity: function IDX_STATE() constant returns(uint256)
-func (_ZrlLocker *ZrlLockerCallerSession) IDXSTATE() (*big.Int, error) {
-	return _ZrlLocker.Contract.IDXSTATE(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) IDX_STATE() (*big.Int, error) {
+	return _ZrlLocker.Contract.IDX_STATE(&_ZrlLocker.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlLocker *ZrlLockerCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+func (_ZrlLocker *ZrlLockerCaller) ROLE_ADMIN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -302,24 +285,24 @@ func (_ZrlLocker *ZrlLockerCaller) ROLEADMIN(opts *bind.CallOpts) (string, error
 	return *ret0, err
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlLocker *ZrlLockerSession) ROLEADMIN() (string, error) {
-	return _ZrlLocker.Contract.ROLEADMIN(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) ROLE_ADMIN() (string, error) {
+	return _ZrlLocker.Contract.ROLE_ADMIN(&_ZrlLocker.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlLocker *ZrlLockerCallerSession) ROLEADMIN() (string, error) {
-	return _ZrlLocker.Contract.ROLEADMIN(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) ROLE_ADMIN() (string, error) {
+	return _ZrlLocker.Contract.ROLE_ADMIN(&_ZrlLocker.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlLocker *ZrlLockerCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error) {
+func (_ZrlLocker *ZrlLockerCaller) ROLE_CLUSTER(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -328,18 +311,18 @@ func (_ZrlLocker *ZrlLockerCaller) ROLECLUSTER(opts *bind.CallOpts) (string, err
 	return *ret0, err
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlLocker *ZrlLockerSession) ROLECLUSTER() (string, error) {
-	return _ZrlLocker.Contract.ROLECLUSTER(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlLocker.Contract.ROLE_CLUSTER(&_ZrlLocker.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlLocker *ZrlLockerCallerSession) ROLECLUSTER() (string, error) {
-	return _ZrlLocker.Contract.ROLECLUSTER(&_ZrlLocker.CallOpts)
+func (_ZrlLocker *ZrlLockerCallerSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlLocker.Contract.ROLE_CLUSTER(&_ZrlLocker.CallOpts)
 }
 
 // DeltaT is a free data retrieval call binding the contract method 0xc7a0f8f7.
@@ -700,747 +683,4 @@ func (_ZrlLocker *ZrlLockerSession) SetState(_tokenId *big.Int, _state *big.Int)
 // Solidity: function setState(_tokenId uint256, _state uint256) returns()
 func (_ZrlLocker *ZrlLockerTransactorSession) SetState(_tokenId *big.Int, _state *big.Int) (*types.Transaction, error) {
 	return _ZrlLocker.Contract.SetState(&_ZrlLocker.TransactOpts, _tokenId, _state)
-}
-
-// ZrlLockerDeltaTimeSetIterator is returned from FilterDeltaTimeSet and is used to iterate over the raw logs and unpacked data for DeltaTimeSet events raised by the ZrlLocker contract.
-type ZrlLockerDeltaTimeSetIterator struct {
-	Event *ZrlLockerDeltaTimeSet // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerDeltaTimeSetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerDeltaTimeSet)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerDeltaTimeSet)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerDeltaTimeSetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerDeltaTimeSetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerDeltaTimeSet represents a DeltaTimeSet event raised by the ZrlLocker contract.
-type ZrlLockerDeltaTimeSet struct {
-	Caller common.Address
-	DeltaT *big.Int
-	Raw    types.Log // Blockchain specific contextual infos
-}
-
-// FilterDeltaTimeSet is a free log retrieval operation binding the contract event 0xacd17757a3133f061ef65177bb74cd35cf1e005becb93c65f73f9c95d4a98794.
-//
-// Solidity: event DeltaTimeSet(_caller address, _deltaT uint256)
-func (_ZrlLocker *ZrlLockerFilterer) FilterDeltaTimeSet(opts *bind.FilterOpts) (*ZrlLockerDeltaTimeSetIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "DeltaTimeSet")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerDeltaTimeSetIterator{contract: _ZrlLocker.contract, event: "DeltaTimeSet", logs: logs, sub: sub}, nil
-}
-
-// WatchDeltaTimeSet is a free log subscription operation binding the contract event 0xacd17757a3133f061ef65177bb74cd35cf1e005becb93c65f73f9c95d4a98794.
-//
-// Solidity: event DeltaTimeSet(_caller address, _deltaT uint256)
-func (_ZrlLocker *ZrlLockerFilterer) WatchDeltaTimeSet(opts *bind.WatchOpts, sink chan<- *ZrlLockerDeltaTimeSet) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "DeltaTimeSet")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerDeltaTimeSet)
-				if err := _ZrlLocker.contract.UnpackLog(event, "DeltaTimeSet", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlLockerExpireSetIterator is returned from FilterExpireSet and is used to iterate over the raw logs and unpacked data for ExpireSet events raised by the ZrlLocker contract.
-type ZrlLockerExpireSetIterator struct {
-	Event *ZrlLockerExpireSet // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerExpireSetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerExpireSet)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerExpireSet)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerExpireSetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerExpireSetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerExpireSet represents a ExpireSet event raised by the ZrlLocker contract.
-type ZrlLockerExpireSet struct {
-	Caller  common.Address
-	TokenId *big.Int
-	Expire  *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterExpireSet is a free log retrieval operation binding the contract event 0x78cd799f5d099bdd3586a6ab5a947eb80e932459410dc30146b47705e952de57.
-//
-// Solidity: event ExpireSet(_caller address, _tokenId uint256, _expire uint256)
-func (_ZrlLocker *ZrlLockerFilterer) FilterExpireSet(opts *bind.FilterOpts) (*ZrlLockerExpireSetIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "ExpireSet")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerExpireSetIterator{contract: _ZrlLocker.contract, event: "ExpireSet", logs: logs, sub: sub}, nil
-}
-
-// WatchExpireSet is a free log subscription operation binding the contract event 0x78cd799f5d099bdd3586a6ab5a947eb80e932459410dc30146b47705e952de57.
-//
-// Solidity: event ExpireSet(_caller address, _tokenId uint256, _expire uint256)
-func (_ZrlLocker *ZrlLockerFilterer) WatchExpireSet(opts *bind.WatchOpts, sink chan<- *ZrlLockerExpireSet) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "ExpireSet")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerExpireSet)
-				if err := _ZrlLocker.contract.UnpackLog(event, "ExpireSet", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlLockerFunctionLockSetIterator is returned from FilterFunctionLockSet and is used to iterate over the raw logs and unpacked data for FunctionLockSet events raised by the ZrlLocker contract.
-type ZrlLockerFunctionLockSetIterator struct {
-	Event *ZrlLockerFunctionLockSet // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerFunctionLockSetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerFunctionLockSet)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerFunctionLockSet)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerFunctionLockSetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerFunctionLockSetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerFunctionLockSet represents a FunctionLockSet event raised by the ZrlLocker contract.
-type ZrlLockerFunctionLockSet struct {
-	Caller  common.Address
-	TokenId *big.Int
-	FuncId  *big.Int
-	Lock    *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterFunctionLockSet is a free log retrieval operation binding the contract event 0xc93e147af259a8b65d8f09a4df8a9ce187f29e04e41bf69310536743578196ad.
-//
-// Solidity: event FunctionLockSet(_caller address, _tokenId uint256, _funcId uint256, _lock uint256)
-func (_ZrlLocker *ZrlLockerFilterer) FilterFunctionLockSet(opts *bind.FilterOpts) (*ZrlLockerFunctionLockSetIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "FunctionLockSet")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerFunctionLockSetIterator{contract: _ZrlLocker.contract, event: "FunctionLockSet", logs: logs, sub: sub}, nil
-}
-
-// WatchFunctionLockSet is a free log subscription operation binding the contract event 0xc93e147af259a8b65d8f09a4df8a9ce187f29e04e41bf69310536743578196ad.
-//
-// Solidity: event FunctionLockSet(_caller address, _tokenId uint256, _funcId uint256, _lock uint256)
-func (_ZrlLocker *ZrlLockerFilterer) WatchFunctionLockSet(opts *bind.WatchOpts, sink chan<- *ZrlLockerFunctionLockSet) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "FunctionLockSet")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerFunctionLockSet)
-				if err := _ZrlLocker.contract.UnpackLog(event, "FunctionLockSet", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlLockerLockStateSetIterator is returned from FilterLockStateSet and is used to iterate over the raw logs and unpacked data for LockStateSet events raised by the ZrlLocker contract.
-type ZrlLockerLockStateSetIterator struct {
-	Event *ZrlLockerLockStateSet // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerLockStateSetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerLockStateSet)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerLockStateSet)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerLockStateSetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerLockStateSetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerLockStateSet represents a LockStateSet event raised by the ZrlLocker contract.
-type ZrlLockerLockStateSet struct {
-	Caller common.Address
-	State  *big.Int
-	Lock   bool
-	Raw    types.Log // Blockchain specific contextual infos
-}
-
-// FilterLockStateSet is a free log retrieval operation binding the contract event 0xb8640e2eb4b26293f0742ae8635ee5e79149eda9dbc2d72a22730d96cdcae63b.
-//
-// Solidity: event LockStateSet(_caller address, _state uint256, _lock bool)
-func (_ZrlLocker *ZrlLockerFilterer) FilterLockStateSet(opts *bind.FilterOpts) (*ZrlLockerLockStateSetIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "LockStateSet")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerLockStateSetIterator{contract: _ZrlLocker.contract, event: "LockStateSet", logs: logs, sub: sub}, nil
-}
-
-// WatchLockStateSet is a free log subscription operation binding the contract event 0xb8640e2eb4b26293f0742ae8635ee5e79149eda9dbc2d72a22730d96cdcae63b.
-//
-// Solidity: event LockStateSet(_caller address, _state uint256, _lock bool)
-func (_ZrlLocker *ZrlLockerFilterer) WatchLockStateSet(opts *bind.WatchOpts, sink chan<- *ZrlLockerLockStateSet) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "LockStateSet")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerLockStateSet)
-				if err := _ZrlLocker.contract.UnpackLog(event, "LockStateSet", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlLockerMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the ZrlLocker contract.
-type ZrlLockerMigratedIterator struct {
-	Event *ZrlLockerMigrated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerMigratedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerMigrated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerMigrated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerMigratedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerMigratedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerMigrated represents a Migrated event raised by the ZrlLocker contract.
-type ZrlLockerMigrated struct {
-	ContractName string
-	MigrationId  string
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlLocker *ZrlLockerFilterer) FilterMigrated(opts *bind.FilterOpts) (*ZrlLockerMigratedIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerMigratedIterator{contract: _ZrlLocker.contract, event: "Migrated", logs: logs, sub: sub}, nil
-}
-
-// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlLocker *ZrlLockerFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *ZrlLockerMigrated) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerMigrated)
-				if err := _ZrlLocker.contract.UnpackLog(event, "Migrated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlLockerStateSetIterator is returned from FilterStateSet and is used to iterate over the raw logs and unpacked data for StateSet events raised by the ZrlLocker contract.
-type ZrlLockerStateSetIterator struct {
-	Event *ZrlLockerStateSet // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlLockerStateSetIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlLockerStateSet)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlLockerStateSet)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlLockerStateSetIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlLockerStateSetIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlLockerStateSet represents a StateSet event raised by the ZrlLocker contract.
-type ZrlLockerStateSet struct {
-	Caller  common.Address
-	TokenId *big.Int
-	State   *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterStateSet is a free log retrieval operation binding the contract event 0x1d79a6e0d9992f96b2facb02f3f2430911c472085429997f740dd1c9fbcbc445.
-//
-// Solidity: event StateSet(_caller address, _tokenId uint256, _state uint256)
-func (_ZrlLocker *ZrlLockerFilterer) FilterStateSet(opts *bind.FilterOpts) (*ZrlLockerStateSetIterator, error) {
-
-	logs, sub, err := _ZrlLocker.contract.FilterLogs(opts, "StateSet")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlLockerStateSetIterator{contract: _ZrlLocker.contract, event: "StateSet", logs: logs, sub: sub}, nil
-}
-
-// WatchStateSet is a free log subscription operation binding the contract event 0x1d79a6e0d9992f96b2facb02f3f2430911c472085429997f740dd1c9fbcbc445.
-//
-// Solidity: event StateSet(_caller address, _tokenId uint256, _state uint256)
-func (_ZrlLocker *ZrlLockerFilterer) WatchStateSet(opts *bind.WatchOpts, sink chan<- *ZrlLockerStateSet) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlLocker.contract.WatchLogs(opts, "StateSet")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlLockerStateSet)
-				if err := _ZrlLocker.contract.UnpackLog(event, "StateSet", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
 }

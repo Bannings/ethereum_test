@@ -7,12 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
 )
 
 // ZrlStorageABI is the input ABI used to generate the binding from.
@@ -22,7 +20,6 @@ const ZrlStorageABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"_tokenId\",\"
 type ZrlStorage struct {
 	ZrlStorageCaller     // Read-only binding to the contract
 	ZrlStorageTransactor // Write-only binding to the contract
-	ZrlStorageFilterer   // Log filterer for contract events
 }
 
 // ZrlStorageCaller is an auto generated read-only Go binding around an Ethereum contract.
@@ -32,11 +29,6 @@ type ZrlStorageCaller struct {
 
 // ZrlStorageTransactor is an auto generated write-only Go binding around an Ethereum contract.
 type ZrlStorageTransactor struct {
-	contract *bind.BoundContract // Generic contract wrapper for the low level calls
-}
-
-// ZrlStorageFilterer is an auto generated log filtering Go binding around an Ethereum contract events.
-type ZrlStorageFilterer struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
@@ -79,16 +71,16 @@ type ZrlStorageTransactorRaw struct {
 
 // NewZrlStorage creates a new instance of ZrlStorage, bound to a specific deployed contract.
 func NewZrlStorage(address common.Address, backend bind.ContractBackend) (*ZrlStorage, error) {
-	contract, err := bindZrlStorage(address, backend, backend, backend)
+	contract, err := bindZrlStorage(address, backend, backend)
 	if err != nil {
 		return nil, err
 	}
-	return &ZrlStorage{ZrlStorageCaller: ZrlStorageCaller{contract: contract}, ZrlStorageTransactor: ZrlStorageTransactor{contract: contract}, ZrlStorageFilterer: ZrlStorageFilterer{contract: contract}}, nil
+	return &ZrlStorage{ZrlStorageCaller: ZrlStorageCaller{contract: contract}, ZrlStorageTransactor: ZrlStorageTransactor{contract: contract}}, nil
 }
 
 // NewZrlStorageCaller creates a new read-only instance of ZrlStorage, bound to a specific deployed contract.
 func NewZrlStorageCaller(address common.Address, caller bind.ContractCaller) (*ZrlStorageCaller, error) {
-	contract, err := bindZrlStorage(address, caller, nil, nil)
+	contract, err := bindZrlStorage(address, caller, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,29 +89,20 @@ func NewZrlStorageCaller(address common.Address, caller bind.ContractCaller) (*Z
 
 // NewZrlStorageTransactor creates a new write-only instance of ZrlStorage, bound to a specific deployed contract.
 func NewZrlStorageTransactor(address common.Address, transactor bind.ContractTransactor) (*ZrlStorageTransactor, error) {
-	contract, err := bindZrlStorage(address, nil, transactor, nil)
+	contract, err := bindZrlStorage(address, nil, transactor)
 	if err != nil {
 		return nil, err
 	}
 	return &ZrlStorageTransactor{contract: contract}, nil
 }
 
-// NewZrlStorageFilterer creates a new log filterer instance of ZrlStorage, bound to a specific deployed contract.
-func NewZrlStorageFilterer(address common.Address, filterer bind.ContractFilterer) (*ZrlStorageFilterer, error) {
-	contract, err := bindZrlStorage(address, nil, nil, filterer)
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlStorageFilterer{contract: contract}, nil
-}
-
 // bindZrlStorage binds a generic wrapper to an already deployed contract.
-func bindZrlStorage(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
+func bindZrlStorage(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
 	parsed, err := abi.JSON(strings.NewReader(ZrlStorageABI))
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, parsed, caller, transactor), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -160,10 +143,10 @@ func (_ZrlStorage *ZrlStorageTransactorRaw) Transact(opts *bind.TransactOpts, me
 	return _ZrlStorage.Contract.contract.Transact(opts, method, params...)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlStorage *ZrlStorageCaller) ROLEADMIN(opts *bind.CallOpts) (string, error) {
+func (_ZrlStorage *ZrlStorageCaller) ROLE_ADMIN(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -172,24 +155,24 @@ func (_ZrlStorage *ZrlStorageCaller) ROLEADMIN(opts *bind.CallOpts) (string, err
 	return *ret0, err
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlStorage *ZrlStorageSession) ROLEADMIN() (string, error) {
-	return _ZrlStorage.Contract.ROLEADMIN(&_ZrlStorage.CallOpts)
+func (_ZrlStorage *ZrlStorageSession) ROLE_ADMIN() (string, error) {
+	return _ZrlStorage.Contract.ROLE_ADMIN(&_ZrlStorage.CallOpts)
 }
 
-// ROLEADMIN is a free data retrieval call binding the contract method 0xd391014b.
+// ROLE_ADMIN is a free data retrieval call binding the contract method 0xd391014b.
 //
 // Solidity: function ROLE_ADMIN() constant returns(string)
-func (_ZrlStorage *ZrlStorageCallerSession) ROLEADMIN() (string, error) {
-	return _ZrlStorage.Contract.ROLEADMIN(&_ZrlStorage.CallOpts)
+func (_ZrlStorage *ZrlStorageCallerSession) ROLE_ADMIN() (string, error) {
+	return _ZrlStorage.Contract.ROLE_ADMIN(&_ZrlStorage.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlStorage *ZrlStorageCaller) ROLECLUSTER(opts *bind.CallOpts) (string, error) {
+func (_ZrlStorage *ZrlStorageCaller) ROLE_CLUSTER(opts *bind.CallOpts) (string, error) {
 	var (
 		ret0 = new(string)
 	)
@@ -198,18 +181,18 @@ func (_ZrlStorage *ZrlStorageCaller) ROLECLUSTER(opts *bind.CallOpts) (string, e
 	return *ret0, err
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlStorage *ZrlStorageSession) ROLECLUSTER() (string, error) {
-	return _ZrlStorage.Contract.ROLECLUSTER(&_ZrlStorage.CallOpts)
+func (_ZrlStorage *ZrlStorageSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlStorage.Contract.ROLE_CLUSTER(&_ZrlStorage.CallOpts)
 }
 
-// ROLECLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
+// ROLE_CLUSTER is a free data retrieval call binding the contract method 0xb8d43d27.
 //
 // Solidity: function ROLE_CLUSTER() constant returns(string)
-func (_ZrlStorage *ZrlStorageCallerSession) ROLECLUSTER() (string, error) {
-	return _ZrlStorage.Contract.ROLECLUSTER(&_ZrlStorage.CallOpts)
+func (_ZrlStorage *ZrlStorageCallerSession) ROLE_CLUSTER() (string, error) {
+	return _ZrlStorage.Contract.ROLE_CLUSTER(&_ZrlStorage.CallOpts)
 }
 
 // EverExisted is a free data retrieval call binding the contract method 0x258a0eea.
@@ -469,376 +452,4 @@ func (_ZrlStorage *ZrlStorageSession) Remove(_tokenId *big.Int) (*types.Transact
 // Solidity: function remove(_tokenId uint256) returns()
 func (_ZrlStorage *ZrlStorageTransactorSession) Remove(_tokenId *big.Int) (*types.Transaction, error) {
 	return _ZrlStorage.Contract.Remove(&_ZrlStorage.TransactOpts, _tokenId)
-}
-
-// ZrlStorageCreatedIterator is returned from FilterCreated and is used to iterate over the raw logs and unpacked data for Created events raised by the ZrlStorage contract.
-type ZrlStorageCreatedIterator struct {
-	Event *ZrlStorageCreated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlStorageCreatedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlStorageCreated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlStorageCreated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlStorageCreatedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlStorageCreatedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlStorageCreated represents a Created event raised by the ZrlStorage contract.
-type ZrlStorageCreated struct {
-	Caller   common.Address
-	TokenId  *big.Int
-	Val      *big.Int
-	CreateBy *big.Int
-	Root     *big.Int
-	Raw      types.Log // Blockchain specific contextual infos
-}
-
-// FilterCreated is a free log retrieval operation binding the contract event 0x7191c0804172ee8ac080b63e93fd6c2f26bbea256aed023d843c2a9f3dee0d3b.
-//
-// Solidity: event Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
-func (_ZrlStorage *ZrlStorageFilterer) FilterCreated(opts *bind.FilterOpts) (*ZrlStorageCreatedIterator, error) {
-
-	logs, sub, err := _ZrlStorage.contract.FilterLogs(opts, "Created")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlStorageCreatedIterator{contract: _ZrlStorage.contract, event: "Created", logs: logs, sub: sub}, nil
-}
-
-// WatchCreated is a free log subscription operation binding the contract event 0x7191c0804172ee8ac080b63e93fd6c2f26bbea256aed023d843c2a9f3dee0d3b.
-//
-// Solidity: event Created(_caller address, _tokenId uint256, _val uint256, _createBy uint256, _root uint256)
-func (_ZrlStorage *ZrlStorageFilterer) WatchCreated(opts *bind.WatchOpts, sink chan<- *ZrlStorageCreated) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlStorage.contract.WatchLogs(opts, "Created")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlStorageCreated)
-				if err := _ZrlStorage.contract.UnpackLog(event, "Created", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlStorageMigratedIterator is returned from FilterMigrated and is used to iterate over the raw logs and unpacked data for Migrated events raised by the ZrlStorage contract.
-type ZrlStorageMigratedIterator struct {
-	Event *ZrlStorageMigrated // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlStorageMigratedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlStorageMigrated)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlStorageMigrated)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlStorageMigratedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlStorageMigratedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlStorageMigrated represents a Migrated event raised by the ZrlStorage contract.
-type ZrlStorageMigrated struct {
-	ContractName string
-	MigrationId  string
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterMigrated is a free log retrieval operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlStorage *ZrlStorageFilterer) FilterMigrated(opts *bind.FilterOpts) (*ZrlStorageMigratedIterator, error) {
-
-	logs, sub, err := _ZrlStorage.contract.FilterLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlStorageMigratedIterator{contract: _ZrlStorage.contract, event: "Migrated", logs: logs, sub: sub}, nil
-}
-
-// WatchMigrated is a free log subscription operation binding the contract event 0xdd117a11c22118c9dee4b5a67ce578bc44529dce21ee0ccc439588fbb9fb4ea3.
-//
-// Solidity: event Migrated(contractName string, migrationId string)
-func (_ZrlStorage *ZrlStorageFilterer) WatchMigrated(opts *bind.WatchOpts, sink chan<- *ZrlStorageMigrated) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlStorage.contract.WatchLogs(opts, "Migrated")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlStorageMigrated)
-				if err := _ZrlStorage.contract.UnpackLog(event, "Migrated", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ZrlStorageRemovedIterator is returned from FilterRemoved and is used to iterate over the raw logs and unpacked data for Removed events raised by the ZrlStorage contract.
-type ZrlStorageRemovedIterator struct {
-	Event *ZrlStorageRemoved // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *ZrlStorageRemovedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(ZrlStorageRemoved)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(ZrlStorageRemoved)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *ZrlStorageRemovedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *ZrlStorageRemovedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// ZrlStorageRemoved represents a Removed event raised by the ZrlStorage contract.
-type ZrlStorageRemoved struct {
-	Caller  common.Address
-	TokenId *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterRemoved is a free log retrieval operation binding the contract event 0xbe80a446a00b8794a7d05e8386915bdde937fe8b48da8d16175a5362b4c3f4f8.
-//
-// Solidity: event Removed(_caller address, _tokenId uint256)
-func (_ZrlStorage *ZrlStorageFilterer) FilterRemoved(opts *bind.FilterOpts) (*ZrlStorageRemovedIterator, error) {
-
-	logs, sub, err := _ZrlStorage.contract.FilterLogs(opts, "Removed")
-	if err != nil {
-		return nil, err
-	}
-	return &ZrlStorageRemovedIterator{contract: _ZrlStorage.contract, event: "Removed", logs: logs, sub: sub}, nil
-}
-
-// WatchRemoved is a free log subscription operation binding the contract event 0xbe80a446a00b8794a7d05e8386915bdde937fe8b48da8d16175a5362b4c3f4f8.
-//
-// Solidity: event Removed(_caller address, _tokenId uint256)
-func (_ZrlStorage *ZrlStorageFilterer) WatchRemoved(opts *bind.WatchOpts, sink chan<- *ZrlStorageRemoved) (event.Subscription, error) {
-
-	logs, sub, err := _ZrlStorage.contract.WatchLogs(opts, "Removed")
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(ZrlStorageRemoved)
-				if err := _ZrlStorage.contract.UnpackLog(event, "Removed", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
 }
