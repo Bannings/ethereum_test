@@ -30,7 +30,7 @@ var (
 )
 
 func init() {
-	g.LoadConfig("../cf_dev.json")
+	g.LoadConfig("../dev.json")
 	conf := g.GetConfig()
 	bConf = conf.BlockchainConfig
 

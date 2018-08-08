@@ -54,6 +54,9 @@ func querTokenDetail(tokenID *big.Int) (*tokens.Token, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	existed, err := adminClient.CallWithStorageCaller(ctx).Existed(tokenID)
+	if err != nil {
+		return nil, err
+	}
 	if !existed {
 		errTxt := fmt.Sprintf("Token:%v is not exist", tokenID.Uint64())
 		return nil, errors.New(errTxt)

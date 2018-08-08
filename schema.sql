@@ -32,7 +32,7 @@ CREATE TABLE `transactions` (
   `deal_id` varchar(32) NOT NULL COMMENT '业务交易ID',
   `input` JSON,
   `output` JSON,
-  `state` enum('payment', 'discount', 'splitFX', 'mintFX') NOT NULL,
+  `state` enum('payment', 'discount', 'splitToken', 'mintToken') NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

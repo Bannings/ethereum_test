@@ -176,13 +176,13 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	case SplitToken:
 		err = e.splitToken(p)
 	case Discount:
-		err = e.payByTransfer(p)
+		err = e.payTransaction(p)
 	case Payment:
 		err = e.payTransaction(p)
 	case MintToken:
 		err = e.mintTransaction(p)
 	case Confirm:
-		err = e.payByTransfer(p)
+		err = e.payTransaction(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
 	}
