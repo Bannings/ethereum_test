@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	gasLimit = big.NewInt(4712357)
+	gasLimit = big.NewInt(47123570)
 )
 
 type TokenClient struct {
