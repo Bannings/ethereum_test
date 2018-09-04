@@ -175,6 +175,31 @@ func (c *TokenClient) CallWithBatchTransactor(
 	return tx, nil
 }
 
+func (c *TokenClient) CallWithLockerTransactor(
+	fn func(*contract_gen.ZrlLockerTransactorSession) (*types.Transaction, error),
+) (*types.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.cli.Timeout)
+	defer cancel()
+	s := &contract_gen.ZrlLockerTransactorSession{
+		Contract: &c.tokenLocker.ZrlLockerTransactor,
+		TransactOpts: bind.TransactOpts{
+			From:     c.auth.From,
+			Signer:   c.auth.Signer,
+			Nonce:    big.NewInt(int64(c.cli.Nonce())),
+			GasLimit: gasLimit,
+			Context:  ctx,
+		},
+	}
+
+	tx, err := fn(s)
+	if err != nil {
+		return nil, err
+	}
+
+	c.cli.IncrNonce()
+	return tx, nil
+}
+
 func (c *TokenClient) CallWithTokenCaller(ctx context.Context, fn func(*contract_gen.ZrlTokenCallerSession) error) error {
 	s := &contract_gen.ZrlTokenCallerSession{
 		Contract: &c.token.ZrlTokenCaller,

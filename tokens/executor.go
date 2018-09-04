@@ -117,9 +117,9 @@ func (e *EthExecutor) Execute(cmd Command) error {
 		return err
 	}
 	switch txType {
-	case SplitToken, Discount, Payment:
+	case SplitToken, Payment:
 		return e.executeBySupplier(cmd)
-	case MintToken, Confirm:
+	case MintToken, Setting, Cancellation:
 		return e.executeByPlatform(cmd)
 	default:
 		return fmt.Errorf("unknow command: %+v", cmd)
@@ -175,13 +175,13 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	switch txType {
 	case SplitToken:
 		err = e.splitToken(p)
-	case Discount:
-		err = e.payTransaction(p)
+	case Setting:
+		err = e.setting(p)
 	case Payment:
 		err = e.payTransaction(p)
 	case MintToken:
 		err = e.mintTransaction(p)
-	case Confirm:
+	case Cancellation:
 		err = e.payTransaction(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
@@ -497,6 +497,39 @@ func (e *EthExecutor) mintToken(p *CmdProcessor) error {
 
 		if err != nil {
 			log.Errorf("call FuxToken.Mint contract failed: %v", err)
+			return err
+		}
+
+		receipt, err := p.WaitMined(context.Background(), tx)
+		if err != nil {
+			return err
+		}
+		if receipt.Status == ethTypes.ReceiptStatusFailed {
+			return ErrTxExecuteFailed
+		}
+	}
+	return nil
+}
+
+func (e *EthExecutor) setting(p *CmdProcessor) error {
+	input := p.cmd.Tx.Input
+	var tx *ethTypes.Transaction
+	for _, t := range input {
+		state, _ := ParseState(t.State)
+		log.Infof("Setting token: id: %v, owner: %v, amount: %v, new state: %v", t.Id.String(), t.Owner, t.Amount, t.State)
+		err := p.CallWithLockerTransactor(
+			func(session *contract_gen.ZrlLockerTransactorSession) (*ethTypes.Transaction, error) {
+				var innerErr error
+				tx, innerErr = session.SetState(
+					&t.Id,
+					new(big.Int).SetInt64(int64(state)),
+				)
+				return tx, innerErr
+			},
+		)
+
+		if err != nil {
+			log.Errorf("Set token state failed: %v", err)
 			return err
 		}
 

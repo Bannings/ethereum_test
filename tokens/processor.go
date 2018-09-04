@@ -87,6 +87,24 @@ func (p *CmdProcessor) CallWithBatchTransactor(
 	return nil
 }
 
+func (p *CmdProcessor) CallWithLockerTransactor(
+	fn func(session *contract_gen.ZrlLockerTransactorSession) (*ethTypes.Transaction, error),
+) error {
+	p.initCmdNonce()
+	if p.cmd.currNonce >= p.tokenClient.Nonce() {
+		tx, err := p.tokenClient.CallWithLockerTransactor(fn)
+		if err == nil {
+			txHash := tx.Hash().Hex()
+			p.cmd.txHashes[strconv.FormatUint(p.cmd.currNonce, 10)] = txHash
+			p.saveTxHash(txHash)
+			p.cmd.currNonce += 1
+		}
+		return err
+	}
+	p.cmd.currNonce += 1
+	return nil
+}
+
 func (p *CmdProcessor) initCmdNonce() {
 	if p.cmd.startNonce == 0 {
 		currNonce := p.tokenClient.Nonce()

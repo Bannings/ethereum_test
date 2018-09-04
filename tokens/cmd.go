@@ -11,32 +11,32 @@ type TxType uint8
 
 const (
 	Payment TxType = iota
-	Discount
+	Setting
 	SplitToken
 	MintToken
-	Confirm
+	Cancellation
 )
 
 var types = []string{
 	"Payment",
-	"Discount",
+	"Setting",
 	"SplitToken",
 	"MintToken",
-	"Confirm",
+	"Cancellation",
 }
 
 func ParseType(typ string) (TxType, error) {
 	switch strings.ToLower(typ) {
 	case "payment":
 		return Payment, nil
-	case "discount":
-		return Discount, nil
+	case "setting":
+		return Setting, nil
 	case "splittoken":
 		return SplitToken, nil
 	case "minttoken":
 		return MintToken, nil
 	case "confirm":
-		return Confirm, nil
+		return Cancellation, nil
 	}
 
 	var t TxType

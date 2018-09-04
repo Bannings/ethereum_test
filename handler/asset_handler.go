@@ -25,7 +25,7 @@ var (
 
 func init() {
 	supplierMap = make(map[string]chan tokens.Transaction)
-	tradeTypes = []string{"Payment", "Discount", "SplitToken", "MintToken", "Confirm"}
+	tradeTypes = []string{"Payment", "Setting", "SplitToken", "MintToken", "Cancellation"}
 	state = []string{"Frozen", "Normal", "Historic"}
 }
 
@@ -70,12 +70,12 @@ func AssetHandler(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, resp)
 		return
 	}
-	//err = verifyTransaction(&trans)
-	//if err != nil {
-	//	resp := g.NewBadResponse("400", err.Error())
-	//	render.JSON(w, r, resp)
-	//	return
-	//}
+	err = verifyTransaction(&trans)
+	if err != nil {
+		resp := g.NewBadResponse("400", err.Error())
+		render.JSON(w, r, resp)
+		return
+	}
 	err = saveTransaction(&trans)
 	if err != nil {
 		log.Errorf("%v", err)

@@ -47,13 +47,10 @@ func QueryTokenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func querTokenDetail(tokenID *big.Int) (*tokens.Token, error) {
-	conf := g.GetConfig()
-	bConf := conf.BlockchainConfig
-	store := keychain.DefaultStore()
-	adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+	adminClient, err := defaultClient()
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	existed, err := adminClient.CallWithStorageCaller(ctx).Existed(tokenID)
+	existed, err := tokenExistOrNot(tokenID, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -83,4 +80,24 @@ func querTokenDetail(tokenID *big.Int) (*tokens.Token, error) {
 	}
 	token := &tokens.Token{Id: *tokenID, Amount: properties.Value.Uint64(), ParentId: *properties.CreateBy, State: state, Owner: company, ExpireTime: expire.Int64()}
 	return token, nil
+}
+
+func defaultClient() (*blockchain.TokenClient, error) {
+	conf := g.GetConfig()
+	bConf := conf.BlockchainConfig
+	store := keychain.DefaultStore()
+	adminClient, err := blockchain.NewTokenClient(store.GetAdminClient(), store.GetAdminAccount(), bConf.ContractAddrs)
+	return adminClient, err
+}
+
+func tokenExistOrNot(tokenID *big.Int, ctx context.Context) (bool, error) {
+	adminClient, err := defaultClient()
+	if err != nil {
+		return false, err
+	}
+	existed, err := adminClient.CallWithStorageCaller(ctx).Existed(tokenID)
+	if err != nil {
+		return false, err
+	}
+	return existed, nil
 }

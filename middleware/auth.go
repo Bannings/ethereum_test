@@ -59,17 +59,3 @@ func baseString(r *http.Request) (string, error) {
 		return "", errors.New("not supported method")
 	}
 }
-
-func OnlyCF(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		node := r.Header.Get("nodeName")
-		if node != "cf" && node != "CF" {
-			render.Render(w, r, g.ErrBadRequest(errors.New("node err: Only CF")))
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	}
-
-	return http.HandlerFunc(fn)
-}
