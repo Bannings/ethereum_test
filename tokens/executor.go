@@ -520,10 +520,7 @@ func (e *EthExecutor) setting(p *CmdProcessor) error {
 		err := p.CallWithLockerTransactor(
 			func(session *contract_gen.ZrlLockerTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
-				tx, innerErr = session.SetState(
-					&t.Id,
-					new(big.Int).SetInt64(int64(state)),
-				)
+				tx, innerErr = session.SetState(&t.Id, new(big.Int).SetInt64(int64(state)))
 				return tx, innerErr
 			},
 		)
