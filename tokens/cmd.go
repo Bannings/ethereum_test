@@ -93,6 +93,7 @@ type Transaction struct {
 }
 
 type Management struct {
+	TxId   string  `json:"tx_id"`
 	Tokens []Token `json:"tokens"`
 	Type   string  `json:"type"`
 }

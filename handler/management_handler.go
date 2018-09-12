@@ -7,6 +7,7 @@ import (
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
 	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.zhuronglink.com/chaincore/r2/keychain"
 	"gitlab.zhuronglink.com/chaincore/r2/tokens"
 	"io/ioutil"
 	"math/big"
@@ -21,6 +22,13 @@ func TokenManagementHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("Unmarshal request failed: %s", err.Error())
 		resp := g.NewBadResponse("400", err.Error())
+		render.JSON(w, r, resp)
+		return
+	}
+	store := keychain.DefaultStore()
+	exist, err := store.IsTransactionExist(management.TxId)
+	if exist {
+		resp := g.NewBadResponse("400", "Transaction id already exist")
 		render.JSON(w, r, resp)
 		return
 	}
@@ -42,7 +50,7 @@ func TokenManagementHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tx := tokens.Transaction{Input: management.Tokens, TxType: management.Type}
+	tx := tokens.Transaction{TxId: management.TxId, Input: management.Tokens, TxType: management.Type}
 	err = saveTransaction(&tx)
 	if err != nil {
 		resp := g.NewBadResponse("400", err.Error())
