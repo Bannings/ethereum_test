@@ -35,7 +35,7 @@ func ParseType(typ string) (TxType, error) {
 		return SplitToken, nil
 	case "minttoken":
 		return MintToken, nil
-	case "confirm":
+	case "cancellation":
 		return Cancellation, nil
 	}
 
