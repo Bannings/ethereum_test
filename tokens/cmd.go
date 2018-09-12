@@ -92,6 +92,11 @@ type Transaction struct {
 	TxType string  `json:"tx_type"`
 }
 
+type Management struct {
+	Tokens []Token `json:"tokens"`
+	Type   string  `json:"type"`
+}
+
 func (t *Transaction) Sponsor() string {
 	return t.Input[0].Owner
 }

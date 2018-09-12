@@ -182,7 +182,7 @@ func (e *EthExecutor) run(cmd Command, p *CmdProcessor) error {
 	case MintToken:
 		err = e.mintTransaction(p)
 	case Cancellation:
-		err = e.payTransaction(p)
+		err = e.cancellation(p)
 	default:
 		return fmt.Errorf("err command: %v", cmd)
 	}
@@ -444,7 +444,7 @@ func (e *EthExecutor) split(input Token, output []Token, p *CmdProcessor) error 
 		}
 		states = append(states, new(big.Int).SetInt64(int64(state)))
 	}
-	log.Infof("Split token: tokenId: %v, newTokenIds: %+v, amounts: %+v", tokenId.String(), newTokenIds, amounts)
+	log.Infof("Split token: tokenId: %v, newTokenIds: %+v, amounts: %+v ,state:%v", tokenId.String(), newTokenIds, amounts, states)
 	var tx *ethTypes.Transaction
 	err := p.CallWithSpliterTransactor(
 		func(session *contract_gen.ZrlSpliterTransactorSession) (*ethTypes.Transaction, error) {
@@ -521,6 +521,40 @@ func (e *EthExecutor) setting(p *CmdProcessor) error {
 			func(session *contract_gen.ZrlLockerTransactorSession) (*ethTypes.Transaction, error) {
 				var innerErr error
 				tx, innerErr = session.SetState(&t.Id, new(big.Int).SetInt64(int64(state)))
+				return tx, innerErr
+			},
+		)
+
+		if err != nil {
+			log.Errorf("Set token state failed: %v", err)
+			return err
+		}
+
+		receipt, err := p.WaitMined(context.Background(), tx)
+		if err != nil {
+			return err
+		}
+		if receipt.Status == ethTypes.ReceiptStatusFailed {
+			return ErrTxExecuteFailed
+		}
+	}
+	return nil
+}
+
+func (e *EthExecutor) cancellation(p *CmdProcessor) error {
+	input := p.cmd.Tx.Input
+	var tx *ethTypes.Transaction
+	for _, t := range input {
+		acc, err := e.keystore.GetAccount(t.Owner)
+		if err != nil {
+			log.Errorf("get account of %v failed: %v", t.Owner, err)
+			return err
+		}
+		log.Infof("Cancellation token: id: %v, owner: %v, amount: %v, state: %v", t.Id.String(), t.Owner, t.Amount, t.State)
+		err = p.CallWithTokenTransactor(
+			func(session *contract_gen.ZrlTokenTransactorSession) (*ethTypes.Transaction, error) {
+				var innerErr error
+				tx, innerErr = session.Burn(acc.Address, &t.Id)
 				return tx, innerErr
 			},
 		)

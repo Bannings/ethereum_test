@@ -96,7 +96,7 @@ func main() {
 
 		r.Post("/supplier/register", handler.RegisterSupplierHandler)
 		r.Post("/asset", handler.AssetHandler)
-		r.Post("/management", handler.TokenManagementHandler)
+		r.Put("/management", handler.TokenManagementHandler)
 		r.Get("/query", handler.QueryTokenHandler)
 	})
 
