@@ -11,16 +11,16 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.zhuronglink.com/chaincore/r2/g"
-	"gitlab.zhuronglink.com/chaincore/r2/handler"
-	mw "gitlab.zhuronglink.com/chaincore/r2/middleware"
+	"gitlab.com/ethereum_test/g"
+	"gitlab.com/ethereum_test/handler"
+	mw "gitlab.com/ethereum_test/middleware"
 
 	"github.com/eddyzhou/log"
 	"github.com/getsentry/raven-go"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"gitlab.zhuronglink.com/chaincore/r2/tokens"
+	"gitlab.com/ethereum_test/tokens"
 )
 
 const (

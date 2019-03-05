@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"gitlab.zhuronglink.com/chaincore/r2/g"
-	"gitlab.zhuronglink.com/chaincore/r2/keychain"
+	"gitlab.com/ethereum_test/g"
+	"gitlab.com/ethereum_test/keychain"
 
 	"fmt"
 	"github.com/eddyzhou/log"

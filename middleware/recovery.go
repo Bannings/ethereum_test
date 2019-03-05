@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.com/ethereum_test/g"
 
 	"github.com/eddyzhou/log"
 	"github.com/getsentry/raven-go"

@@ -3,9 +3,9 @@ package handler
 import (
 	"github.com/eddyzhou/log"
 	"github.com/go-chi/render"
-	"gitlab.zhuronglink.com/chaincore/r2/g"
-	"gitlab.zhuronglink.com/chaincore/r2/keychain"
-	"gitlab.zhuronglink.com/chaincore/r2/tokens"
+	"gitlab.com/ethereum_test/g"
+	"gitlab.com/ethereum_test/keychain"
+	"gitlab.com/ethereum_test/tokens"
 	"net/http"
 
 	"context"

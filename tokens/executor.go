@@ -9,9 +9,9 @@ import (
 	"sync"
 
 	"gitlab.zhuronglink.com/chaincore/contract-gen"
-	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
-	"gitlab.zhuronglink.com/chaincore/r2/g"
-	"gitlab.zhuronglink.com/chaincore/r2/keychain"
+	"gitlab.com/ethereum_test/blockchain"
+	"gitlab.com/ethereum_test/g"
+	"gitlab.com/ethereum_test/keychain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/common"

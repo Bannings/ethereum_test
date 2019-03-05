@@ -3,9 +3,9 @@ package tokens
 import (
 	"sync"
 
-	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
-	"gitlab.zhuronglink.com/chaincore/r2/g"
-	"gitlab.zhuronglink.com/chaincore/r2/keychain"
+	"gitlab.com/ethereum_test/blockchain"
+	"gitlab.com/ethereum_test/g"
+	"gitlab.com/ethereum_test/keychain"
 	"gitlab.zhuronglink.com/infra/gocommons/lru"
 )
 

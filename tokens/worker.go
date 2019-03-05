@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/eddyzhou/log"
-	"gitlab.zhuronglink.com/chaincore/r2/g"
+	"gitlab.com/ethereum_test/g"
 	"sync"
 )
 

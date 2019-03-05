@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"gitlab.zhuronglink.com/chaincore/contract-gen"
-	"gitlab.zhuronglink.com/chaincore/r2/blockchain"
+	"gitlab.com/ethereum_test/blockchain"
 
 	"github.com/eddyzhou/log"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
